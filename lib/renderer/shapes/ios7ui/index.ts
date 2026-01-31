@@ -1,0 +1,48 @@
+import type { ShapeRegistry } from '../../shape-registry.ts';
+import { Ios7uiActionDialogHandler } from './action-dialog.ts';
+import { Ios7uiAppBarHandler } from './app-bar.ts';
+import { Ios7uiDownloadBarHandler } from './download-bar.ts';
+import { Ios7uiHorLinesHandler } from './hor-lines.ts';
+import { Ios7uiIconGridHandler } from './icon-grid.ts';
+import { Ios7uiIconHandler } from './icon.ts';
+import { Ios7uiOnOffButtonHandler } from './on-off-button.ts';
+import { Ios7uiPageControlHandler } from './page-control.ts';
+import { Ios7uiPhoneHandler } from './phone.ts';
+import { Ios7uiSliderHandler } from './slider.ts';
+import { Ios7uiAnchorHandler } from './anchor.ts';
+import { Ios7uiBottomButtonHandler } from './bottom-button.ts';
+import { Ios7uiCalloutHandler } from './callout.ts';
+import { Ios7uiLeftButtonHandler } from './left-button.ts';
+import { Ios7uiMarginRectHandler } from './margin-rect.ts';
+import { Ios7uiRightButtonHandler } from './right-button.ts';
+import { Ios7uiRrectHandler } from './rrect.ts';
+import { Ios7uiSearchBoxHandler } from './search-box.ts';
+import { Ios7uiSelectBarHandler } from './select-bar.ts';
+import { Ios7uiTopButtonHandler } from './top-button.ts';
+import { Ios7uiUrlHandler } from './url.ts';
+import { Ios7uiHorButtonBarHandler } from './hor-button-bar.ts';
+
+export function registerIos7uiHandlers(registry: ShapeRegistry): void {
+  registry.register('mxgraph.ios7ui.horLines', Ios7uiHorLinesHandler);
+  registry.register('mxgraph.ios7ui.appBar', Ios7uiAppBarHandler);
+  registry.register('mxgraph.ios7ui.phone', Ios7uiPhoneHandler);
+  registry.register('mxgraph.ios7ui.iconGrid', Ios7uiIconGridHandler);
+  registry.register('mxgraph.ios7ui.icon', Ios7uiIconHandler);
+  registry.register('mxgraph.ios7ui.pageControl', Ios7uiPageControlHandler);
+  registry.register('mxgraph.ios7ui.actionDialog', Ios7uiActionDialogHandler);
+  registry.register('mxgraph.ios7ui.downloadBar', Ios7uiDownloadBarHandler);
+  registry.register('mxgraph.ios7ui.onOffButton', Ios7uiOnOffButtonHandler);
+  registry.register('mxgraph.ios7ui.slider', Ios7uiSliderHandler);
+  registry.register('mxgraph.ios7ui.anchor', Ios7uiAnchorHandler);
+  registry.register('mxgraph.ios7ui.bottomButton', Ios7uiBottomButtonHandler);
+  registry.register('mxgraph.ios7ui.callout', Ios7uiCalloutHandler);
+  registry.register('mxgraph.ios7ui.leftButton', Ios7uiLeftButtonHandler);
+  registry.register('mxgraph.ios7ui.marginRect', Ios7uiMarginRectHandler);
+  registry.register('mxgraph.ios7ui.rightButton', Ios7uiRightButtonHandler);
+  registry.register('mxgraph.ios7ui.rrect', Ios7uiRrectHandler);
+  registry.register('mxgraph.ios7ui.searchBox', Ios7uiSearchBoxHandler);
+  registry.register('mxgraph.ios7ui.selectBar', Ios7uiSelectBarHandler);
+  registry.register('mxgraph.ios7ui.topButton', Ios7uiTopButtonHandler);
+  registry.register('mxgraph.ios7ui.url', Ios7uiUrlHandler);
+  registry.register('mxgraph.ios7ui.horButtonBar', Ios7uiHorButtonBarHandler);
+}

@@ -1,0 +1,44 @@
+import type { ShapeRegistry } from '../../shape-registry.ts';
+import { AndroidStatusBarHandler } from './status-bar.ts';
+import { AndroidTab2Handler } from './tab-2.ts';
+import { AndroidAnchorHandler } from './anchor.ts';
+import { AndroidCheckboxHandler } from './checkbox.ts';
+import { AndroidIndeterminateSpinnerHandler } from './indeterminate-spinner.ts';
+import { AndroidPhoneHandler } from './phone.ts';
+import { AndroidProgressBarHandler } from './progress-bar.ts';
+import { AndroidProgressScrubberDisabledHandler } from './progress-scrubber-disabled.ts';
+import { AndroidProgressScrubberFocusedHandler } from './progress-scrubber-focused.ts';
+import { AndroidProgressScrubberPressedHandler } from './progress-scrubber-pressed.ts';
+import { AndroidQuickscroll2Handler } from './quickscroll2.ts';
+import { AndroidQuickscroll3Handler } from './quickscroll3.ts';
+import { AndroidRrectHandler } from './rrect.ts';
+import { AndroidScrollbars2Handler } from './scrollbars2.ts';
+import { AndroidSpinner2Handler } from './spinner2.ts';
+import { AndroidTextSelHandlesHandler } from './text-sel-handles.ts';
+import { AndroidCheckboxGroupHandler } from './checkbox-group.ts';
+import { AndroidMenuBarHandler } from './menu-bar.ts';
+import { AndroidRadioGroupHandler } from './radio-group.ts';
+import { AndroidTabBarHandler } from './tab-bar.ts';
+
+export function registerAndroidHandlers(registry: ShapeRegistry): void {
+  registry.register('mxgraph.android.tab2', AndroidTab2Handler);
+  registry.register('mxgraph.android.statusBar', AndroidStatusBarHandler);
+  registry.register('mxgraph.android.anchor', AndroidAnchorHandler);
+  registry.register('mxgraph.android.checkbox', AndroidCheckboxHandler);
+  registry.register('mxgraph.android.indeterminateSpinner', AndroidIndeterminateSpinnerHandler);
+  registry.register('mxgraph.android.phone', AndroidPhoneHandler);
+  registry.register('mxgraph.android.progressBar', AndroidProgressBarHandler);
+  registry.register('mxgraph.android.progressScrubberDisabled', AndroidProgressScrubberDisabledHandler);
+  registry.register('mxgraph.android.progressScrubberFocused', AndroidProgressScrubberFocusedHandler);
+  registry.register('mxgraph.android.progressScrubberPressed', AndroidProgressScrubberPressedHandler);
+  registry.register('mxgraph.android.quickscroll2', AndroidQuickscroll2Handler);
+  registry.register('mxgraph.android.quickscroll3', AndroidQuickscroll3Handler);
+  registry.register('mxgraph.android.rrect', AndroidRrectHandler);
+  registry.register('mxgraph.android.scrollbars2', AndroidScrollbars2Handler);
+  registry.register('mxgraph.android.spinner2', AndroidSpinner2Handler);
+  registry.register('mxgraph.android.textSelHandles', AndroidTextSelHandlesHandler);
+  registry.register('mxgraph.android.checkboxGroup', AndroidCheckboxGroupHandler);
+  registry.register('mxgraph.android.menuBar', AndroidMenuBarHandler);
+  registry.register('mxgraph.android.radioGroup', AndroidRadioGroupHandler);
+  registry.register('mxgraph.android.tabBar', AndroidTabBarHandler);
+}

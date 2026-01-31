@@ -1,0 +1,48 @@
+import type { ShapeRegistry } from '../../shape-registry.ts';
+import { InfographicBannerSingleFoldHandler } from './banner-single-fold.ts';
+import { InfographicCircularCallout2Handler } from './circular-callout-2.ts';
+import { InfographicCylinderHandler } from './cylinder.ts';
+import { InfographicRibbonSimpleHandler } from './ribbon-simple.ts';
+import { InfographicShadedCubeHandler } from './shaded-cube.ts';
+import { InfographicBarCalloutHandler } from './bar-callout.ts';
+import { InfographicBannerHandler } from './banner.ts';
+import { InfographicBannerHalfFoldHandler } from './banner-half-fold.ts';
+import { InfographicBendingArchHandler } from './bending-arch.ts';
+import { InfographicCircularCalloutHandler } from './circular-callout.ts';
+import { InfographicCircularDialHandler } from './circular-dial.ts';
+import { InfographicFlagHandler } from './flag.ts';
+import { InfographicNumberedEntryVertHandler } from './numbered-entry-vert.ts';
+import { InfographicParallelogramHandler } from './parallelogram.ts';
+import { InfographicPartConcEllipseHandler } from './part-conc-ellipse.ts';
+import { InfographicPyramidStepHandler } from './pyramid-step.ts';
+import { InfographicRibbonBackFoldedHandler } from './ribbon-back-folded.ts';
+import { InfographicRibbonDoubleFoldedHandler } from './ribbon-double-folded.ts';
+import { InfographicRibbonFrontFoldedHandler } from './ribbon-front-folded.ts';
+import { InfographicRibbonRolledHandler } from './ribbon-rolled.ts';
+import { InfographicShadedPyramidHandler } from './shaded-pyramid.ts';
+import { InfographicShadedTriangleHandler } from './shaded-triangle.ts';
+
+export function registerInfographicHandlers(registry: ShapeRegistry): void {
+  registry.register('mxgraph.infographic.bannerSingleFold', InfographicBannerSingleFoldHandler);
+  registry.register('mxgraph.infographic.circularCallout2', InfographicCircularCallout2Handler);
+  registry.register('mxgraph.infographic.cylinder', InfographicCylinderHandler);
+  registry.register('mxgraph.infographic.ribbonSimple', InfographicRibbonSimpleHandler);
+  registry.register('mxgraph.infographic.shadedCube', InfographicShadedCubeHandler);
+  registry.register('mxgraph.infographic.barCallout', InfographicBarCalloutHandler);
+  registry.register('mxgraph.infographic.banner', InfographicBannerHandler);
+  registry.register('mxgraph.infographic.bannerHalfFold', InfographicBannerHalfFoldHandler);
+  registry.register('mxgraph.infographic.bendingArch', InfographicBendingArchHandler);
+  registry.register('mxgraph.infographic.circularCallout', InfographicCircularCalloutHandler);
+  registry.register('mxgraph.infographic.circularDial', InfographicCircularDialHandler);
+  registry.register('mxgraph.infographic.flag', InfographicFlagHandler);
+  registry.register('mxgraph.infographic.numberedEntryVert', InfographicNumberedEntryVertHandler);
+  registry.register('mxgraph.infographic.parallelogram', InfographicParallelogramHandler);
+  registry.register('mxgraph.infographic.partConcEllipse', InfographicPartConcEllipseHandler);
+  registry.register('mxgraph.infographic.pyramidStep', InfographicPyramidStepHandler);
+  registry.register('mxgraph.infographic.ribbonBackFolded', InfographicRibbonBackFoldedHandler);
+  registry.register('mxgraph.infographic.ribbonDoubleFolded', InfographicRibbonDoubleFoldedHandler);
+  registry.register('mxgraph.infographic.ribbonFrontFolded', InfographicRibbonFrontFoldedHandler);
+  registry.register('mxgraph.infographic.ribbonRolled', InfographicRibbonRolledHandler);
+  registry.register('mxgraph.infographic.shadedPyramid', InfographicShadedPyramidHandler);
+  registry.register('mxgraph.infographic.shadedTriangle', InfographicShadedTriangleHandler);
+}

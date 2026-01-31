@@ -1,0 +1,48 @@
+import type { ShapeRegistry } from '../../shape-registry.ts';
+import { ActorHandler } from './actor.ts';
+import { CloudHandler } from './cloud.ts';
+import { ComponentHandler } from './component.ts';
+import { CornerHandler } from './corner.ts';
+import { CurlyBracketHandler } from './curly-bracket.ts';
+import { DimensionHandler } from './dimension.ts';
+import { EndStateHandler } from './end-state.ts';
+import { EmptyHandler } from './empty.ts';
+import { EmojiHandler } from './emoji.ts';
+import { FolderHandler } from './folder.ts';
+import { ImageHandler } from './image.ts';
+import { LabelHandler } from './label.ts';
+import { NoteHandler } from './note.ts';
+import { OffPageConnectorHandler } from './off-page-connector.ts';
+import { PartialRectangleHandler } from './partial-rectangle.ts';
+import { PlusHandler } from './plus.ts';
+import { StartStateHandler } from './start-state.ts';
+import { UmlActorHandler } from './uml-actor.ts';
+import { UmlFrameHandler } from './uml-frame.ts';
+import { UmlLifelineHandler } from './uml-lifeline.ts';
+import { WaypointHandler } from './waypoint.ts';
+
+export function registerMiscHandlers(registry: ShapeRegistry): void {
+  registry.register('umlActor', UmlActorHandler);
+  registry.register('cloud', CloudHandler);
+  registry.register('component', ComponentHandler);
+  registry.register('corner', CornerHandler);
+  registry.register('curlyBracket', CurlyBracketHandler);
+  registry.register('dimension', DimensionHandler);
+  registry.register('arrow', EmptyHandler);
+  registry.register('arrowConnector', EmptyHandler);
+  registry.register('connector', EmptyHandler);
+  registry.register('endState', EndStateHandler);
+  registry.register('mxgraph.emoji', EmojiHandler);
+  registry.register('folder', FolderHandler);
+  registry.register('image', ImageHandler);
+  registry.register('label', LabelHandler);
+  registry.register('note', NoteHandler);
+  registry.register('offPageConnector', OffPageConnectorHandler);
+  registry.register('partialRectangle', PartialRectangleHandler);
+  registry.register('plus', PlusHandler);
+  registry.register('startState', StartStateHandler);
+  registry.register('umlFrame', UmlFrameHandler);
+  registry.register('umlLifeline', UmlLifelineHandler);
+  registry.register('waypoint', WaypointHandler);
+  registry.register('actor', ActorHandler);
+}

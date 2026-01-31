@@ -1,0 +1,48 @@
+import type { ShapeRegistry } from '../../shape-registry.ts';
+import { BootstrapBottomButtonHandler } from './bottom-button.ts';
+import { BootstrapHorLinesHandler } from './hor-lines.ts';
+import { BootstrapImageHandler } from './image.ts';
+import { BootstrapLeftButtonHandler } from './left-button.ts';
+import { BootstrapLeftButtonStripedHandler } from './left-button-striped.ts';
+import { BootstrapRatingHandler } from './rating.ts';
+import { BootstrapRrectHandler } from './rrect.ts';
+import { BootstrapRightButtonHandler } from './right-button.ts';
+import { BootstrapTopButtonHandler } from './top-button.ts';
+import { BootstrapAnchorHandler } from './anchor.ts';
+import { BootstrapCheckboxHandler } from './checkbox.ts';
+import { BootstrapRadioButtonHandler } from './radio-button.ts';
+import { BootstrapXHandler } from './x.ts';
+import { BootstrapArrowHandler } from './arrow.ts';
+import { BootstrapCheckbox2Handler } from './checkbox2.ts';
+import { BootstrapPopoverHandler } from './popover.ts';
+import { BootstrapRadioButton2Handler } from './radio-button2.ts';
+import { BootstrapRangeInputHandler } from './range-input.ts';
+import { BootstrapRoundedButtonHandler } from './rounded-button.ts';
+import { BootstrapSwitchHandler } from './switch.ts';
+import { BootstrapTabTopHandler } from './tab-top.ts';
+import { BootstrapUser2Handler } from './user2.ts';
+
+export function registerBootstrapHandlers(registry: ShapeRegistry): void {
+  registry.register('mxgraph.bootstrap.rrect', BootstrapRrectHandler);
+  registry.register('mxgraph.bootstrap.topButton', BootstrapTopButtonHandler);
+  registry.register('mxgraph.bootstrap.horLines', BootstrapHorLinesHandler);
+  registry.register('mxgraph.bootstrap.leftButton', BootstrapLeftButtonHandler);
+  registry.register('mxgraph.bootstrap.rating', BootstrapRatingHandler);
+  registry.register('mxgraph.bootstrap.bottomButton', BootstrapBottomButtonHandler);
+  registry.register('mxgraph.bootstrap.rightButton', BootstrapRightButtonHandler);
+  registry.register('mxgraph.bootstrap.image', BootstrapImageHandler);
+  registry.register('mxgraph.bootstrap.leftButtonStriped', BootstrapLeftButtonStripedHandler);
+  registry.register('mxgraph.bootstrap.anchor', BootstrapAnchorHandler);
+  registry.register('mxgraph.bootstrap.checkbox', BootstrapCheckboxHandler);
+  registry.register('mxgraph.bootstrap.radioButton', BootstrapRadioButtonHandler);
+  registry.register('mxgraph.bootstrap.x', BootstrapXHandler);
+  registry.register('mxgraph.bootstrap.arrow', BootstrapArrowHandler);
+  registry.register('mxgraph.bootstrap.checkbox2', BootstrapCheckbox2Handler);
+  registry.register('mxgraph.bootstrap.popover', BootstrapPopoverHandler);
+  registry.register('mxgraph.bootstrap.radioButton2', BootstrapRadioButton2Handler);
+  registry.register('mxgraph.bootstrap.rangeInput', BootstrapRangeInputHandler);
+  registry.register('mxgraph.bootstrap.roundedButton', BootstrapRoundedButtonHandler);
+  registry.register('mxgraph.bootstrap.switch', BootstrapSwitchHandler);
+  registry.register('mxgraph.bootstrap.tabTop', BootstrapTabTopHandler);
+  registry.register('mxgraph.bootstrap.user2', BootstrapUser2Handler);
+}

@@ -1,0 +1,38 @@
+import type { ShapeRegistry } from '../../shape-registry.ts';
+import { RackGeneralCabinetLegHandler } from './cabinet-leg.ts';
+import { RackGeneralChannelBaseHandler } from './channel-base.ts';
+import { RackGeneralHorCableDuct1UHandler } from './hor-cable-duct1u.ts';
+import { RackGeneralHorCableDuct2UHandler } from './hor-cable-duct2u.ts';
+import { RackGeneralHorRoutingBankHandler } from './hor-routing-bank.ts';
+import { RackGeneralHorRoutingBank1UHandler } from './hor-routing-bank1u.ts';
+import { RackGeneralHorRoutingBank2UHandler } from './hor-routing-bank2u.ts';
+import { RackGeneralNeatPatch2UHandler } from './neat-patch2u.ts';
+import { RackGeneralPlateHandler } from './plate.ts';
+import { RackGeneralRackCabinetHandler } from './rack-cabinet.ts';
+import { RackGeneralRackCabinet2Handler } from './rack-cabinet2.ts';
+import { RackGeneralRackCabinet3Handler } from './rack-cabinet3.ts';
+import { RackGeneralRackNumberingHandler } from './rack-numbering.ts';
+import { RackGeneralShelfHandler } from './shelf.ts';
+import { RackGeneralShelf1UHandler } from './shelf1u.ts';
+import { RackGeneralShelf2UHandler } from './shelf2u.ts';
+import { RackGeneralShelf4UHandler } from './shelf4u.ts';
+
+export const registerRackGeneralHandlers = (registry: ShapeRegistry): void => {
+  registry.register('mxgraph.rackGeneral.cabinetLeg', RackGeneralCabinetLegHandler);
+  registry.register('mxgraph.rackGeneral.channelBase', RackGeneralChannelBaseHandler);
+  registry.register('mxgraph.rackGeneral.horCableDuct1U', RackGeneralHorCableDuct1UHandler);
+  registry.register('mxgraph.rackGeneral.horCableDuct2U', RackGeneralHorCableDuct2UHandler);
+  registry.register('mxgraph.rackGeneral.horRoutingBank', RackGeneralHorRoutingBankHandler);
+  registry.register('mxgraph.rackGeneral.horRoutingBank1U', RackGeneralHorRoutingBank1UHandler);
+  registry.register('mxgraph.rackGeneral.horRoutingBank2U', RackGeneralHorRoutingBank2UHandler);
+  registry.register('mxgraph.rackGeneral.neatPatch2U', RackGeneralNeatPatch2UHandler);
+  registry.register('mxgraph.rackGeneral.plate', RackGeneralPlateHandler);
+  registry.register('mxgraph.rackGeneral.rackCabinet', RackGeneralRackCabinetHandler);
+  registry.register('mxgraph.rackGeneral.rackCabinet2', RackGeneralRackCabinet2Handler);
+  registry.register('mxgraph.rackGeneral.rackCabinet3', RackGeneralRackCabinet3Handler);
+  registry.register('mxgraph.rackGeneral.rackNumbering', RackGeneralRackNumberingHandler);
+  registry.register('mxgraph.rackGeneral.shelf', RackGeneralShelfHandler);
+  registry.register('mxgraph.rackGeneral.shelf1U', RackGeneralShelf1UHandler);
+  registry.register('mxgraph.rackGeneral.shelf2U', RackGeneralShelf2UHandler);
+  registry.register('mxgraph.rackGeneral.shelf4U', RackGeneralShelf4UHandler);
+};

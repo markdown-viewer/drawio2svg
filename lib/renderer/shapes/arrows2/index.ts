@@ -1,0 +1,46 @@
+import type { ShapeRegistry } from '../../shape-registry.ts';
+import { Arrows2ArrowHandler } from './arrow.ts';
+import { Arrows2JumpInArrowHandler } from './jump-in-arrow.ts';
+import { Arrows2StylisedArrowHandler } from './stylised-arrow.ts';
+import { Arrows2TwoWayArrowHandler } from './two-way-arrow.ts';
+import { Arrows2UTurnArrowHandler } from './u-turn-arrow.ts';
+import { Arrows2BendArrowHandler } from './bend-arrow.ts';
+import { Arrows2BendDoubleArrowHandler } from './bend-double-arrow.ts';
+import { Arrows2CalloutArrowHandler } from './callout-arrow.ts';
+import { Arrows2CalloutDouble90ArrowHandler } from './callout-double90arrow.ts';
+import { Arrows2CalloutDoubleArrowHandler } from './callout-double-arrow.ts';
+import { Arrows2CalloutQuadArrowHandler } from './callout-quad-arrow.ts';
+import { Arrows2QuadArrowHandler } from './quad-arrow.ts';
+import { Arrows2SharpArrowHandler } from './sharp-arrow.ts';
+import { Arrows2SharpArrow2Handler } from './sharp-arrow2.ts';
+import { Arrows2StripedArrowHandler } from './striped-arrow.ts';
+import { Arrows2TailedArrowHandler } from './tailed-arrow.ts';
+import { Arrows2TailedNotchedArrowHandler } from './tailed-notched-arrow.ts';
+import { Arrows2TriadArrowHandler } from './triad-arrow.ts';
+import { Arrows2WedgeArrowHandler } from './wedge-arrow.ts';
+import { Arrows2WedgeArrowDashedHandler } from './wedge-arrow-dashed.ts';
+import { Arrows2WedgeArrowDashed2Handler } from './wedge-arrow-dashed2.ts';
+
+export function registerArrows2Handlers(registry: ShapeRegistry): void {
+  registry.register('mxgraph.arrows2.arrow', Arrows2ArrowHandler);
+  registry.register('mxgraph.arrows2.jumpInArrow', Arrows2JumpInArrowHandler);
+  registry.register('mxgraph.arrows2.stylisedArrow', Arrows2StylisedArrowHandler);
+  registry.register('mxgraph.arrows2.twoWayArrow', Arrows2TwoWayArrowHandler);
+  registry.register('mxgraph.arrows2.uTurnArrow', Arrows2UTurnArrowHandler);
+  registry.register('mxgraph.arrows2.bendArrow', Arrows2BendArrowHandler);
+  registry.register('mxgraph.arrows2.bendDoubleArrow', Arrows2BendDoubleArrowHandler);
+  registry.register('mxgraph.arrows2.calloutArrow', Arrows2CalloutArrowHandler);
+  registry.register('mxgraph.arrows2.calloutDouble90Arrow', Arrows2CalloutDouble90ArrowHandler);
+  registry.register('mxgraph.arrows2.calloutDoubleArrow', Arrows2CalloutDoubleArrowHandler);
+  registry.register('mxgraph.arrows2.calloutQuadArrow', Arrows2CalloutQuadArrowHandler);
+  registry.register('mxgraph.arrows2.quadArrow', Arrows2QuadArrowHandler);
+  registry.register('mxgraph.arrows2.sharpArrow', Arrows2SharpArrowHandler);
+  registry.register('mxgraph.arrows2.sharpArrow2', Arrows2SharpArrow2Handler);
+  registry.register('mxgraph.arrows2.stripedArrow', Arrows2StripedArrowHandler);
+  registry.register('mxgraph.arrows2.tailedArrow', Arrows2TailedArrowHandler);
+  registry.register('mxgraph.arrows2.tailedNotchedArrow', Arrows2TailedNotchedArrowHandler);
+  registry.register('mxgraph.arrows2.triadArrow', Arrows2TriadArrowHandler);
+  registry.register('mxgraph.arrows2.wedgeArrow', Arrows2WedgeArrowHandler);
+  registry.register('mxgraph.arrows2.wedgeArrowDashed', Arrows2WedgeArrowDashedHandler);
+  registry.register('mxgraph.arrows2.wedgeArrowDashed2', Arrows2WedgeArrowDashed2Handler);
+}

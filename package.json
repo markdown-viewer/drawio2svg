@@ -1,0 +1,53 @@
+{
+  "name": "@markdown-viewer/drawio2svg",
+  "version": "1.0.0",
+  "description": "Lightweight DrawIO to SVG converter for browser and fibjs",
+  "type": "module",
+  "main": "lib/index.ts",
+  "types": "lib/index.ts",
+  "exports": {
+    ".": "./lib/index.ts",
+    "./lib/text": "./lib/text/index.ts",
+    "./lib/stencil": "./lib/stencil/index.ts",
+    "./lib/decompress": "./lib/decompress.ts"
+  },
+  "files": [
+    "lib",
+    "resources",
+    "README.md"
+  ],
+  "keywords": [
+    "drawio",
+    "svg",
+    "converter",
+    "mxgraph",
+    "diagram",
+    "fibjs",
+    "flowchart",
+    "uml",
+    "bpmn"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markdown-viewer/drawio2svg"
+  },
+  "homepage": "https://github.com/markdown-viewer/drawio2svg#readme",
+  "bugs": {
+    "url": "https://github.com/markdown-viewer/drawio2svg/issues"
+  },
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "fibjs": ">=0.38.0"
+  },
+  "dependencies": {
+    "pako": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/pako": "^2.0.3"
+  },
+	"publishConfig": {
+		"access": "public"
+	}
+}

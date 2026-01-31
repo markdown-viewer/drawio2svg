@@ -1,0 +1,57 @@
+// @ts-nocheck
+import type { RenderContext, ShapeAttrs } from '../../../renderer.ts';
+import { BaseShapeHandler } from '../../shape-registry.ts';
+
+export class Archimate3ServiceHandler extends BaseShapeHandler {
+  constructor(renderCtx: RenderContext) {
+    super(renderCtx);
+  }
+
+  render(attrs: ShapeAttrs): void {
+    const {
+      builder,
+      currentGroup,
+      applyShapeAttrsToBuilder,
+      x,
+      y,
+      width,
+      height,
+      style,
+      getStencilSvg,
+      renderStencilShape,
+    } = this.renderCtx;
+    if (!builder || !currentGroup) return;
+    if (width <= 0 || height <= 0) return;
+
+    builder.setCanvasRoot(currentGroup);
+    builder.save();
+    applyShapeAttrsToBuilder(builder, attrs);
+
+    builder.translate(x, y);
+    this.renderBackground(builder, 0, 0, width, height, style, getStencilSvg, renderStencilShape);
+    builder.setShadow(!1);
+    builder.restore();
+  }
+
+  private renderBackground(
+    builder: RenderContext['builder'],
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    style: RenderContext['style'],
+    getStencilSvg?: RenderContext['getStencilSvg'],
+    renderStencilShape?: RenderContext['renderStencilShape']
+  ): void {
+    if (!builder) return;
+    x = Math.max(width - 0.5 * height, 0.5 * width);
+    width = Math.min(0.5 * height, 0.5 * width);
+    builder.begin();
+    builder.moveTo(x, 0);
+    builder.arcTo(0.5 * height, 0.5 * height, 0, 0, 1, x, height);
+    builder.lineTo(width, height);
+    builder.arcTo(0.5 * height, 0.5 * height, 0, 0, 1, width, 0);
+    builder.close();
+    builder.fillAndStroke();
+  }
+}
