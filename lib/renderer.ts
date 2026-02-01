@@ -32,13 +32,14 @@ import {
   type TextRenderContext
 } from './renderer/text/labels.ts';
 import { getTextMeasureProvider } from './text/index.ts';
+import { DEFAULT_FONT_FAMILY, setDefaultFontFamily } from './text/constants.ts';
 import { measureTextBoundsAtPosition } from './renderer/text/bounds.ts';
 import { measureMultilineTextSize, measureMultilineTextLayout } from './renderer/text/metrics.ts';
 import { isEdgeChildLabel, getAbsolutePosition as getAbsolutePositionHelper } from './renderer/geometry.ts';
 import { renderVertexLabel } from './renderer/text/vertex-label.ts';
 import { renderInlineImage as renderInlineImageHelper } from './renderer/inline-image.ts';
 import { createPlaceholderInlineSvg } from './renderer/placeholder-svg.ts';
-import { ShapeRegistry } from './renderer/shape-registry.ts';
+import { ShapeRegistry, setSystemDefaultFontFamily } from './renderer/shape-registry.ts';
 import type { LabelOverrides } from './renderer/shape-registry.ts';
 import { registerHandlers } from './renderer/shapes/index.ts';
  
@@ -189,6 +190,8 @@ export interface RenderOptions {
   padding?: number;
   /** Scale factor (default: 1) */
   scale?: number;
+  /** Default font family for text rendering (optional) */
+  fontFamily?: string;
   /** Stencil bundle for mxgraph stencils (optional) */
   stencils?: StencilBundle | null;
 }
@@ -289,11 +292,16 @@ export class SvgRenderer {
   private edgeJumpPoints: Map<string, { x: number; y: number }[]> = new Map();
   
   constructor(options: RenderOptions = {}) {
+    if (options.fontFamily) {
+      setDefaultFontFamily(options.fontFamily);
+      setSystemDefaultFontFamily(options.fontFamily);
+    }
     this.options = {
       pageIndex: options.pageIndex ?? 0,
       backgroundColor: options.backgroundColor ?? 'transparent',
       padding: options.padding ?? 2,
       scale: options.scale ?? 1,
+      fontFamily: options.fontFamily ?? DEFAULT_FONT_FAMILY,
       stencils: options.stencils ?? null,
     };
     this.domParser = new DOMParser();

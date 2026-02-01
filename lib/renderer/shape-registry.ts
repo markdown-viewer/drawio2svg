@@ -53,10 +53,17 @@ const SYSTEM_DEFAULTS: Record<string, any> = {
   strokeColor: '#000000',
   fillColor: '#ffffff',
   strokeWidth: 1,
-  fontFamily: 'Arial,Helvetica,sans-serif',
+  fontFamily: 'Arial, Helvetica, sans-serif',
   fontSize: 11,
   opacity: 100,
 };
+
+export function setSystemDefaultFontFamily(fontFamily: string): void {
+  if (!fontFamily || !fontFamily.trim()) {
+    return;
+  }
+  SYSTEM_DEFAULTS.fontFamily = fontFamily;
+}
 
 export abstract class BaseShapeHandler implements ShapeHandler {
   protected renderCtx: RenderContext;

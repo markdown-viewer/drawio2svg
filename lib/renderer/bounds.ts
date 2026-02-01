@@ -1,6 +1,7 @@
 import type { MxStyle } from '../parser.ts';
 import { measureTextBoundsAtPosition } from './text/bounds.ts';
 import { measureMultilineText, measureTextLayout } from '../text/index.ts';
+import { DEFAULT_FONT_FAMILY } from '../text/constants.ts';
 
 export interface Bounds {
   minX: number;
@@ -77,7 +78,7 @@ export function extendBoundsForInternalLabelOverflow(
 
   // Only process centered internal labels
   const fontSize = parseFloat(style.fontSize as string) || 12;
-  const fontFamily = (style.fontFamily as string) || 'Helvetica';
+  const fontFamily = (style.fontFamily as string) || DEFAULT_FONT_FAMILY;
   const fontStyleRaw = parseInt(style.fontStyle as string) || 0;
   const fontWeight = (fontStyleRaw & 1) !== 0 ? 'bold' : 'normal';
   const fontStyle = (fontStyleRaw & 2) !== 0 ? 'italic' : 'normal';
@@ -154,7 +155,7 @@ export function extendBoundsForExternalLabels(
     (shapeType === 'image' ? 'bottom' : undefined);
 
   const fontSize = parseFloat(style.fontSize as string) || 12;
-  const fontFamily = (style.fontFamily as string) || 'Helvetica';
+  const fontFamily = (style.fontFamily as string) || DEFAULT_FONT_FAMILY;
   const fontStyleRaw = parseInt(style.fontStyle as string) || 0;
   const fontWeight = (fontStyleRaw & 1) !== 0 ? 'bold' : 'normal';
   const fontStyle = (fontStyleRaw & 2) !== 0 ? 'italic' : 'normal';

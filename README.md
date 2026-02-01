@@ -43,6 +43,7 @@ const svg = convert(drawioXml, {
   backgroundColor: null,  // Background color (default: transparent)
   padding: 2,             // Padding around the diagram (default: 2)
   scale: 1,               // Scale factor (default: 1)
+  fontFamily: 'Arial',    // Default font family (optional)
   stencils: null          // StencilBundle for custom stencils
 });
 ```
@@ -80,6 +81,7 @@ const renderer = new SvgRenderer({
   pageIndex: 0,
   padding: 10,
   scale: 2,
+  fontFamily: 'Arial',
   stencils: myStencilBundle
 });
 
