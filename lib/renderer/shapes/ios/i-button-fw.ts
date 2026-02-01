@@ -51,6 +51,7 @@ export class IosIButtonFwHandler extends BaseShapeHandler {
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
+    let rSize;
     x = this.getStyleValue(style, 'fillColor', '').toString();
     y = this.getStyleValue(style, 'fillColor2', '').toString();
     builder.setGradient(x, y, 0, 0, width, height, 'south', 1, 1);

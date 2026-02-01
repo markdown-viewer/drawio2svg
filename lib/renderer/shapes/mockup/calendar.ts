@@ -76,6 +76,7 @@ export class MockupFormsCalendarHandler extends BaseShapeHandler {
     let v;
     let r;
     let w;
+    let fistDay;
     b = this.getStyleValue(style, 'strokeColor', '#999999');
     c = this.getStyleValue(style, 'fillColor', '#ffffff');
     f = this.getStyleValue(style, 'strokeColor2', '#008cff');

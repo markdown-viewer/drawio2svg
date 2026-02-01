@@ -61,6 +61,8 @@ export class IosIKeybLettHandler extends BaseShapeHandler {
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
+    let rSizeX;
+    let rSizeY;
     builder.setGradient(
       '#EEF3F9',
       '#DBE2E9',

@@ -38,6 +38,7 @@ export class MockupContainersHorTabBarHandler extends BaseShapeHandler {
     let n;
     let p = 0;
     let q;
+    let currW;
     for (
       f = this.getStyleValue(style, 'textSize', '17').toString(),
         g = this.getStyleValue(style, 'tabs', 'Tab 1,+Tab 2,Tab 3').toString().split(','),

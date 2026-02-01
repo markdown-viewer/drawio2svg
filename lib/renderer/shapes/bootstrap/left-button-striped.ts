@@ -19,6 +19,7 @@ export class BootstrapLeftButtonStripedHandler extends BaseShapeHandler {
     let e = y;
 
     let f;
+    let rSize;
     builder.translate(d, e);
     rSize = 5;
     builder.begin();
