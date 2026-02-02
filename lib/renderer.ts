@@ -2045,8 +2045,11 @@ export class SvgRenderer {
     const inlineStencilSvg = this.getInlineStencilSvg(shape);
     if (inlineStencilSvg) return inlineStencilSvg;
 
-    if (!this.stencils) return null;
+    return this.getStencilSvgFromResource(shape);
+  }
 
+  private getStencilSvgFromResource(shape: string): string | null {
+    if (!this.stencils) return null;
     if (!shape.startsWith('mxgraph.')) return null;
     const parts = shape.split('.');
     if (parts.length < 3) return null;
@@ -2279,7 +2282,6 @@ export class SvgRenderer {
     const labelBackgroundColor = ctx.style.labelBackgroundColor as string | undefined;
     const timerStartFill = this.normalizeColor(labelBackgroundColor || (ctx.style.fillColor as string) || '#ffffff');
     let timerStartCircleIndex = 0;
-    let fillColorPathIndex = 0;
 
     const transformPoint = (x: number, y: number, relative: boolean): { x: number; y: number } => {
       if (relative) {
@@ -2297,10 +2299,37 @@ export class SvgRenderer {
     const isRackStencil = !!(shapeName && shapeName.startsWith('mxgraph.rack'));
 
     const replaceColorToken = (val: string): string => {
-      // Handle both {{token}} format and plain token format
+      // Handle {{token}} or {{token|default}} format
+      const match = val.match(/^\{\{([^}|]+)(?:\|([^}]+))?\}\}$/);
+      if (match) {
+        const [, token, defaultVal] = match;
+        const lower = token.toLowerCase();
+        // strokeColor and strokeColor2 use styleStroke
+        if (lower === 'strokecolor' || lower === 'strokecolor2') {
+          return isRackStencil ? 'none' : styleStroke;
+        }
+        // strokeColor3-5: use from style or fall back to default value, then styleStroke
+        const strokeMatch = lower.match(/^strokecolor([3-5])$/);
+        if (strokeMatch) {
+          const styleVal = ctx.style[`strokeColor${strokeMatch[1]}` as keyof typeof ctx.style] as string | undefined;
+          return styleVal || defaultVal || styleStroke;
+        }
+        // fillColor uses styleFill directly
+        if (lower === 'fillcolor') {
+          return styleFill;
+        }
+        // fillColor2-8: use from style or fall back to default value, then styleFill
+        const fillMatch = lower.match(/^fillcolor([2-8])$/);
+        if (fillMatch) {
+          const styleVal = ctx.style[`fillColor${fillMatch[1]}` as keyof typeof ctx.style] as string | undefined;
+          return styleVal || defaultVal || styleFill;
+        }
+        // Unknown token with default - return default
+        if (defaultVal) return defaultVal;
+      }
+      // Plain token format (legacy)
       const lower = val.toLowerCase().replace(/^\{\{|\}\}$/g, '');
       if (lower === 'strokecolor' || lower === 'strokecolor2') {
-        // Rack stencils render strokeColor as 'none'
         return isRackStencil ? 'none' : styleStroke;
       }
       if (lower === 'fillcolor' || lower === 'fillcolor2' || lower === 'fillcolor3' || lower === 'fillcolor4') return styleFill;
@@ -2573,13 +2602,6 @@ export class SvgRenderer {
           const stroke = el.getAttribute('stroke') || '';
           const fillId = this.normalizeColorId(fill);
           const strokeId = this.normalizeColorId(stroke);
-
-          if (shapeName === 'mxgraph.cisco.routers.mobile_access_router' && /fillcolor/i.test(rawFill)) {
-            fillColorPathIndex += 1;
-            if (fillColorPathIndex === 1) {
-              el.setAttribute('fill', 'none');
-            }
-          }
 
           if (shapeName === 'mxgraph.citrix.desktop' && stroke === 'none' && /fillcolor/i.test(rawFill)) {
             return false;
@@ -2879,7 +2901,8 @@ export class SvgRenderer {
     // DOM: Create cell group and set as current rendering target
     let cellGroup: Element | null = null;
     if (this.builder) {
-      cellGroup = createCellGroupHelper(this.builder, dataCellId, style.shape as string | undefined, (g) => this.pushGroup(g));
+      const dataShape = shape && this.getStencilSvgFromResource(shape) ? shape : undefined;
+      cellGroup = createCellGroupHelper(this.builder, dataCellId, dataShape, (g) => this.pushGroup(g));
     }
 
     const link = style.link as string | undefined;
@@ -2901,10 +2924,13 @@ export class SvgRenderer {
     }
 
     const isGroup = style.group === '1' || style.group === true;
+    // Check if group has visual elements (fillColor/strokeColor='none' is not visual)
+    const hasFillColor = style.fillColor && style.fillColor !== 'none';
+    const hasStrokeColor = style.strokeColor && style.strokeColor !== 'none';
     const hasGroupVisual = Boolean(
       style.shape ||
-      style.fillColor ||
-      style.strokeColor ||
+      hasFillColor ||
+      hasStrokeColor ||
       style.rounded === '1' ||
       style.rounded === true ||
       style.shadow === '1' ||
@@ -4116,7 +4142,9 @@ export class SvgRenderer {
           const d = `M ${points.map((pt) => `${pt.x.toFixed(2)} ${pt.y.toFixed(2)}`).join(' L ')} Z`;
           const path = this.builder.createPath(d);
           const edgeStyleName = style.edgeStyle as string | undefined;
-          const fillValue = edgeStyleName ? 'none' : this.normalizeColor((style.fillColor as string) || '#ffffff');
+          // Note: edgeStyle='none' means "no edge style", should be treated as falsy
+          const hasEdgeStyle = edgeStyleName && edgeStyleName !== 'none';
+          const fillValue = hasEdgeStyle ? 'none' : this.normalizeColor((style.fillColor as string) || '#ffffff');
           path.setAttribute('fill', fillValue);
           path.setAttribute('stroke', strokeColor === 'none' ? 'none' : strokeColor);
           path.setAttribute('stroke-width', String(strokeWidth));

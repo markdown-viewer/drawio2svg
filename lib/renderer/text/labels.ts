@@ -56,6 +56,7 @@ export function renderNativeTextLabel(
   const fontFamily = (style.fontFamily as string) || DEFAULT_FONT_FAMILY;
   const hasFontStyle = style.fontStyle !== undefined;
   const fontStyle = parseInt(style.fontStyle as string) || 0;
+  const shape = (style.shape as string) || '';
 
   const isLabelShape = style.label === true || style.label === '1';
   const spacingTop = parseFloat(style.spacingTop as string) || 0;
@@ -84,6 +85,25 @@ export function renderNativeTextLabel(
   const verticalLabelPosition = style.verticalLabelPosition as string | undefined;
   const isHorizontalLabel = style.horizontal !== 0 && style.horizontal !== '0' && style.horizontal !== false;
   const skipHorizontalRotation = labelPosition === 'left' || labelPosition === 'right';
+  const labelOverrides = ctx.getLabelOverrides?.(shape);
+
+  // Apply getLabelBounds if available (adjust bounds for markers, etc.)
+  const boundedLbl = style.boundedLbl === '1' || style.boundedLbl === true;
+  const isCenteredLabel = (!labelPosition || labelPosition === 'center')
+    && (!verticalLabelPosition || verticalLabelPosition === 'middle');
+  
+  let labelX = x;
+  let labelY = y;
+  let labelW = width;
+  let labelH = height;
+  
+  if (labelOverrides?.getLabelBounds && isCenteredLabel && (boundedLbl || labelOverrides.alwaysUseLabelBounds)) {
+    const bounds = labelOverrides.getLabelBounds(style, x, y, width, height);
+    labelX = bounds.x;
+    labelY = bounds.y;
+    labelW = bounds.width;
+    labelH = bounds.height;
+  }
 
   // Calculate text position based on alignment
   let textX: number;
@@ -94,13 +114,13 @@ export function renderNativeTextLabel(
       // Universal spacingLeft handling per the platform's getSpacing() logic
       if (style.spacingLeft) {
         const spacingLeft = parseFloat(style.spacingLeft as string) || 0;
-        textX = x + spacingLeft + 1.5; // Match the platform positioning
+        textX = labelX + spacingLeft + 1.5; // Match the platform positioning
       } else if (style.shape === 'note') {
-        textX = x + 2;
+        textX = labelX + 2;
       } else if (isTextShape) {
-        textX = x + 2;
+        textX = labelX + 2;
       } else {
-        textX = x + 4; // Small padding from left edge for regular shapes
+        textX = labelX + 4; // Small padding from left edge for regular shapes
       }
       textAnchor = 'start';
       break;
@@ -157,7 +177,9 @@ export function renderNativeTextLabel(
     undefined,
     isHtmlContent
   );
-  const measuredLineHeight = textLayout.lineHeight;
+  // Use fixed line height formula matching drawio's LINE_HEIGHT constant (1.2)
+  // instead of measured lineHeight for consistent positioning
+  const measuredLineHeight = Math.round(fontSize * 1.2);
 
   // Split text into lines for SVG text element rendering (SVG text doesn't support auto line breaks)
   const rawValue = value
@@ -232,24 +254,24 @@ export function renderNativeTextLabel(
     let startY: number;
 
     if (verticalLabelPosition === 'top') {
-      startY = y - 6 - (lineCount - 1) * lineHeight;
+      startY = labelY - 6 - (lineCount - 1) * lineHeight;
     } else if (verticalLabelPosition === 'bottom') {
-      startY = y + height + fontSize + 6;
+      startY = labelY + labelH + fontSize + 6;
     } else {
       switch (verticalAlign) {
         case 'top': {
           const topOffset = 6;
-          startY = y + fontSize + topOffset + spacingTop;
+          startY = labelY + fontSize + topOffset + spacingTop;
           break;
         }
         case 'bottom':
-          startY = y + height - (lineCount - 1) * lineHeight - 4;
+          startY = labelY + labelH - (lineCount - 1) * lineHeight - 4;
           break;
         case 'middle':
         default: {
-          startY = y + (height - totalHeight) / 2 + fontSize;
+          startY = labelY + (labelH - totalHeight) / 2 + fontSize;
           if (isTextShape && spacingTop !== 0) {
-            const extraSpace = height - totalHeight;
+            const extraSpace = labelH - totalHeight;
             if (extraSpace <= fontSize * 1.5) {
               startY += spacingTop / 2;
             }
@@ -257,6 +279,17 @@ export function renderNativeTextLabel(
           break;
         }
       }
+    }
+
+    const overridePaddingTop = labelOverrides?.getPaddingTop?.({
+      valign: verticalAlign,
+      labelPosition,
+      fontSize,
+      labelY: labelY,
+      labelH: labelH
+    });
+    if (overridePaddingTop !== undefined) {
+      startY = overridePaddingTop;
     }
 
     lines.forEach((line, index) => {
@@ -326,6 +359,7 @@ export function renderNativeTextLabel(
           break;
       }
     }
+
 
     if (rotation !== 0 && isTextShape) {
       const centerY = y + height / 2;
@@ -434,7 +468,12 @@ export function renderHtmlLabel(
   const spacing = parseFloat(style.spacing as string) || 0;
   const spacingTop = parseFloat(style.spacingTop as string) || 0;
   const spacingBottom = parseFloat(style.spacingBottom as string) || 0;
-  const spacingLeft = parseFloat(style.spacingLeft as string) || 0;
+  // For label shape with image on left, the x coordinate is already adjusted by vertex-label.ts
+  // to account for image space. In this case, spacingLeft should not be applied again.
+  const imageAlign = (style.imageAlign as string) || 'left';
+  const isLabelShapeWithLeftImage = (style.shape === 'label' || style.label === true || style.label === '1')
+    && style.image && imageAlign === 'left';
+  const spacingLeft = isLabelShapeWithLeftImage ? 0 : (parseFloat(style.spacingLeft as string) || 0);
   const spacingRight = parseFloat(style.spacingRight as string) || 0;
 
   const isLineShape = style.line === true || style.line === '1' || style.shape === 'line';
@@ -492,11 +531,19 @@ export function renderHtmlLabel(
       labelW = bounds.width;
       labelH = bounds.height;
     }
-    // Apply inset-based overrides (doubleEllipse, process)
+    // Apply inset-based overrides (doubleEllipse, process, cylinder, datastore)
     else if (labelOverrides.getInset) {
-      const inset = labelOverrides.getInset(style, width, height);
-      if (inset.left) labelX = x + inset.left;
-      if (inset.right) labelW = width - (inset.left || 0) - (inset.right || 0);
+      // Check if this shape requires boundedLbl flag
+      const shouldApplyInset = labelOverrides.alwaysUseLabelBounds || 
+        (labelOverrides.requiresBoundedLbl ? boundedLbl : true);
+      
+      if (shouldApplyInset) {
+        const inset = labelOverrides.getInset(style, width, height);
+        if (inset.left) labelX = x + inset.left;
+        if (inset.top) labelY = y + inset.top;
+        if (inset.left || inset.right) labelW = width - (inset.left || 0) - (inset.right || 0);
+        if (inset.top || inset.bottom) labelH = height - (inset.top || 0) - (inset.bottom || 0);
+      }
     } else if (labelOverrides.inset) {
       const inset = labelOverrides.inset;
       if (inset.left) labelX = x + inset.left;
@@ -547,6 +594,17 @@ export function renderHtmlLabel(
   } else {
     // Default to middle
     paddingTop = Math.round(labelY + labelH / 2);
+  }
+
+  // Handle line shape with vertical direction (north/south) and verticalAlign=top
+  // For vertical lines, verticalAlign=top means the label appears below the line
+  // This is because the line is rendered at the center, but vertically oriented
+  const direction = style.direction as string;
+  const isVerticalLine = isLineShape && (direction === 'north' || direction === 'south');
+  if (isVerticalLine && valign === 'top') {
+    // For vertical line with verticalAlign=top, position label below the line
+    // The label should start at y + height + offset
+    paddingTop = Math.round(labelY + labelH);
   }
 
   // Apply handler-provided paddingTop override
@@ -755,7 +813,9 @@ export function renderHtmlLabel(
         // Without wrap: use width: 1px centered mode
         labelWidth = 1;
         labelHeight = 1;
-        marginLeft = x + width / 2;
+        if (align === 'center') {
+          marginLeft = x + width / 2;
+        }
       }
     }
     if (!whiteSpaceWrap && align === 'center' && spacingLeft !== 0) {
@@ -777,7 +837,9 @@ export function renderHtmlLabel(
         // Without wrap: use width: 1px centered mode
         labelWidth = 1;
         labelHeight = 1;
-        marginLeft = x + width / 2;
+        if (align === 'center') {
+          marginLeft = x + width / 2;
+        }
       }
     }
     if (!whiteSpaceWrap && align === 'center' && spacingLeft !== 0) {
@@ -1371,6 +1433,9 @@ export function renderSwimlaneNativeLabel(
   const hasFontStyle = style.fontStyle !== undefined;
   const fontStyle = parseInt(style.fontStyle as string) || 0;
   const valign = (style.verticalAlign as string) || 'middle';
+  const align = (style.align as string) || 'center';
+  const spacingLeft = parseFloat(style.spacingLeft as string) || 0;
+  const spacingRight = parseFloat(style.spacingRight as string) || 0;
   const spacingBottom = parseFloat(style.spacingBottom as string) || 0;
 
   // Font style flags: 1=bold, 2=italic, 4=underline
@@ -1379,8 +1444,24 @@ export function renderSwimlaneNativeLabel(
   const isItalic = (fontStyle & 2) !== 0;
   const isUnderline = (fontStyle & 4) !== 0;
 
-  // Calculate text position
-  const textX = x + width / 2;
+  // Calculate text position based on horizontal alignment
+  let textX: number;
+  let textAnchor: string;
+  // mxConstants.LABEL_INSET = 4, but drawio uses spacing + some base offset (~2)
+  const baseInset = 2;
+
+  if (align === 'left') {
+    textX = x + spacingLeft + baseInset;
+    textAnchor = 'start';
+  } else if (align === 'right') {
+    textX = x + width - spacingRight - baseInset;
+    textAnchor = 'end';
+  } else {
+    // center (default)
+    textX = x + width / 2;
+    textAnchor = 'middle';
+  }
+
   let textY: number;
 
   // Special handling for kanban-style swimlanes with very small startSize and verticalAlign=bottom
@@ -1390,7 +1471,8 @@ export function renderSwimlaneNativeLabel(
     textY = y - spacingBottom - 3.5;
   } else {
     // Normal case: centered in header area
-    textY = y + height / 2 + fontSize / 3; // Adjust for baseline
+    // Baseline adjustment: use fontSize * 0.35 for more accurate vertical centering
+    textY = y + height / 2 + fontSize * 0.35;
   }
 
   // Create text group with styling
@@ -1406,7 +1488,7 @@ export function renderSwimlaneNativeLabel(
   textGroup.setAttribute('fill', fontColor);
   textGroup.setAttribute('font-family', `"${fontFamily}"`);
   textGroup.setAttribute('font-size', `${fontSize}px`);
-  textGroup.setAttribute('text-anchor', 'middle');
+  textGroup.setAttribute('text-anchor', textAnchor);
 
   if (isBold) textGroup.setAttribute('font-weight', 'bold');
   if (isItalic) textGroup.setAttribute('font-style', 'italic');

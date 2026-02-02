@@ -144,15 +144,15 @@ function normalizeStencilColor(color: string | null, state: StencilStyleState, d
   if (c === 'fill' || c === 'fillColor') return state.fillColor;
   if (c === 'stroke' || c === 'strokeColor') return state.strokeColor;
   if (c === 'none' || c === 'transparent') return 'none';
-  // fillColor2-8 -> placeholder with default fallback
+  // fillColor2-8 -> placeholder with optional default: {{fillColorN}} or {{fillColorN|default}}
   const fillMatch = c.match(/^fillColor(\d)$/);
   if (fillMatch) {
-    return defaultColor ?? `{{fillColor${fillMatch[1]}}}`;
+    return defaultColor ? `{{fillColor${fillMatch[1]}|${defaultColor}}}` : `{{fillColor${fillMatch[1]}}}`;
   }
-  // strokeColor2-5 -> placeholder with default fallback
+  // strokeColor2-5 -> placeholder with optional default: {{strokeColorN}} or {{strokeColorN|default}}
   const strokeMatch = c.match(/^strokeColor(\d)$/);
   if (strokeMatch) {
-    return defaultColor ?? `{{strokeColor${strokeMatch[1]}}}`;
+    return defaultColor ? `{{strokeColor${strokeMatch[1]}|${defaultColor}}}` : `{{strokeColor${strokeMatch[1]}}}`;
   }
   return c;
 }

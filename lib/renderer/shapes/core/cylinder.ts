@@ -6,6 +6,8 @@ export class CylinderHandler extends CylinderShapeHandler {
     super(renderCtx);
   }
 
+  // Inherits getLabelOverrides() from CylinderShapeHandler
+
   render(attrs: ShapeAttrs): void {
     const { builder, currentGroup, x, y, width, height, applyShapeAttrsToBuilder, style } = this.renderCtx;
     if (!builder || !currentGroup) return;

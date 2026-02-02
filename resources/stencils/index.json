@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-30T19:48:07.714Z",
+  "generatedAt": "2026-02-02T01:16:55.651Z",
   "totalShapes": 8910,
   "totalGroups": 48,
   "totalFiles": 202,
@@ -14,7 +14,7 @@
       "group": "android",
       "file": "android.json",
       "count": 49,
-      "size": 7144
+      "size": 7316
     },
     {
       "group": "arrows",
@@ -92,13 +92,13 @@
       "group": "cisco",
       "file": "cisco.json",
       "count": 296,
-      "size": 146024
+      "size": 146864
     },
     {
       "group": "cisco19",
       "file": "cisco19.json",
       "count": 232,
-      "size": 318364
+      "size": 318468
     },
     {
       "group": "cisco_safe",
@@ -206,13 +206,13 @@
       "group": "mockup",
       "file": "mockup.json",
       "count": 104,
-      "size": 29868
+      "size": 30024
     },
     {
       "group": "mscae",
       "file": "mscae.json",
       "count": 368,
-      "size": 243668
+      "size": 243692
     },
     {
       "group": "networks",
@@ -254,7 +254,7 @@
       "group": "salesforce",
       "file": "salesforce.json",
       "count": 96,
-      "size": 112632
+      "size": 113048
     },
     {
       "group": "signs",

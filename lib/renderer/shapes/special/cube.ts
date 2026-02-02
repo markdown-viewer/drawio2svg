@@ -8,24 +8,33 @@ export class CubeHandler extends RectangleShapeHandler {
   }
 
   private getCubeSize(style: MxStyle, width: number, height: number): { sizeX: number; sizeY: number } {
+    // drawio uses: s = Math.max(0, Math.min(w, Math.min(h, size)))
+    // This means size is clamped to the smaller dimension
+    const defaultSize = 20;
     const sizeValue = parseFloat(style.size as string);
-    if (Number.isFinite(sizeValue)) {
-      return {
-        sizeX: Math.max(0, Math.min(sizeValue, width)),
-        sizeY: Math.max(0, Math.min(sizeValue, height))
-      };
-    }
-
-    return {
-      sizeX: Math.min(20, width / 3),
-      sizeY: Math.min(20, height / 3)
-    };
+    const size = Number.isFinite(sizeValue) ? sizeValue : defaultSize;
+    const s = Math.max(0, Math.min(width, Math.min(height, size)));
+    return { sizeX: s, sizeY: s };
   }
 
   getLabelOverrides(): LabelOverrides | null {
     return {
       getLabelBounds: (style: MxStyle, x: number, y: number, width: number, height: number) => {
         const { sizeX, sizeY } = this.getCubeSize(style, width, height);
+        const direction = style.direction as string;
+
+        // For direction=south, the fold is on the opposite corner
+        // keep left edge but still offset the top by size
+        if (direction === 'south') {
+          return {
+            x: x,
+            y: y + sizeY,
+            width: width - sizeX,
+            height: height - sizeY
+          };
+        }
+
+        // Default (north/west): fold at top-left, label offset by size
         return {
           x: x + sizeX,
           y: y + sizeY,
@@ -58,14 +67,14 @@ export class CubeHandler extends RectangleShapeHandler {
     currentGroup.appendChild(group);
 
     if (useShading) {
-      const basePath = `M ${left} ${top} L ${left + sizeX} ${top} L ${right} ${top + sizeY} L ${right} ${bottom} L ${right - sizeX} ${bottom} L ${left} ${bottom - sizeY} Z`;
-      const topShadePath = `M ${left} ${top} L ${left + sizeX} ${top} L ${right} ${top + sizeY} L ${right - sizeX} ${top + sizeY} Z`;
-      const sideShadePath = `M ${left} ${top} L ${right - sizeX} ${top + sizeY} L ${right - sizeX} ${bottom} L ${left} ${bottom - sizeY} Z`;
-      const outlinePath = `M ${right - sizeX} ${bottom} L ${right - sizeX} ${top + sizeY} L ${left} ${top} M ${right - sizeX} ${top + sizeY} L ${right} ${top + sizeY}`;
+      // Use same direction as non-shading branch (fold at top-right corner)
+      const basePath = `M ${left} ${top} L ${right - sizeX} ${top} L ${right} ${top + sizeY} L ${right} ${bottom} L ${left + sizeX} ${bottom} L ${left} ${bottom - sizeY} Z`;
+      const topShadePath = `M ${left} ${top} L ${right - sizeX} ${top} L ${right} ${top + sizeY} L ${left + sizeX} ${top + sizeY} Z`;
+      const sideShadePath = `M ${left} ${top} L ${left + sizeX} ${top + sizeY} L ${left + sizeX} ${bottom} L ${left} ${bottom - sizeY} Z`;
+      const outlinePath = `M ${left + sizeX} ${bottom} L ${left + sizeX} ${top + sizeY} L ${left} ${top} M ${left + sizeX} ${top + sizeY} L ${right} ${top + sizeY}`;
 
       const base = builder.createPath(basePath);
       applyShapeAttrsToElement(base, attrs);
-      base.setAttribute('stroke', 'none');
       base.setAttribute('pointer-events', 'all');
       group.appendChild(base);
 
@@ -89,8 +98,8 @@ export class CubeHandler extends RectangleShapeHandler {
       group.appendChild(sideShade);
 
       const outline = builder.createPath(outlinePath);
+      applyShapeAttrsToElement(outline, attrs);
       outline.setAttribute('fill', 'none');
-      outline.setAttribute('stroke', 'none');
       outline.setAttribute('pointer-events', 'all');
       group.appendChild(outline);
     } else {

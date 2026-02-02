@@ -72,36 +72,270 @@ export interface ParsedDrawio {
 /**
  * Parse style string into key-value pairs
  * e.g., "shape=ellipse;fillColor=#FF0000" → { shape: "ellipse", fillColor: "#FF0000" }
+ *
+ * Named styles are defined in drawio's default-style2 theme.
+ * See: temp/drawio-dev/src/main/webapp/js/viewer-static.min.js
+ * Graph.prototype.defaultThemes["default-style2"] = mxUtils.parseXml('<mxStylesheet>...</mxStylesheet>')
  */
 const DEFAULT_VERTEX_STYLE: MxStyle = {};
 
 const DEFAULT_EDGE_STYLE: MxStyle = {};
 
+/**
+ * Named style registry based on drawio's default-style2 theme.
+ * When a style token without '=' is encountered (e.g., "ellipse;fillColor=red"),
+ * we look up the token in this registry and merge all its properties.
+ *
+ * Source: Graph.prototype.defaultThemes["default-style2"] in viewer-static.min.js
+ */
 const STYLE_REGISTRY: Record<string, MxStyle> = {
+  // Base styles
   defaultVertex: DEFAULT_VERTEX_STYLE,
   defaultEdge: DEFAULT_EDGE_STYLE,
-};
 
-const SHAPE_TOKENS = new Set([
-  'text',
-  'swimlane',
-  'ellipse',
-  'doubleEllipse',
-  'rhombus',
-  'triangle',
-  'line',
-  'image',
-  'rectangle',
-  'label',
-  'hexagon',
-  'octagon',
-  'pentagon',
-  'parallelogram',
-  'trapezoid',
-  'cloud',
-  'actor',
-  'cylinder',
-]);
+  // Text style: no fill, align left
+  text: {
+    shape: 'text',
+    fillColor: 'none',
+    gradientColor: 'none',
+    strokeColor: 'none',
+    align: 'left',
+    verticalAlign: 'top',
+  },
+
+  // Edge label: extends text
+  edgeLabel: {
+    fillColor: 'none',
+    gradientColor: 'none',
+    strokeColor: 'none',
+    align: 'left',
+    verticalAlign: 'top',
+    fontSize: 11,
+  },
+
+  // Label style: bold text with icon space
+  label: {
+    shape: 'label',
+    fontStyle: 1,
+    align: 'left',
+    verticalAlign: 'middle',
+    spacing: 2,
+    spacingLeft: 52,
+    imageWidth: 42,
+    imageHeight: 42,
+    rounded: 1,
+  },
+
+  // Icon style: extends label, centered
+  icon: {
+    shape: 'label',
+    fontStyle: 0,
+    align: 'center',
+    imageAlign: 'center',
+    verticalLabelPosition: 'bottom',
+    verticalAlign: 'top',
+    spacingTop: 6,
+    spacing: 0,
+    spacingLeft: 0,
+    imageWidth: 48,
+    imageHeight: 48,
+    rounded: 1,
+  },
+
+  // Swimlane style
+  swimlane: {
+    shape: 'swimlane',
+    fontSize: 12,
+    fontStyle: 1,
+    startSize: 23,
+  },
+
+  // Group style: invisible container
+  group: {
+    verticalAlign: 'top',
+    fillColor: 'none',
+    strokeColor: 'none',
+    gradientColor: 'none',
+    pointerEvents: 0,
+  },
+
+  // Shape styles with perimeters
+  ellipse: {
+    shape: 'ellipse',
+    perimeter: 'ellipsePerimeter',
+  },
+
+  rhombus: {
+    shape: 'rhombus',
+    perimeter: 'rhombusPerimeter',
+  },
+
+  triangle: {
+    shape: 'triangle',
+    perimeter: 'trianglePerimeter',
+  },
+
+  // Line style: thick stroke
+  line: {
+    shape: 'line',
+    strokeWidth: 4,
+    verticalAlign: 'top',
+  },
+
+  // Image style
+  image: {
+    shape: 'image',
+    verticalAlign: 'top',
+    verticalLabelPosition: 'bottom',
+  },
+
+  // Round image: extends image with ellipse perimeter
+  roundImage: {
+    shape: 'image',
+    verticalAlign: 'top',
+    verticalLabelPosition: 'bottom',
+    perimeter: 'ellipsePerimeter',
+  },
+
+  // Rhombus image: extends image with rhombus perimeter
+  rhombusImage: {
+    shape: 'image',
+    verticalAlign: 'top',
+    verticalLabelPosition: 'bottom',
+    perimeter: 'rhombusPerimeter',
+  },
+
+  // Arrow shape style
+  // Note: fillColor='default' in drawio means use the default fill color (white)
+  arrow: {
+    shape: 'arrow',
+    edgeStyle: 'none',
+    fillColor: '#ffffff',
+  },
+
+  // Fancy style: shadow and glass
+  fancy: {
+    shadow: '1',
+    glass: '1',
+  },
+
+  // Color styles with fancy (shadow + glass)
+  gray: {
+    shadow: '1',
+    glass: '1',
+    gradientColor: '#B3B3B3',
+    fillColor: '#F5F5F5',
+    strokeColor: '#666666',
+  },
+
+  blue: {
+    shadow: '1',
+    gradientColor: '#7EA6E0',
+    fillColor: '#DAE8FC',
+    strokeColor: '#6C8EBF',
+  },
+
+  green: {
+    shadow: '1',
+    glass: '1',
+    gradientColor: '#97D077',
+    fillColor: '#D5E8D4',
+    strokeColor: '#82B366',
+  },
+
+  turquoise: {
+    gradientColor: '#67AB9F',
+    fillColor: '#D5E8D4',
+    strokeColor: '#6A9153',
+  },
+
+  yellow: {
+    shadow: '1',
+    glass: '1',
+    gradientColor: '#FFD966',
+    fillColor: '#FFF2CC',
+    strokeColor: '#D6B656',
+  },
+
+  orange: {
+    gradientColor: '#FFA500',
+    fillColor: '#FFCD28',
+    strokeColor: '#D79B00',
+  },
+
+  red: {
+    shadow: '1',
+    gradientColor: '#EA6B66',
+    fillColor: '#F8CECC',
+    strokeColor: '#B85450',
+  },
+
+  pink: {
+    gradientColor: '#B5739D',
+    fillColor: '#E6D0DE',
+    strokeColor: '#996185',
+  },
+
+  // purple only sets shadow, not colors (matching old behavior)
+  purple: {
+    shadow: '1',
+  },
+
+  // Plain color styles (no shadow/glass)
+  'plain-gray': {
+    gradientColor: '#B3B3B3',
+    fillColor: '#F5F5F5',
+    strokeColor: '#666666',
+  },
+
+  'plain-blue': {
+    gradientColor: '#7EA6E0',
+    fillColor: '#DAE8FC',
+    strokeColor: '#6C8EBF',
+  },
+
+  'plain-green': {
+    gradientColor: '#97D077',
+    fillColor: '#D5E8D4',
+    strokeColor: '#82B366',
+  },
+
+  'plain-turquoise': {
+    gradientColor: '#67AB9F',
+    fillColor: '#D5E8D4',
+    strokeColor: '#6A9153',
+  },
+
+  'plain-yellow': {
+    gradientColor: '#FFD966',
+    fillColor: '#FFF2CC',
+    strokeColor: '#D6B656',
+  },
+
+  'plain-orange': {
+    gradientColor: '#FFA500',
+    fillColor: '#FFCD28',
+    strokeColor: '#D79B00',
+  },
+
+  'plain-red': {
+    gradientColor: '#EA6B66',
+    fillColor: '#F8CECC',
+    strokeColor: '#B85450',
+  },
+
+  'plain-pink': {
+    gradientColor: '#B5739D',
+    fillColor: '#E6D0DE',
+    strokeColor: '#996185',
+  },
+
+  'plain-purple': {
+    gradientColor: '#8C6C9C',
+    fillColor: '#E1D5E7',
+    strokeColor: '#9673A6',
+  },
+};
 
 function resolveStyleString(styleStr: string | null, isEdge: boolean): MxStyle {
   const baseStyle = isEdge ? DEFAULT_EDGE_STYLE : DEFAULT_VERTEX_STYLE;
@@ -134,122 +368,25 @@ function resolveStyleString(styleStr: string | null, isEdge: boolean): MxStyle {
           continue;
         }
 
-        if (SHAPE_TOKENS.has(name)) {
-          style[name] = true;
-          style.shape = name;
-          continue;
-        }
-
+        // Look up named style in registry (based on drawio's default-style2 theme)
         const namedStyle = STYLE_REGISTRY[name];
         if (namedStyle) {
+          // Merge all properties from named style (only if not already set)
           for (const key in namedStyle) {
-            style[key] = namedStyle[key];
+            if (style[key] === undefined) {
+              style[key] = namedStyle[key];
+            }
           }
+          // Set the token as a flag for backward compatibility
+          style[name] = true;
         } else {
+          // Unknown token, just set it as a flag
           style[name] = true;
         }
       }
     }
   } else {
     style = { ...baseStyle };
-  }
-
-  // Apply simple built-in style aliases
-  if ((style['plain-blue'] === true || style['plain-blue'] === '1') && !style.fillColor) {
-    style.fillColor = '#DAE8FC';
-  }
-  if ((style['plain-gray'] === true || style['plain-gray'] === '1') && !style.fillColor) {
-    style.fillColor = '#F5F5F5';
-  }
-  if (style.blue === true || style.blue === '1') {
-    if (!style.fillColor) {
-      style.fillColor = '#DAE8FC';
-    }
-    if (!style.gradientColor) {
-      style.gradientColor = '#7EA6E0';
-    }
-    if (!style.strokeColor) {
-      style.strokeColor = '#6C8EBF';
-    }
-    if (style.shadow === undefined) {
-      style.shadow = '1';
-    }
-  }
-  if ((style['plain-purple'] === true || style['plain-purple'] === '1') && !style.fillColor) {
-    style.fillColor = '#E1D5E7';
-  }
-  if (style.purple === true || style.purple === '1') {
-    if (style.shadow === undefined) {
-      style.shadow = '1';
-    }
-  }
-  if ((style['plain-red'] === true || style['plain-red'] === '1') && !style.fillColor) {
-    style.fillColor = '#F8CECC';
-    style.gradientColor = '#EA6B66';
-    if (!style.strokeColor) {
-      style.strokeColor = '#B85450';
-    }
-  }
-  if (style.red === true || style.red === '1') {
-    if (!style.fillColor) {
-      style.fillColor = '#F8CECC';
-    }
-    if (!style.gradientColor) {
-      style.gradientColor = '#EA6B66';
-    }
-    if (!style.strokeColor) {
-      style.strokeColor = '#B85450';
-    }
-    if (style.shadow === undefined) {
-      style.shadow = '1';
-    }
-  }
-  if ((style['plain-green'] === true || style['plain-green'] === '1') && !style.fillColor) {
-    style.fillColor = '#D5E8D4';
-    style.gradientColor = '#97D077';
-    if (!style.strokeColor) {
-      style.strokeColor = '#82B366';
-    }
-  }
-  if (style.green === true || style.green === '1') {
-    if (!style.fillColor) {
-      style.fillColor = '#D5E8D4';
-    }
-    if (!style.gradientColor) {
-      style.gradientColor = '#97D077';
-    }
-    if (!style.strokeColor) {
-      style.strokeColor = '#82B366';
-    }
-    if (style.shadow === undefined) {
-      style.shadow = '1';
-    }
-    if (style.glass === undefined) {
-      style.glass = '1';
-    }
-  }
-  if (style.yellow === true || style.yellow === '1') {
-    const isPlainYellow = style['plain-yellow'] === true || style['plain-yellow'] === '1';
-    if (!style.fillColor) {
-      style.fillColor = '#FFF2CC';
-    }
-    if (!style.gradientColor) {
-      style.gradientColor = '#FFD966';
-    }
-    if (!style.strokeColor) {
-      style.strokeColor = '#D6B656';
-    }
-    if (style.shadow === undefined) {
-      style.shadow = '1';
-    }
-    if (!isPlainYellow && style.glass === undefined) {
-      style.glass = '1';
-    }
-  }
-  if (style.orange === true || style.orange === '1') {
-    if (!style.strokeColor) {
-      style.strokeColor = '#D79B00';
-    }
   }
 
   return style;

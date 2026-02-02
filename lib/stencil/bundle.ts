@@ -54,8 +54,12 @@ export function applyStencilColors(svg: string, style: StencilColorStyle): strin
     .replace(/\{\{fillColor\}\}/gi, fill)
     .replace(/\{\{strokeColor\}\}/gi, stroke)
     .replace(/\{\{fontColor\}\}/gi, font)
-    .replace(/\{\{fillColor([2-8])\}\}/gi, (_, n) => style[`fillColor${n}` as keyof StencilColorStyle] || fill)
-    .replace(/\{\{strokeColor([2-5])\}\}/gi, (_, n) => style[`strokeColor${n}` as keyof StencilColorStyle] || stroke);
+    // fillColor2-8: {{fillColorN}} or {{fillColorN|default}}
+    .replace(/\{\{fillColor([2-8])(?:\|([^}]+))?\}\}/gi, (_, n, defaultVal) => 
+      style[`fillColor${n}` as keyof StencilColorStyle] || defaultVal || fill)
+    // strokeColor2-5: {{strokeColorN}} or {{strokeColorN|default}}
+    .replace(/\{\{strokeColor([2-5])(?:\|([^}]+))?\}\}/gi, (_, n, defaultVal) => 
+      style[`strokeColor${n}` as keyof StencilColorStyle] || defaultVal || stroke);
 }
 
 function decodeBase64(data: string): Uint8Array {

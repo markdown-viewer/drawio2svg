@@ -1,5 +1,5 @@
 import type { RenderContext, ShapeAttrs } from '../../../renderer.ts';
-import { CylinderShapeHandler } from '../../shape-registry.ts';
+import { CylinderShapeHandler, type LabelOverrides } from '../../shape-registry.ts';
 
 /**
  * Datastore shape - cylinder with multiple internal lines (database symbol)
@@ -8,6 +8,19 @@ import { CylinderShapeHandler } from '../../shape-registry.ts';
 export class DatastoreHandler extends CylinderShapeHandler {
   constructor(renderCtx: RenderContext) {
     super(renderCtx);
+  }
+
+  // Override: DataStoreShape.prototype.getLabelMargins always applies (no boundedLbl check)
+  getLabelOverrides(): LabelOverrides | null {
+    return {
+      getInset: (style, _width, height) => {
+        const strokeWidth = parseFloat(style.strokeWidth as string) || 1;
+        const dy = Math.min(height / 2, Math.round(height / 8) + strokeWidth - 1);
+        const topMargin = 2.5 * dy;
+        return { top: topMargin };
+      },
+      alwaysUseLabelBounds: true
+    };
   }
 
   render(attrs: ShapeAttrs): void {

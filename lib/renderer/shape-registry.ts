@@ -22,8 +22,10 @@ export interface LabelOverrides {
   getInset?: (style: MxStyle, width: number, height: number) => { left?: number; right?: number; top?: number; bottom?: number };
   // Custom label bounds calculation for boundedLbl shapes
   getLabelBounds?: (style: MxStyle, x: number, y: number, width: number, height: number) => { x: number; y: number; width: number; height: number };
-  // Always use getLabelBounds regardless of boundedLbl flag
+  // Always use getLabelBounds/getInset regardless of boundedLbl flag
   alwaysUseLabelBounds?: boolean;
+  // Only apply getInset when boundedLbl is true (for cylinder-like shapes)
+  requiresBoundedLbl?: boolean;
   // Calculate paddingTop override (returns new value or undefined to skip)
   getPaddingTop?: (ctx: PaddingTopContext) => number | undefined;
   // Default startSize for swimlane-like shapes when not specified in style
@@ -304,6 +306,20 @@ export abstract class RhombusShapeHandler extends BaseShapeHandler {
 export abstract class CylinderShapeHandler extends BaseShapeHandler {
   // Inherits supportsGlass(): false from BaseShapeHandler
   // Inherits isRoundable(): false from BaseShapeHandler
+
+  // mxCylinder.prototype.getLabelMargins - only applies when boundedLbl=true
+  getLabelOverrides(): LabelOverrides | null {
+    return {
+      getInset: (style, _width, height) => {
+        const maxHeight = 40;
+        const sizeValue = parseFloat(style.size as string);
+        const size = Number.isFinite(sizeValue) ? sizeValue : 0.15;
+        const topMargin = Math.min(maxHeight, height * size * 2);
+        return { top: topMargin };
+      },
+      requiresBoundedLbl: true
+    };
+  }
 }
 
 /**

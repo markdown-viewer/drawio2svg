@@ -337,7 +337,8 @@ function renderTableLines(
         continue;
       }
       if (!started) {
-        builder.addPoints([p], false, 0, false);
+        // Use moveTo directly instead of addPoints to avoid duplicate "M x y L x y"
+        builder.moveTo(p.x, p.y);
         started = true;
       } else {
         builder.lineTo(p.x, p.y);

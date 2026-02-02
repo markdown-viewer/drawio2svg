@@ -48,23 +48,28 @@ export function measureText(
       const decodedText = decodeEntities(text);
       wrapper.textContent = decodedText;
     } else {
-      wrapper.textContent = text;
+      // For plain text, convert line breaks to HTML <br> for accurate measurement
+      const htmlEncodedText = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\r\n|\r|\n/g, '<br>');
+      wrapper.innerHTML = htmlEncodedText;
     }
 
-    if (isHtmlValue) {
-      wrapper.style.margin = '0';
-      wrapper.style.padding = '0';
-      const elements = wrapper.querySelectorAll('*');
-      elements.forEach((el) => {
-        const htmlEl = el as HTMLElement;
-        htmlEl.style.margin = '0';
-        htmlEl.style.padding = '0';
-      });
-    }
+    // Always reset margins and padding for accurate measurement
+    wrapper.style.margin = '0';
+    wrapper.style.padding = '0';
+    const elements = wrapper.querySelectorAll('*');
+    elements.forEach((el) => {
+      const htmlEl = el as HTMLElement;
+      htmlEl.style.margin = '0';
+      htmlEl.style.padding = '0';
+    });
 
     const hasBlocks = hasHtmlTags && Boolean(wrapper.querySelector('div, p, li, ul, ol'));
     const contentText = wrapper.textContent || '';
-    const hasLineBreaks = /\r|\n/.test(contentText);
+    const hasLineBreaks = /<br\s*\/?>/i.test(text) || /\r|\n/.test(contentText);
     if (hasBlocks) {
       wrapper.style.whiteSpace = 'normal';
     } else if (hasLineBreaks) {
@@ -145,19 +150,25 @@ export function measureTextLayout(
       const decodedText = decodeEntities(text);
       wrapper.textContent = decodedText;
     } else {
-      wrapper.textContent = text;
+      // For plain text, convert line breaks to HTML <br> for accurate measurement
+      // This ensures consistent rendering measurement with how drawio calculates text bounds
+      const htmlEncodedText = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\r\n|\r|\n/g, '<br>');
+      wrapper.innerHTML = htmlEncodedText;
     }
 
-    if (isHtmlValue) {
-      wrapper.style.margin = '0';
-      wrapper.style.padding = '0';
-      const elements = wrapper.querySelectorAll('*');
-      elements.forEach((el) => {
-        const htmlEl = el as HTMLElement;
-        htmlEl.style.margin = '0';
-        htmlEl.style.padding = '0';
-      });
-    }
+    // Always reset margins and padding for accurate measurement
+    wrapper.style.margin = '0';
+    wrapper.style.padding = '0';
+    const elements = wrapper.querySelectorAll('*');
+    elements.forEach((el) => {
+      const htmlEl = el as HTMLElement;
+      htmlEl.style.margin = '0';
+      htmlEl.style.padding = '0';
+    });
 
     // Get computed line height
     const computedStyle = window.getComputedStyle(wrapper);

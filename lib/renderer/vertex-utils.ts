@@ -17,7 +17,12 @@ export function getLineStrokeWidth(
   style: MxStyle,
   defaultStrokeWidth: number
 ): number {
-  return lineShape && style.strokeWidth === undefined ? 4 : defaultStrokeWidth;
+  // mxLine default strokeWidth is 1 (see mxLine.js line 30)
+  // Only use the line-specific default when strokeWidth is not explicitly set
+  if (lineShape && style.strokeWidth === undefined) {
+    return 1;
+  }
+  return defaultStrokeWidth;
 }
 
 export function shouldSkipPlaceholderShape(

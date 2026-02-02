@@ -108,9 +108,6 @@ export function resetTextMeasureProvider(): void {
 import { measureText as measureTextWithDom } from './webview-measure.ts';
 import { DEFAULT_FONT_FAMILY } from './constants.ts';
 
-// Cache for measured text dimensions
-const textMeasureCache = new Map<string, { width: number; height: number }>();
-
 // Detect if we're in a browser environment with DOM support
 const isBrowser = typeof window !== 'undefined' && typeof document !== 'undefined';
 
@@ -133,21 +130,7 @@ function initMeasureDiv(): HTMLDivElement | null {
 }
 
 /**
- * Generate cache key for text measurement
- */
-function getCacheKey(
-  text: string,
-  fontSize: number,
-  fontFamily: string,
-  fontWeight: string,
-  fontStyle: string,
-  isHtml: boolean
-): string {
-  return `${text}|${fontSize}|${fontFamily}|${fontWeight}|${fontStyle}|${isHtml ? 'html' : 'text'}`;
-}
-
-/**
- * Measure text dimensions with caching
+ * Measure text dimensions
  * 
  * @param text - Text to measure (can include HTML tags, which will be stripped)
  * @param fontSize - Font size in pixels
@@ -168,13 +151,6 @@ export function measureText(
     return { width: 0, height: fontSize };
   }
   
-  // Check cache first
-  const cacheKey = getCacheKey(text, fontSize, fontFamily, fontWeight, fontStyle, isHtml);
-  const cached = textMeasureCache.get(cacheKey);
-  if (cached) {
-    return cached;
-  }
-  
   let result: { width: number; height: number };
   
   // Use custom provider if set
@@ -192,14 +168,6 @@ export function measureText(
       );
     }
   }
-  
-  // Cache the result (limit cache size)
-  if (textMeasureCache.size > 1000) {
-    // Clear oldest entries (simple LRU approximation)
-    const keysToDelete = Array.from(textMeasureCache.keys()).slice(0, 500);
-    keysToDelete.forEach(k => textMeasureCache.delete(k));
-  }
-  textMeasureCache.set(cacheKey, result);
   
   return result;
 }
@@ -312,14 +280,6 @@ export function measureTextLayout(
   textLayoutCache.set(cacheKey, result);
 
   return result;
-}
-
-/**
- * Clear the measurement cache
- * Useful for testing or when font resources change
- */
-export function clearMeasureCache(): void {
-  textMeasureCache.clear();
 }
 
 /**

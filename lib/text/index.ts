@@ -15,7 +15,6 @@ export {
   measureText,
   measureMultilineText,
   measureTextLayout,
-  clearMeasureCache,
   isBrowserMeasurementAvailable
 } from './measure.ts';
 

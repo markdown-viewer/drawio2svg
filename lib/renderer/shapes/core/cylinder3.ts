@@ -1,5 +1,5 @@
 import type { RenderContext, ShapeAttrs } from '../../../renderer.ts';
-import { CylinderShapeHandler } from '../../shape-registry.ts';
+import { CylinderShapeHandler, type LabelOverrides } from '../../shape-registry.ts';
 
 /**
  * Cylinder3 shape - flexible cylinder with optional lid
@@ -8,6 +8,28 @@ import { CylinderShapeHandler } from '../../shape-registry.ts';
 export class Cylinder3Handler extends CylinderShapeHandler {
   constructor(renderCtx: RenderContext) {
     super(renderCtx);
+  }
+
+  // Override: CylinderShape3.prototype.getLabelMargins has different calculation
+  // - size is pixel value (default 15), not ratio
+  // - includes bottom margin
+  getLabelOverrides(): LabelOverrides | null {
+    return {
+      getInset: (style, _width, height) => {
+        let size = Number(style.size) || 15;
+        
+        const lidValue = style.lid;
+        const lid = lidValue !== false && lidValue !== 0 && lidValue !== '0' && lidValue !== 'false';
+        if (!lid) {
+          size /= 2;
+        }
+        
+        const topMargin = Math.min(height, size * 2);
+        const bottomMargin = Math.max(0, size * 0.3);
+        return { top: topMargin, bottom: bottomMargin };
+      },
+      requiresBoundedLbl: true
+    };
   }
 
   render(attrs: ShapeAttrs): void {

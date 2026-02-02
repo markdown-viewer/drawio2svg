@@ -1,10 +1,43 @@
 import type { RenderContext, ShapeAttrs } from '../../../renderer.ts';
+import type { MxStyle } from '../../../parser.ts';
 import { RectangleShapeHandler } from '../../shape-registry.ts';
 import { renderOutlineLayer, renderSymbolLayer } from './shape.ts';
 
 export class BpmnTaskHandler extends RectangleShapeHandler {
   constructor(renderCtx: RenderContext) {
     super(renderCtx);
+  }
+
+  getLabelOverrides() {
+    return {
+      // Adjust label bounds to account for bottom markers (loop, parallel, etc.)
+      getLabelBounds: (style: MxStyle, x: number, y: number, width: number, height: number) => {
+        // When part=1, this cell is part of a choreography activity,
+        // the marker is rendered by the parent container, not this cell.
+        // So we should not reduce the height.
+        if (style.part === '1' || style.part === true) {
+          return { x, y, width, height };
+        }
+
+        // Check if any bottom markers are present that affect text layout
+        // Note: isLoopSub does not reduce label height in draw.io
+        const hasBottomMarkers = 
+          style.isLoopStandard === '1' || style.isLoopStandard === true ||
+          style.isLoopMultiParallel === '1' || style.isLoopMultiParallel === true ||
+          style.isLoopMultiSeq === '1' || style.isLoopMultiSeq === true ||
+          style.isLoopComp === '1' || style.isLoopComp === true ||
+          style.isAdHoc === '1' || style.isAdHoc === true;
+        
+        if (hasBottomMarkers) {
+          // Markers occupy ~14px at the bottom
+          const markerHeight = 14;
+          return { x, y, width, height: height - markerHeight };
+        }
+        
+        return { x, y, width, height };
+      },
+      alwaysUseLabelBounds: true
+    };
   }
 
   render(attrs: ShapeAttrs): void {
@@ -22,10 +55,21 @@ export class BpmnTaskHandler extends RectangleShapeHandler {
     const strokeWidth = attrs.strokeWidth;
     const innerInset = isTransaction ? outlineIndent : 2;
 
-    const outerPath = createRectPath(x, y, width, height, true);
-    const innerPath = createInsetRectPath(x, y, width, height, innerInset, false);
+    const rectStyle = String(style.rectStyle ?? '').toLowerCase();
+    const useRounded = rectStyle === 'rounded';
+    const baseRadius = useRounded ? getCornerRadius(style, width, height, 0) : 0;
+
+    const outerPath = useRounded
+      ? createRoundedRectPath(x, y, width, height, baseRadius, true)
+      : createRectPath(x, y, width, height, true);
+    const innerPath = useRounded
+      ? createInsetRoundedRectPath(x, y, width, height, innerInset, baseRadius, false)
+      : createInsetRectPath(x, y, width, height, innerInset, false);
     const strokePath = isTransaction
-      ? `${outerPath} ${createInsetRectPath(x, y, width, height, outlineIndent, true)}`
+      ? `${outerPath} ${useRounded
+          ? createInsetRoundedRectPath(x, y, width, height, outlineIndent, baseRadius, true)
+          : createInsetRectPath(x, y, width, height, outlineIndent, true)
+        }`
       : outerPath;
 
     const fill = builder.createPath(outerPath);
@@ -110,6 +154,77 @@ function createRectPath(
   }
 
   return parts.join(' ');
+}
+
+function createRoundedRectPath(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number,
+  closePath: boolean
+): string {
+  const round2 = (value: number): number => Number(value.toFixed(2));
+  const k = 0.5522847498;
+
+  const r = Math.max(0, Math.min(radius, Math.min(width, height) / 2));
+  if (r === 0) {
+    return createRectPath(x, y, width, height, closePath);
+  }
+
+  const x0 = round2(x);
+  const y0 = round2(y);
+  const x1 = round2(x + width);
+  const y1 = round2(y + height);
+  const c = round2(r * k);
+
+  const parts: string[] = [];
+  parts.push(`M ${x0} ${round2(y0 + r)}`);
+  parts.push(
+    `C ${x0} ${round2(y0 + r - c)} ${round2(x0 + r - c)} ${y0} ${round2(x0 + r)} ${y0}`
+  );
+  parts.push(`L ${round2(x1 - r)} ${y0}`);
+  parts.push(
+    `C ${round2(x1 - r + c)} ${y0} ${x1} ${round2(y0 + r - c)} ${x1} ${round2(y0 + r)}`
+  );
+  parts.push(`L ${x1} ${round2(y1 - r)}`);
+  parts.push(
+    `C ${x1} ${round2(y1 - r + c)} ${round2(x1 - r + c)} ${y1} ${round2(x1 - r)} ${y1}`
+  );
+  parts.push(`L ${round2(x0 + r)} ${y1}`);
+  parts.push(
+    `C ${round2(x0 + r - c)} ${y1} ${x0} ${round2(y1 - r + c)} ${x0} ${round2(y1 - r)}`
+  );
+
+  if (closePath) {
+    parts.push('Z');
+  }
+
+  return parts.join(' ');
+}
+
+function createInsetRoundedRectPath(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  inset: number,
+  radius: number,
+  closePath: boolean
+): string {
+  const insetX = x + inset;
+  const insetY = y + inset;
+  const insetW = Math.max(0, width - inset * 2);
+  const insetH = Math.max(0, height - inset * 2);
+  const insetRadius = Math.max(0, radius - inset / 2);
+  return createRoundedRectPath(insetX, insetY, insetW, insetH, insetRadius, closePath);
+}
+
+function getCornerRadius(style: MxStyle, width: number, height: number, inset: number): number {
+  const sizeValue = parseFloat(style.size as string);
+  const size = Number.isFinite(sizeValue) ? sizeValue : 10;
+  const rawRadius = Math.max(0, size - inset / 2);
+  return Math.max(0, Math.min(rawRadius, Math.min(width, height) / 2));
 }
 
 function createInsetRectPath(
