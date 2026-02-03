@@ -2051,46 +2051,35 @@ export class SvgRenderer {
   private getStencilSvgFromResource(shape: string): string | null {
     if (!this.stencils) return null;
     if (!shape.startsWith('mxgraph.')) return null;
-    const parts = shape.split('.');
-    if (parts.length < 3) return null;
-    let group = parts[1];
-    let key = parts.slice(2).join('/');
-    if (group === 'veeam2') {
-      group = 'veeam';
-      key = `veeam2/${key}`;
-    }
-    const direct = this.stencils.get(group, key) || this.stencils.get(`${group}/${key}`);
+    
+    // The shape name format is "mxgraph.{package}.{name}" where package may have dots
+    // e.g., "mxgraph.veeam2.1u_server" -> key="veeam2.1u_server"
+    // e.g., "mxgraph.weblogos.identi.ca" -> key="weblogos.identi.ca"
+    // 
+    // Resource keys are stored in the same format (without "mxgraph." prefix)
+    // We need to find which group file contains the key
+    const key = shape.slice('mxgraph.'.length);
+    
+    // Extract the first part as potential group for lookup
+    const parts = key.split('.');
+    const group = parts[0];
+    
+    // Direct lookup with full key
+    const direct = this.stencils.get(group, key);
     if (direct) return direct;
-    const prefixed = this.stencils.get(group, `${group}/${key}`);
-    if (prefixed) return prefixed;
-    const camelToSnake = key.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
-    const normalizedKey = camelToSnake
-      .replace(/[()]/g, '')
-      .replace(/[\s,]+/g, '_')
-      .replace(/-+/g, '_')
-      .replace(/_+/g, '_')
-      .replace(/\/\/_/g, '/')
-      .replace(/_\//g, '/')
-      .replace(/^_+|_+$/g, '');
-    const normalized = this.stencils.get(group, camelToSnake)
-      || this.stencils.get(`${group}/${camelToSnake}`)
-      || this.stencils.get(group, `${group}/${camelToSnake}`)
-      || this.stencils.get(group, normalizedKey)
-      || this.stencils.get(`${group}/${normalizedKey}`)
-      || this.stencils.get(group, `${group}/${normalizedKey}`);
-    if (normalized) return normalized;
+    
+    // Try all groups in case the key is stored in a different group file
     const groupData = this.stencils.getGroup(group);
-    if (!groupData) return null;
-    const prefixedKey = `${group}/${key}`;
-    if (groupData[prefixedKey]) return groupData[prefixedKey];
-    const prefixedNormalized = `${group}/${normalizedKey}`;
-    if (normalizedKey && groupData[prefixedNormalized]) return groupData[prefixedNormalized];
-    const suffixKey = `/${key}`;
-    const suffixNormalized = normalizedKey ? `/${normalizedKey}` : '';
-    const match = Object.keys(groupData).find((k) =>
-      k.endsWith(suffixKey) || (suffixNormalized && k.endsWith(suffixNormalized))
-    );
-    return match ? groupData[match] : null;
+    if (groupData && groupData[key]) return groupData[key];
+    
+    // Fallback: search all groups for this key
+    const allGroups = this.stencils.groups();
+    for (const g of allGroups) {
+      const data = this.stencils.getGroup(g);
+      if (data && data[key]) return data[key];
+    }
+    
+    return null;
   }
 
   private getInlineStencilSvg(shape: string): string | null {

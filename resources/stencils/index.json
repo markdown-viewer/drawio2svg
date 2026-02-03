@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-02T01:16:55.651Z",
+  "generatedAt": "2026-02-03T03:11:03.910Z",
   "totalShapes": 8910,
   "totalGroups": 48,
   "totalFiles": 202,
@@ -8,7 +8,7 @@
       "group": "alibaba_cloud",
       "file": "alibaba_cloud.json",
       "count": 310,
-      "size": 268664
+      "size": 268740
     },
     {
       "group": "android",
@@ -20,277 +20,277 @@
       "group": "arrows",
       "file": "arrows.json",
       "count": 34,
-      "size": 3032
+      "size": 3040
     },
     {
       "group": "atlassian",
       "file": "atlassian.json",
       "count": 26,
-      "size": 5392
+      "size": 5420
     },
     {
       "group": "aws",
       "file": "aws.json",
       "count": 99,
-      "size": 38988
+      "size": 39000
     },
     {
       "group": "aws2",
       "file": "aws2.json",
       "count": 250,
-      "size": 141512
+      "size": 141532
     },
     {
       "group": "aws3",
       "file": "aws3.json",
       "count": 293,
-      "size": 169676
+      "size": 169712
     },
     {
       "group": "aws3d",
       "file": "aws3d.json",
       "count": 16,
-      "size": 6812
+      "size": 6820
     },
     {
       "group": "aws4",
       "file": "aws4.json",
       "count": 1031,
-      "size": 1136788
+      "size": 1136888
     },
     {
       "group": "azure",
       "file": "azure.json",
       "count": 89,
-      "size": 51680
+      "size": 51700
     },
     {
       "group": "basic",
       "file": "basic.json",
       "count": 30,
-      "size": 6996
+      "size": 7008
     },
     {
       "group": "bootstrap",
       "file": "bootstrap.json",
       "count": 4,
-      "size": 1552
+      "size": 1568
     },
     {
       "group": "bpmn",
       "file": "bpmn.json",
       "count": 39,
-      "size": 4332
+      "size": 4348
     },
     {
       "group": "cabinets",
       "file": "cabinets.json",
       "count": 53,
-      "size": 6428
+      "size": 6444
     },
     {
       "group": "cisco",
       "file": "cisco.json",
       "count": 296,
-      "size": 146864
+      "size": 146948
     },
     {
       "group": "cisco19",
       "file": "cisco19.json",
       "count": 232,
-      "size": 318468
+      "size": 318524
     },
     {
       "group": "cisco_safe",
       "file": "cisco_safe.json",
       "count": 485,
-      "size": 663912
+      "size": 664064
     },
     {
       "group": "citrix",
       "file": "citrix.json",
       "count": 97,
-      "size": 140068
+      "size": 140108
     },
     {
       "group": "citrix2",
       "file": "citrix2.json",
       "count": 126,
-      "size": 206044
+      "size": 206072
     },
     {
       "group": "eip",
       "file": "eip.json",
       "count": 36,
-      "size": 4564
+      "size": 4572
     },
     {
       "group": "electrical",
       "file": "electrical.json",
       "count": 527,
-      "size": 40380
+      "size": 40416
     },
     {
       "group": "floorplan",
       "file": "floorplan.json",
       "count": 44,
-      "size": 16288
+      "size": 16300
     },
     {
       "group": "flowchart",
       "file": "flowchart.json",
       "count": 34,
-      "size": 4096
+      "size": 4112
     },
     {
       "group": "fluid_power",
       "file": "fluid_power.json",
       "count": 246,
-      "size": 98548
+      "size": 98636
     },
     {
       "group": "gcp",
       "file": "gcp.json",
       "count": 66,
-      "size": 41152
+      "size": 41160
     },
     {
       "group": "gcp2",
       "file": "gcp2.json",
       "count": 297,
-      "size": 185872
+      "size": 185928
     },
     {
       "group": "gmdl",
       "file": "gmdl.json",
       "count": 104,
-      "size": 20032
+      "size": 20048
     },
     {
       "group": "ibm",
       "file": "ibm.json",
       "count": 8,
-      "size": 4964
+      "size": 4972
     },
     {
       "group": "ibm_cloud",
       "file": "ibm_cloud.json",
       "count": 110,
-      "size": 42720
+      "size": 42792
     },
     {
       "group": "ios7",
       "file": "ios7.json",
       "count": 168,
-      "size": 27636
+      "size": 27672
     },
     {
       "group": "kubernetes",
       "file": "kubernetes.json",
       "count": 40,
-      "size": 22856
+      "size": 22868
     },
     {
       "group": "kubernetes2",
       "file": "kubernetes2.json",
       "count": 39,
-      "size": 26100
+      "size": 26124
     },
     {
       "group": "lean_mapping",
       "file": "lean_mapping.json",
       "count": 13,
-      "size": 2812
+      "size": 2832
     },
     {
       "group": "mockup",
       "file": "mockup.json",
       "count": 104,
-      "size": 30024
+      "size": 30056
     },
     {
       "group": "mscae",
       "file": "mscae.json",
       "count": 368,
-      "size": 243692
+      "size": 243772
     },
     {
       "group": "networks",
       "file": "networks.json",
       "count": 57,
-      "size": 20496
+      "size": 20516
     },
     {
       "group": "networks2",
       "file": "networks2.json",
       "count": 114,
-      "size": 144076
+      "size": 144120
     },
     {
       "group": "office",
       "file": "office.json",
       "count": 449,
-      "size": 295076
+      "size": 295332
     },
     {
       "group": "openstack",
       "file": "openstack.json",
       "count": 18,
-      "size": 18072
+      "size": 18092
     },
     {
       "group": "pid",
       "file": "pid.json",
       "count": 478,
-      "size": 37976
+      "size": 38256
     },
     {
       "group": "rack",
       "file": "rack.json",
       "count": 487,
-      "size": 490920
+      "size": 490952
     },
     {
       "group": "salesforce",
       "file": "salesforce.json",
       "count": 96,
-      "size": 113048
+      "size": 113084
     },
     {
       "group": "signs",
       "file": "signs.json",
       "count": 369,
-      "size": 258700
+      "size": 258788
     },
     {
       "group": "sitemap",
       "file": "sitemap.json",
       "count": 50,
-      "size": 24420
+      "size": 24432
     },
     {
       "group": "veeam",
       "file": "veeam.json",
       "count": 580,
-      "size": 362632
+      "size": 362660
     },
     {
       "group": "vvd",
       "file": "vvd.json",
       "count": 94,
-      "size": 132568
+      "size": 132584
     },
     {
       "group": "webicons",
       "file": "webicons.json",
       "count": 176,
-      "size": 138828
+      "size": 138872
     },
     {
       "group": "weblogos",
       "file": "weblogos.json",
       "count": 178,
-      "size": 146072
+      "size": 146160
     }
   ]
 }
