@@ -84,7 +84,10 @@ export function renderNativeTextLabel(
   const labelPosition = style.labelPosition as string | undefined;
   const verticalLabelPosition = style.verticalLabelPosition as string | undefined;
   const isHorizontalLabel = style.horizontal !== 0 && style.horizontal !== '0' && style.horizontal !== false;
-  const skipHorizontalRotation = labelPosition === 'left' || labelPosition === 'right';
+  // Skip rotation when label is at external positions (left/right/top/bottom)
+  // External labels should remain horizontal regardless of shape rotation
+  const skipHorizontalRotation = labelPosition === 'left' || labelPosition === 'right'
+    || verticalLabelPosition === 'top' || verticalLabelPosition === 'bottom';
   const labelOverrides = ctx.getLabelOverrides?.(shape);
 
   // Apply getLabelBounds if available (adjust bounds for markers, etc.)
@@ -644,7 +647,10 @@ export function renderHtmlLabel(
   }
 
   const isHorizontalLabel = style.horizontal !== 0 && style.horizontal !== '0' && style.horizontal !== false;
-  const skipHorizontalRotation = labelPosition === 'left' || labelPosition === 'right';
+  // Skip rotation when label is at external positions (left/right/top/bottom)
+  // External labels should remain horizontal regardless of shape rotation
+  const skipHorizontalRotation = labelPosition === 'left' || labelPosition === 'right'
+    || verticalLabelPosition === 'top' || verticalLabelPosition === 'bottom';
   if (!isHorizontalLabel && !skipHorizontalRotation && whiteSpaceWrap) {
     let rotatedLabelWidth = Math.max(0, labelH - 2 - spacingTop - spacingBottom);
     let verticalOffsetX = 0;
@@ -877,7 +883,10 @@ export function renderHtmlLabel(
 
   // Handle rotation for the label
   let rotation = parseFloat(style.rotation as string) || 0;
-  if ((labelPosition === 'left' || labelPosition === 'right') && !isTextShape) {
+  // Skip rotation when label is at external positions (left/right/top/bottom)
+  // External labels should remain horizontal regardless of shape rotation
+  if ((labelPosition === 'left' || labelPosition === 'right'
+    || verticalLabelPosition === 'top' || verticalLabelPosition === 'bottom') && !isTextShape) {
     rotation = 0;
   }
   if (!isHorizontalLabel && rotation === 0 && !skipHorizontalRotation) {
@@ -959,9 +968,10 @@ export function renderHtmlLabel(
       'line-height: 1.2',
       'pointer-events: all',
       ...(hasLabelBackground ? [`background-color: ${labelBackgroundColor}`] : []),
-      `font-weight: ${fontWeight}`,
-      `font-style: ${fontStyleCss}`,
-      `text-decoration: ${textDecoration}`,
+      // Only set font-weight/style/decoration when non-default to avoid overriding inline styles
+      ...(isBold ? [`font-weight: ${fontWeight}`] : []),
+      ...(isItalic ? [`font-style: ${fontStyleCss}`] : []),
+      ...(isUnderline ? [`text-decoration: ${textDecoration}`] : []),
       `white-space: ${whiteSpaceWrap ? 'normal' : 'nowrap'}`,
       'overflow-wrap: normal',
       ...(isTableHtml ? ['width: 100%', 'height: 100%'] : [])
@@ -1355,9 +1365,10 @@ export function renderEdgeLabel(
       'line-height: 1.2',
       'pointer-events: all',
       bgColorStyle,
-      `font-weight: ${fontWeight}`,
-      `font-style: ${fontStyleCss}`,
-      `text-decoration: ${textDecoration}`,
+      // Only set font-weight/style/decoration when non-default to avoid overriding inline styles
+      ...(isBold ? [`font-weight: ${fontWeight}`] : []),
+      ...(isItalic ? [`font-style: ${fontStyleCss}`] : []),
+      ...(isUnderline ? [`text-decoration: ${textDecoration}`] : []),
       `white-space: ${whiteSpaceWrap ? 'normal' : 'nowrap'}`,
       ...(whiteSpaceWrap ? ['word-wrap: normal'] : [])
     ].filter(s => s).join('; ') + ';';
@@ -1656,7 +1667,8 @@ export function renderSwimlaneHtmlLabel(
       `color: ${fontColor}`,
       'line-height: 1.2',
       'pointer-events: all',
-      `font-weight: ${fontWeight}`,
+      // Only set font-weight when bold to avoid overriding inline styles
+      ...(isBold ? [`font-weight: ${fontWeight}`] : []),
       whiteSpaceStyle
     ].filter(s => s).join('; ') + ';';
     innerDiv.setAttribute('style', textStyle);
