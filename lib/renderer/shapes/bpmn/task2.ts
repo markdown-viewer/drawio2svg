@@ -16,7 +16,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -83,8 +83,8 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
     const baseOffsetY = bpmnShapeType === 'call' ? 14 + strokeWidth * 2 : offsetBase;
     const offsetY = isTransaction ? baseOffsetY + indent : baseOffsetY;
 
-    this.renderLoopMarkers(builder, x, y, width, height, offsetY, style, attrs, getStencilSvg, renderStencilShape);
-    this.renderTaskMarker(builder, x, y, style, attrs, taskMarker, strokeWidth, bpmnShapeType, getStencilSvg, renderStencilShape);
+    this.renderLoopMarkers(builder, x, y, width, height, offsetY, style, attrs, getStencilShape, renderStencilShape);
+    this.renderTaskMarker(builder, x, y, style, attrs, taskMarker, strokeWidth, bpmnShapeType, getStencilShape, renderStencilShape);
     this.renderEmbeddedEvent(builder, x, y, style, attrs, bpmnShapeType, strokeWidth);
 
     builder.restore();
@@ -99,7 +99,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
     offsetY: number,
     style: RenderContext['style'],
     attrs: ShapeAttrs,
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -131,7 +131,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
         12,
         12,
         attrs,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       currXOffset += iconSpaceX;
@@ -173,7 +173,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
         14,
         12,
         attrs,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       currXOffset += iconSpaceX;
@@ -205,7 +205,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
         12,
         6,
         { ...attrs, fillColor: strokeColor, strokeColor: 'none' },
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       currXOffset += iconSpaceX;
@@ -224,7 +224,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
     taskMarker: string,
     strokeWidth: number,
     bpmnShapeType: string,
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -239,7 +239,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
           16,
           16,
           attrs,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -257,7 +257,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
           16,
           16,
           attrs,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -269,7 +269,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
           18,
           14,
           attrs,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -281,7 +281,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
           18,
           14,
           attrs,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -293,7 +293,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
           19,
           18,
           attrs,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -365,10 +365,10 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
     width: number,
     height: number,
     attrs: ShapeAttrs,
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
-    if (!getStencilSvg || !renderStencilShape) return;
+    if (!getStencilShape || !renderStencilShape) return;
     const fillColor = attrs.fillColor === 'none' ? '#ffffff' : attrs.fillColor;
     const strokeColor = attrs.strokeColor === 'none' ? '#000000' : attrs.strokeColor;
     const stencilStyle = {
@@ -377,9 +377,9 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
       strokeColor,
       aspect: 'fixed',
     } as any;
-    const svg = getStencilSvg(stencilStyle);
-    if (!svg) return;
-    renderStencilShape({ x, y, width, height, style: stencilStyle }, svg);
+    const stencilShape = getStencilShape(name);
+    if (!stencilShape) return;
+    renderStencilShape({ x, y, width, height, style: stencilStyle }, stencilShape);
   }
 }
 

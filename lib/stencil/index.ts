@@ -1,22 +1,19 @@
 /**
  * Stencil module
  * 
- * Provides stencil bundle management and XML-to-SVG conversion utilities.
+ * Provides stencil bundle management and XML-to-JSON conversion utilities.
  */
+
+// Re-export with V2 suffix for backward compatibility during transition
+export {
+  type StencilShape,
+  convertStencilXmlToShapes,
+  parseInlineStencil
+} from './xml.ts';
 
 export {
   type StencilBundle,
   type StencilGroupSource,
-  type StencilColorStyle,
-  applyStencilColors,
   createStencilBundle,
   createStencilBundleFromCompressedGroups
 } from './bundle.ts';
-
-export {
-  type StencilShapeSvg,
-  type StencilConversionStats,
-  convertStencilXmlToSvgs,
-  getConversionStats as getStencilConversionStats,
-  printConversionStats as printStencilConversionStats
-} from './xml.ts';

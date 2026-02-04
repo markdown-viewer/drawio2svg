@@ -17,7 +17,7 @@ export class Ios7uiDownloadBarHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -28,7 +28,7 @@ export class Ios7uiDownloadBarHandler extends BaseShapeHandler {
     applyShapeAttrsToBuilder(builder, attrs);
 
     builder.translate(x, y);
-    this.renderForeground(builder, 0, 0, width, height, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(builder, 0, 0, width, height, style, getStencilShape, renderStencilShape);
     builder.restore();
   }
 
@@ -39,7 +39,7 @@ export class Ios7uiDownloadBarHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

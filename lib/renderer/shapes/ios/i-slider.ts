@@ -17,7 +17,7 @@ export class IosISliderHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -29,7 +29,7 @@ export class IosISliderHandler extends BaseShapeHandler {
 
     builder.translate(x, y);
     builder.setShadow(!1);
-    this.renderForeground(builder, 0, 0, width, height, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(builder, 0, 0, width, height, style, getStencilShape, renderStencilShape);
     builder.restore();
   }
 
@@ -40,7 +40,7 @@ export class IosISliderHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

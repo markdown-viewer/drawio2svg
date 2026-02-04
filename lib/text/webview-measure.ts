@@ -128,11 +128,66 @@ export function measureTextLayout(
     const hasBlockTags = isHtmlValue && /<(div|p|li|ul|ol|table|tr|td|th)\b/i.test(text);
 
     // Set container width for wrapping calculation
+    // Use double container: outer for measuring actual size, inner for triggering wrap
     if (containerWidth !== undefined && containerWidth > 0) {
-      wrapper.style.width = containerWidth + 'px';
-      wrapper.style.whiteSpace = 'normal';
-      wrapper.style.wordWrap = 'normal';
-      (wrapper.style as CSSStyleDeclaration).overflowWrap = 'normal';
+      // Outer wrapper: overflow visible, position relative to contain the inner
+      wrapper.style.width = 'auto';
+      wrapper.style.display = 'inline-block';
+      wrapper.style.overflow = 'visible';
+      wrapper.style.position = 'relative';
+      
+      // Inner container: fixed width triggers wrapping, but content can overflow
+      const innerWrapper = document.createElement('div');
+      innerWrapper.style.width = containerWidth + 'px';
+      innerWrapper.style.whiteSpace = 'normal';
+      innerWrapper.style.wordWrap = 'normal';
+      (innerWrapper.style as CSSStyleDeclaration).overflowWrap = 'normal';
+      innerWrapper.style.overflow = 'visible';
+      wrapper.appendChild(innerWrapper);
+      
+      if (hasHtmlTags) {
+        innerWrapper.innerHTML = text;
+      } else if (isHtmlValue) {
+        const decodedText = decodeEntities(text);
+        innerWrapper.textContent = decodedText;
+      } else {
+        const htmlEncodedText = text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\r\n|\r|\n/g, '<br>');
+        innerWrapper.innerHTML = htmlEncodedText;
+      }
+      
+      // Reset margins and padding
+      innerWrapper.style.margin = '0';
+      innerWrapper.style.padding = '0';
+      const elements = innerWrapper.querySelectorAll('*');
+      elements.forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        htmlEl.style.margin = '0';
+        htmlEl.style.padding = '0';
+      });
+      
+      // Get computed line height
+      const computedStyle = window.getComputedStyle(innerWrapper);
+      const computedLineHeight = parseFloat(computedStyle.lineHeight);
+      const rawLineHeight = Number.isFinite(computedLineHeight) ? computedLineHeight : Math.round(fontSize * 1.2);
+      const lineHeight = Math.max(1, Math.round(rawLineHeight));
+
+      // Use scrollWidth to get actual content width (includes overflow)
+      const actualWidth = Math.max(innerWrapper.scrollWidth, innerWrapper.getBoundingClientRect().width);
+      const rect = innerWrapper.getBoundingClientRect();
+      const rawHeight = rect.height || lineHeight;
+      const lineCount = Math.max(1, Math.round(rawHeight / lineHeight));
+      const height = Math.max(lineHeight, Math.round(rawHeight));
+
+      return {
+        width: actualWidth,
+        height,
+        lineCount,
+        lineHeight
+      };
     } else if (hasBlockTags) {
       wrapper.style.width = 'auto';
       wrapper.style.whiteSpace = 'normal';

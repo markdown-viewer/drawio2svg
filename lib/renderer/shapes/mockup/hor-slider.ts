@@ -17,7 +17,7 @@ export class MockupFormsHorSliderHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -30,9 +30,9 @@ export class MockupFormsHorSliderHandler extends BaseShapeHandler {
     const f = this.getStyleValue(style, 'sliderStyle', 'basic');
 
     builder.translate(x, y);
-    this.renderBackground(builder, width, height, 5, f, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, width, height, 5, f, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
-    this.renderForeground(builder, width, height, 5, f, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(builder, width, height, 5, f, style, getStencilShape, renderStencilShape);
     builder.restore();
   }
 
@@ -43,7 +43,7 @@ export class MockupFormsHorSliderHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -65,7 +65,7 @@ export class MockupFormsHorSliderHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

@@ -12,7 +12,7 @@ import pako from 'pako';
  * @param compressed - Base64 encoded, deflated, URL encoded content
  * @returns Decompressed XML string, or null if decompression fails
  */
-function decompressContent(compressed: string): string | null {
+export function decompressContent(compressed: string): string | null {
     try {
         // Base64 decode
         const buffer = Buffer.from(compressed, 'base64');

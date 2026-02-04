@@ -17,7 +17,7 @@ export class RackGeneralContainerHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -41,10 +41,10 @@ export class RackGeneralContainerHandler extends BaseShapeHandler {
       builder.translate(x, y);
     }
     builder.setFillColor(g as string);
-    this.renderBackground(builder, 0, 0, b, height, style, getStencilSvg, renderStencilShape, 12);
+    this.renderBackground(builder, 0, 0, b, height, style, getStencilShape, renderStencilShape, 12);
     builder.setShadow(!1);
     builder.setFillColor(h as string);
-    this.renderForeground(builder, 0, 0, b, height, style, getStencilSvg, renderStencilShape, 12);
+    this.renderForeground(builder, 0, 0, b, height, style, getStencilShape, renderStencilShape, 12);
     if (f !== 'off' && 42 < b) {
       this.render_sideText(builder, b, height, 12);
     }
@@ -58,7 +58,7 @@ export class RackGeneralContainerHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {
@@ -74,7 +74,7 @@ export class RackGeneralContainerHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {

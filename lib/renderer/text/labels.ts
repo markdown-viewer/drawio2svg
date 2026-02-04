@@ -883,10 +883,32 @@ export function renderHtmlLabel(
 
   // Handle rotation for the label
   let rotation = parseFloat(style.rotation as string) || 0;
-  // Skip rotation when label is at external positions (left/right/top/bottom)
-  // External labels should remain horizontal regardless of shape rotation
-  if ((labelPosition === 'left' || labelPosition === 'right'
-    || verticalLabelPosition === 'top' || verticalLabelPosition === 'bottom') && !isTextShape) {
+  const shapeRotation = rotation;  // Save original shape rotation for external label positioning
+  // For external labels (left/right/top/bottom), the label itself still rotates with the shape,
+  // but the label position must be calculated relative to the rotated shape bounds
+  const hasExternalLabelPos = labelPosition === 'left' || labelPosition === 'right' ||
+    verticalLabelPosition === 'top' || verticalLabelPosition === 'bottom';
+
+  // When shape has rotation and label is at external position AND label is horizontal (no horizontal=0),
+  // rotate label position around shape center.
+  // Skip for horizontal=0 labels since they use getLabelBounds which already handles rotation.
+  if (isHorizontalLabel && hasExternalLabelPos && !isTextShape && shapeRotation !== 0) {
+    const shapeCenterX = x + width / 2;
+    const shapeCenterY = y + height / 2;
+    const rad = shapeRotation * Math.PI / 180;
+    const cosR = Math.cos(rad);
+    const sinR = Math.sin(rad);
+    // Rotate the label position (marginLeft, paddingTop) around shape center
+    const labelX = marginLeft;
+    const labelY = paddingTop;
+    const rotatedX = shapeCenterX + (labelX - shapeCenterX) * cosR - (labelY - shapeCenterY) * sinR;
+    const rotatedY = shapeCenterY + (labelX - shapeCenterX) * sinR + (labelY - shapeCenterY) * cosR;
+    marginLeft = rotatedX;
+    paddingTop = rotatedY;
+  }
+  // For horizontal=0 (vertical text) with external label positions, skip the shape rotation
+  // since getLabelBounds already handles the positioning
+  if (!isHorizontalLabel && hasExternalLabelPos && !isTextShape) {
     rotation = 0;
   }
   if (!isHorizontalLabel && rotation === 0 && !skipHorizontalRotation) {
@@ -900,6 +922,11 @@ export function renderHtmlLabel(
   }
   if (!isHorizontalLabel && !skipHorizontalRotation && whiteSpaceWrap && !isVerticalSingleLine) {
     centerX = marginLeft + labelWidth / 2;
+    centerY = paddingTop;
+  }
+  // For external labels with shape rotation (horizontal labels only), use rotated position as rotation center
+  if (isHorizontalLabel && hasExternalLabelPos && !isTextShape && shapeRotation !== 0) {
+    centerX = marginLeft;
     centerY = paddingTop;
   }
   if (rotation !== 0 && isTextShape && isHorizontalLabel && align !== 'center') {

@@ -96,19 +96,36 @@ export function extendBoundsForInternalLabelOverflow(
   
   // If overflow is hidden, text is clipped to shape bounds
   if (overflow === 'hidden' || overflow === 'fill') return;
-  
-  // If wrap is enabled and overflow is not visible, text stays within bounds
-  if (whiteSpace === 'wrap' && overflow !== 'visible') return;
 
-  const { width: labelWidth } = measureMultilineText(
-    decodedLabelValue,
-    fontSize,
-    fontFamily,
-    fontWeight,
-    fontStyle,
-    1.2,
-    isHtml
-  );
+  // When wrap is enabled, measure with container width to get actual wrapped width
+  // Otherwise measure without wrapping
+  let labelWidth: number;
+  
+  if (whiteSpace === 'wrap' && overflow !== 'visible') {
+    // Measure text with wrapping at container width
+    const layoutResult = measureTextLayout(
+      decodedLabelValue,
+      fontSize,
+      fontFamily,
+      fontWeight,
+      fontStyle,
+      width, // container width for wrapping
+      isHtml
+    );
+    labelWidth = layoutResult.width;
+  } else {
+    // Measure without wrapping
+    const result = measureMultilineText(
+      decodedLabelValue,
+      fontSize,
+      fontFamily,
+      fontWeight,
+      fontStyle,
+      1.2,
+      isHtml
+    );
+    labelWidth = result.width;
+  }
 
   // Only extend if label width exceeds shape width
   if (labelWidth <= width) return;
@@ -271,10 +288,12 @@ export function extendBoundsForExternalLabels(
     rightPadding = Math.max(0, rightPadding - paddingAdjust);
   }
 
+  // Restore original labelPosition bounds update
   if (style.labelPosition === 'left') {
     const spacingRightPad = needsFixedWidthPad ? Math.max(0, spacingRight) : spacingRight;
     const extraPad = needsFixedWidthPad && spacingRight < 0 ? 4 : 0;
-    const widthPad = Math.round(labelWidth) + 2 + spacingRightPad + extraPad;
+    // Use +1 instead of +2 to better match draw.io's bounds calculation
+    const widthPad = Math.round(labelWidth) + 1 + spacingRightPad + extraPad;
     const pad = needsFixedWidthPad
       ? Math.max(0, widthPad)
       : Math.max(0, leftPadding + spacingRight);
@@ -282,7 +301,8 @@ export function extendBoundsForExternalLabels(
   } else if (style.labelPosition === 'right') {
     const spacingLeftPad = needsFixedWidthPad ? Math.max(0, spacingLeft) : spacingLeft;
     const extraPad = needsFixedWidthPad && spacingLeft < 0 ? 4 : 0;
-    const widthPad = Math.round(labelWidth) + 2 + spacingLeftPad + extraPad;
+    // Use +1 instead of +2 to better match draw.io's bounds calculation
+    const widthPad = Math.round(labelWidth) + 1 + spacingLeftPad + extraPad;
     const pad = needsFixedWidthPad
       ? Math.max(0, widthPad)
       : Math.max(0, rightPadding + spacingLeft);

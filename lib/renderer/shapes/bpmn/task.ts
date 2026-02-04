@@ -41,7 +41,7 @@ export class BpmnTaskHandler extends RectangleShapeHandler {
   }
 
   render(attrs: ShapeAttrs): void {
-    const { builder, currentGroup, x, y, width, height, style, getStencilSvg, renderStencilShape } = this.renderCtx;
+    const { builder, currentGroup, x, y, width, height, style, getStencilShape, renderStencilShape } = this.renderCtx;
     if (!builder || !currentGroup) return;
 
     const strokeColor = attrs.strokeColor === 'none' ? 'none' : attrs.strokeColor;
@@ -101,9 +101,9 @@ export class BpmnTaskHandler extends RectangleShapeHandler {
     if (marker === 'send' || marker === 'receive') {
       renderSendMarker(this.renderCtx, attrs, marker === 'send');
     } else if (marker === 'service') {
-      renderStencilByName(this.renderCtx, 'mxgraph.bpmn.service_task', x + 2, y + 2, 16, 16, attrs, getStencilSvg, renderStencilShape);
+      renderStencilByName(this.renderCtx, 'mxgraph.bpmn.service_task', x + 2, y + 2, 16, 16, attrs, getStencilShape, renderStencilShape);
     } else if (marker === 'user') {
-      renderStencilByName(this.renderCtx, 'mxgraph.bpmn.user_task', x + 2, y + 2, 16, 16, attrs, getStencilSvg, renderStencilShape);
+      renderStencilByName(this.renderCtx, 'mxgraph.bpmn.user_task', x + 2, y + 2, 16, 16, attrs, getStencilShape, renderStencilShape);
     } else if (marker === 'manual') {
       renderStencilByName(
         this.renderCtx,
@@ -113,14 +113,14 @@ export class BpmnTaskHandler extends RectangleShapeHandler {
         18,
         14,
         attrs,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape,
         'transparent'
       );
     } else if (marker === 'businessRule') {
-      renderStencilByName(this.renderCtx, 'mxgraph.bpmn.business_rule_task', x + 4, y + 4, 18, 14, attrs, getStencilSvg, renderStencilShape);
+      renderStencilByName(this.renderCtx, 'mxgraph.bpmn.business_rule_task', x + 4, y + 4, 18, 14, attrs, getStencilShape, renderStencilShape, 'transparent');
     } else if (marker === 'script') {
-      renderStencilByName(this.renderCtx, 'mxgraph.bpmn.script_task', x + 3, y + 3, 19, 18, attrs, getStencilSvg, renderStencilShape);
+      renderStencilByName(this.renderCtx, 'mxgraph.bpmn.script_task', x + 3, y + 3, 19, 18, attrs, getStencilShape, renderStencilShape, 'transparent');
     }
 
     renderLoopMarkers(this.renderCtx, attrs, indent);
@@ -283,7 +283,7 @@ function renderSendMarker(renderCtx: RenderContext, attrs: ShapeAttrs, isFilled:
 }
 
 function renderLoopMarkers(renderCtx: RenderContext, attrs: ShapeAttrs, indent: number): void {
-  const { builder, currentGroup, x, y, width, height, style, getStencilSvg, renderStencilShape } = renderCtx;
+  const { builder, currentGroup, x, y, width, height, style, getStencilShape, renderStencilShape } = renderCtx;
   if (!builder || !currentGroup) return;
 
   const isSubprocess = style.isLoopSub === '1' || style.isLoopSub === true;
@@ -308,8 +308,8 @@ function renderLoopMarkers(renderCtx: RenderContext, attrs: ShapeAttrs, indent: 
   const markerBaseY = y + height - offsetY + 1;
 
   if (isLoopStandard) {
-    if (getStencilSvg && renderStencilShape) {
-      renderStencilByName(renderCtx, 'mxgraph.bpmn.loop', x + width / 2 + currXOffset + 1, markerBaseY, 12, 12, attrs, getStencilSvg, renderStencilShape);
+    if (getStencilShape && renderStencilShape) {
+      renderStencilByName(renderCtx, 'mxgraph.bpmn.loop', x + width / 2 + currXOffset + 1, markerBaseY, 12, 12, attrs, getStencilShape, renderStencilShape);
     } else {
       const markerX = x + width / 2 + currXOffset + 1;
       const markerY = markerBaseY;
@@ -361,8 +361,8 @@ function renderLoopMarkers(renderCtx: RenderContext, attrs: ShapeAttrs, indent: 
     currXOffset += iconSpaceX;
   }
 
-  if (isLoopComp && getStencilSvg && renderStencilShape) {
-    renderStencilByName(renderCtx, 'mxgraph.bpmn.compensation', x + width / 2 + currXOffset, markerBaseY, 14, 12, attrs, getStencilSvg, renderStencilShape);
+  if (isLoopComp && getStencilShape && renderStencilShape) {
+    renderStencilByName(renderCtx, 'mxgraph.bpmn.compensation', x + width / 2 + currXOffset, markerBaseY, 14, 12, attrs, getStencilShape, renderStencilShape);
     currXOffset += iconSpaceX;
   }
 
@@ -386,7 +386,7 @@ function renderLoopMarkers(renderCtx: RenderContext, attrs: ShapeAttrs, indent: 
     currXOffset += iconSpaceX;
   }
 
-  if (isAdHoc && getStencilSvg && renderStencilShape) {
+  if (isAdHoc && getStencilShape && renderStencilShape) {
     renderStencilByName(
       renderCtx,
       'mxgraph.bpmn.ad_hoc',
@@ -395,7 +395,7 @@ function renderLoopMarkers(renderCtx: RenderContext, attrs: ShapeAttrs, indent: 
       12,
       6,
       { ...attrs, fillColor: strokeColor, strokeColor: 'none' },
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape
     );
     currXOffset += iconSpaceX;
@@ -411,10 +411,12 @@ function renderEmbeddedEvent(renderCtx: RenderContext, attrs: ShapeAttrs): void 
 
   const symbol = (style.symbol as string) || 'standard';
   const embeddedCtx = { ...renderCtx, x, y, width: 20, height: 20 };
+  // Use transparent fill for embedded event in Task (matches draw.io official behavior)
+  const eventAttrs = { ...attrs, fillColor: 'transparent' };
 
-  renderOutlineLayer(embeddedCtx, attrs, outline);
+  renderOutlineLayer(embeddedCtx, eventAttrs, outline);
   if (symbol && symbol !== 'general') {
-    renderSymbolLayer(embeddedCtx, attrs, symbol, outline);
+    renderSymbolLayer(embeddedCtx, eventAttrs, symbol, outline);
   }
 }
 
@@ -426,13 +428,13 @@ function renderStencilByName(
   width: number,
   height: number,
   attrs: ShapeAttrs,
-  getStencilSvg?: RenderContext['getStencilSvg'],
+  getStencilShape?: RenderContext['getStencilShape'],
   renderStencilShape?: RenderContext['renderStencilShape'],
   fillOverride?: string
 ): void {
-  const resolvedGetStencilSvg = getStencilSvg ?? renderCtx.getStencilSvg;
+  const resolvedGetStencilShape = getStencilShape ?? renderCtx.getStencilShape;
   const resolvedRenderStencilShape = renderStencilShape ?? renderCtx.renderStencilShape;
-  if (!resolvedGetStencilSvg || !resolvedRenderStencilShape) return;
+  if (!resolvedGetStencilShape || !resolvedRenderStencilShape) return;
   const fillColor = fillOverride ?? (attrs.fillColor === 'none' ? '#ffffff' : attrs.fillColor);
   const strokeColor = attrs.strokeColor === 'none' ? '#000000' : attrs.strokeColor;
   const stencilStyle = {
@@ -441,7 +443,7 @@ function renderStencilByName(
     strokeColor,
     aspect: 'fixed',
   } as any;
-  const svg = resolvedGetStencilSvg(stencilStyle);
-  if (!svg) return;
-  resolvedRenderStencilShape({ x, y, width, height, style: stencilStyle }, svg);
+  const stencilShape = resolvedGetStencilShape(name);
+  if (!stencilShape) return;
+  resolvedRenderStencilShape({ x, y, width, height, style: stencilStyle }, stencilShape);
 }

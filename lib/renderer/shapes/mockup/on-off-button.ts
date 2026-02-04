@@ -17,7 +17,7 @@ export class MockupButtonsOnOffButtonHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -32,9 +32,9 @@ export class MockupButtonsOnOffButtonHandler extends BaseShapeHandler {
     builder.translate(x, y);
     b = Math.max(b, 10);
     c = Math.max(c, 10);
-    this.renderBackground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, x, y, b, c, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
-    this.renderForeground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(builder, x, y, b, c, style, getStencilShape, renderStencilShape);
     builder.restore();
   }
 
@@ -45,7 +45,7 @@ export class MockupButtonsOnOffButtonHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -60,7 +60,7 @@ export class MockupButtonsOnOffButtonHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

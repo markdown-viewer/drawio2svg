@@ -17,7 +17,7 @@ export class MockupTextLinkBarHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -83,7 +83,7 @@ export class MockupTextLinkBarHandler extends BaseShapeHandler {
       10,
       q,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
       t,
       5,
@@ -117,7 +117,7 @@ export class MockupTextLinkBarHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any,

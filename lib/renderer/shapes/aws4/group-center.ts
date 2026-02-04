@@ -17,7 +17,7 @@ export class Aws4GroupCenterHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -61,9 +61,9 @@ export class Aws4GroupCenterHandler extends BaseShapeHandler {
         __ty + 0,
         d,
         d,
-        e,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
     }
@@ -78,10 +78,10 @@ export class Aws4GroupCenterHandler extends BaseShapeHandler {
     height: number,
     fillColor: string | undefined,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
-    if (!getStencilSvg || !renderStencilShape) return;
+    if (!getStencilShape || !renderStencilShape) return;
     if (!name) return;
     const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
     const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
@@ -107,8 +107,9 @@ export class Aws4GroupCenterHandler extends BaseShapeHandler {
       strokeColor: 'none',
       ...(aspect ? { aspect } : {}),
     } as any;
-    const svg = getStencilSvg(stencilStyle);
-    if (!svg) return;
-    renderStencilShape({ x, y, width, height, style: stencilStyle }, svg);
+    const stencilShape = getStencilShape(stencilStyle.shape);
+    if (!stencilShape) return;
+    const ctx = { x, y, width, height, style: stencilStyle };
+    renderStencilShape(ctx, stencilShape);
   }
 }

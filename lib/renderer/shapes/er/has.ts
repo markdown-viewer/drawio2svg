@@ -17,7 +17,7 @@ export class ErHasHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -35,7 +35,7 @@ export class ErHasHandler extends BaseShapeHandler {
     builder.translate(x, y);
     b = Math.max(b, 20);
     c = Math.max(c, 20);
-    this.renderBackground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape, 10, g);
+    this.renderBackground(builder, x, y, b, c, style, getStencilShape, renderStencilShape, 10, g);
     builder.setShadow(!1);
     this.render_mainText(builder, x, y, b, c, f, h, g);
     builder.restore();
@@ -48,7 +48,7 @@ export class ErHasHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any

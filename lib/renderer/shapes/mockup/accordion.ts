@@ -17,7 +17,7 @@ export class MockupContainersAccordionHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -80,7 +80,7 @@ export class MockupContainersAccordionHandler extends BaseShapeHandler {
       10,
       q,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
       5,
       q * w,
@@ -117,7 +117,7 @@ export class MockupContainersAccordionHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any,

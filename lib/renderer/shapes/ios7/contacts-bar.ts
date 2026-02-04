@@ -14,7 +14,9 @@ export class Ios7ContactsBarHandler extends RectangleShapeHandler {
     if (width <= 0 || height <= 0) return;
 
     const format = (value: number): number => Number(value.toFixed(2));
-    const fillColor = normalizeColor('#e0e0e0');
+    // Use fillColor from style, defaulting to white (#ffffff) like draw.io
+    const rawFillColor = attrs.fillColor || '#ffffff';
+    const fillColor = rawFillColor === 'none' ? 'none' : normalizeColor(rawFillColor);
     const strokeColor = attrs.strokeColor === 'none' ? 'none' : attrs.strokeColor;
 
     const background = builder.createRect(format(x), format(y), format(width), format(height), {

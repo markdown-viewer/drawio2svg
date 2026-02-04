@@ -17,7 +17,7 @@ export class KubernetesIconHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -45,9 +45,9 @@ export class KubernetesIconHandler extends BaseShapeHandler {
       __ty + 0,
       width,
       height,
-      h,
+      undefined,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape
     );
     builder.setFillColor(g as string);
@@ -57,9 +57,9 @@ export class KubernetesIconHandler extends BaseShapeHandler {
       __ty + 0.03 * height,
       0.94 * width,
       0.94 * height,
-      g,
+      undefined,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape
     );
     f = 'mxgraph.kubernetes.' + f;
@@ -71,9 +71,9 @@ export class KubernetesIconHandler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * width,
         0.6 * height,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
     }
@@ -88,10 +88,10 @@ export class KubernetesIconHandler extends BaseShapeHandler {
     height: number,
     fillColor: string | undefined,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
-    if (!getStencilSvg || !renderStencilShape) return;
+    if (!getStencilShape || !renderStencilShape) return;
     if (!name) return;
     const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
     const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
@@ -117,8 +117,9 @@ export class KubernetesIconHandler extends BaseShapeHandler {
       strokeColor: 'none',
       ...(aspect ? { aspect } : {}),
     } as any;
-    const svg = getStencilSvg(stencilStyle);
-    if (!svg) return;
-    renderStencilShape({ x, y, width, height, style: stencilStyle }, svg);
+    const stencilShape = getStencilShape(stencilStyle.shape);
+    if (!stencilShape) return;
+    const ctx = { x, y, width, height, style: stencilStyle };
+    renderStencilShape(ctx, stencilShape);
   }
 }

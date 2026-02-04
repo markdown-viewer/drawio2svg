@@ -17,7 +17,7 @@ export class Ios7uiActionDialogHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -36,7 +36,7 @@ export class Ios7uiActionDialogHandler extends BaseShapeHandler {
     h = this.getStyleValue(style, 'textColor', '#666666');
     k = this.getStyleValue(style, 'textSize', '17');
     builder.translate(x, y);
-    this.renderBackground(builder, x, y, width, height, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, x, y, width, height, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
     builder.setFillColor('#e0e0e0' as string);
     builder.roundrect(
@@ -70,7 +70,7 @@ export class Ios7uiActionDialogHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

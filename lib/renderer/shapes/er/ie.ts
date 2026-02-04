@@ -17,7 +17,7 @@ export class ErIeHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -34,9 +34,9 @@ export class ErIeHandler extends BaseShapeHandler {
     builder.translate(x, y);
     b = Math.max(b, c / 1.5);
     c = Math.max(c, 5 * g);
-    this.renderBackground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, x, y, b, c, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
-    this.renderForeground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape, g, f);
+    this.renderForeground(builder, x, y, b, c, style, getStencilShape, renderStencilShape, g, f);
     builder.restore();
   }
 
@@ -47,7 +47,7 @@ export class ErIeHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -67,7 +67,7 @@ export class ErIeHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any

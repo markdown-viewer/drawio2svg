@@ -17,7 +17,7 @@ export class MockupContainersVerTabBarHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -60,7 +60,7 @@ export class MockupContainersVerTabBarHandler extends BaseShapeHandler {
     b = Math.max(b, f + 5);
     c = Math.max(c, 20 + k * h + 5 * (k - 1));
     builder.translate(x, y);
-    this.renderBackground(builder, b, c, 5, f, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, b, c, 5, f, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
     this.render_backTabs(builder, b, c, 5, h, f, 10, 5, 10, k, l, m);
     this.render_focusTab(builder, b, c, 5, h, f, 10, 5, 10, k, l, m);
@@ -75,7 +75,7 @@ export class MockupContainersVerTabBarHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

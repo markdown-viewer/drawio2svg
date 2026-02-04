@@ -17,7 +17,7 @@ export class RackGeneralRackNumberingHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -33,7 +33,7 @@ export class RackGeneralRackNumberingHandler extends BaseShapeHandler {
 
     builder.translate(x, y);
     c = f * g;
-    this.renderBackground(builder, 0, 0, width, c, style, getStencilSvg, renderStencilShape, h);
+    this.renderBackground(builder, 0, 0, width, c, style, getStencilShape, renderStencilShape, h);
     builder.setShadow(!1);
     this.render_sideText(builder, width, c, f, g, h);
     builder.restore();
@@ -46,7 +46,7 @@ export class RackGeneralRackNumberingHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {

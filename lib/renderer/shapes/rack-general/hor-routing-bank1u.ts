@@ -17,7 +17,7 @@ export class RackGeneralHorRoutingBank1UHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -28,9 +28,9 @@ export class RackGeneralHorRoutingBank1UHandler extends BaseShapeHandler {
     applyShapeAttrsToBuilder(builder, attrs);
 
     builder.translate(x, y);
-    this.renderBackground(builder, 0, 0, width, height, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, 0, 0, width, height, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
-    this.renderForeground(builder, 0, 0, width, height, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(builder, 0, 0, width, height, style, getStencilShape, renderStencilShape);
     builder.restore();
   }
 
@@ -41,7 +41,7 @@ export class RackGeneralHorRoutingBank1UHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -56,7 +56,7 @@ export class RackGeneralHorRoutingBank1UHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

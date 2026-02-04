@@ -17,7 +17,7 @@ export class MockupFormsSplitterHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -30,9 +30,9 @@ export class MockupFormsSplitterHandler extends BaseShapeHandler {
 
     b = Math.max(b, 35);
     builder.translate(x, y);
-    this.renderBackground(builder, 0, 0, b, height, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, 0, 0, b, height, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
-    this.renderForeground(builder, 0, 0, b, height, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(builder, 0, 0, b, height, style, getStencilShape, renderStencilShape);
     builder.restore();
   }
 
@@ -43,7 +43,7 @@ export class MockupFormsSplitterHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -63,7 +63,7 @@ export class MockupFormsSplitterHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

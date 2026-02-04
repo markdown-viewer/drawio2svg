@@ -59,9 +59,9 @@ export class Networks2IconHandler extends BaseShapeHandler {
         p2,
         p3,
         p4,
-        '#000000',
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
     }
@@ -126,7 +126,7 @@ export class Networks2IconHandler extends BaseShapeHandler {
           p4 * h,
           undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
       }
@@ -139,7 +139,7 @@ export class Networks2IconHandler extends BaseShapeHandler {
         p4,
         undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
     }
@@ -153,10 +153,10 @@ export class Networks2IconHandler extends BaseShapeHandler {
     height: number,
     fillColor: string | undefined,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
-    if (!getStencilSvg || !renderStencilShape) return;
+    if (!getStencilShape || !renderStencilShape) return;
     if (!name) return;
     const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
     const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
@@ -182,8 +182,9 @@ export class Networks2IconHandler extends BaseShapeHandler {
       strokeColor: 'none',
       ...(aspect ? { aspect } : {}),
     } as any;
-    const svg = getStencilSvg(stencilStyle);
-    if (!svg) return;
-    renderStencilShape({ x, y, width, height, style: stencilStyle }, svg);
+    const stencilShape = getStencilShape(stencilStyle.shape);
+    if (!stencilShape) return;
+    const ctx = { x, y, width, height, style: stencilStyle };
+    renderStencilShape(ctx, stencilShape);
   }
 }

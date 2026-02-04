@@ -8,15 +8,19 @@ export class FallbackShapeHandler extends RectangleShapeHandler {
   }
 
   render(attrs: ShapeAttrs): void {
-    const { getStencilSvg, renderStencilShape, style, cellGroup } = this.renderCtx;
-    const stencilSvg = getStencilSvg ? getStencilSvg(style) : null;
-    if (stencilSvg && renderStencilShape) {
+    const { getStencilShape, renderStencilShape, style, cellGroup } = this.renderCtx;
+    
+    // Try to render as stencil shape
+    const stencilShape = getStencilShape ? getStencilShape(style.shape || '') : null;
+    if (stencilShape && renderStencilShape) {
       if (cellGroup) {
-        cellGroup.setAttribute('data-stencil', '1');
+        cellGroup.setAttribute('data-stencil', 'true');
       }
-      renderStencilShape(this.renderCtx, stencilSvg);
+      renderStencilShape(this.renderCtx, stencilShape);
       return;
     }
+    
+    // Fall back to rectangle if no stencil found
     new RectangleHandler(this.renderCtx).render(attrs);
   }
 }

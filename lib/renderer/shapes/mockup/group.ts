@@ -17,7 +17,7 @@ export class MockupContainersGroupHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -38,9 +38,9 @@ export class MockupContainersGroupHandler extends BaseShapeHandler {
     builder.translate(x, y);
     b = Math.max(b, h + 15);
     c = Math.max(c, g + 10);
-    this.renderBackground(builder, b, c, h, g, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, b, c, h, g, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
-    this.renderForeground(builder, b, c, h, g, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(builder, b, c, h, g, style, getStencilShape, renderStencilShape);
     this.render_buttonText(builder, b, c, f, g);
     builder.restore();
   }
@@ -52,7 +52,7 @@ export class MockupContainersGroupHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -67,7 +67,7 @@ export class MockupContainersGroupHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

@@ -86,11 +86,13 @@ export function SideToSide(
     let y2 = getRoutingCenterY(actualTarget);
 
     if (pt != null) {
-      if (pt.y >= actualSource.y && pt.y <= actualSource.y + actualSource.height) {
+      // Use tolerance for floating point comparison (0.5px)
+      const tol = 0.5;
+      if (pt.y >= actualSource.y - tol && pt.y <= actualSource.y + actualSource.height + tol) {
         y1 = pt.y;
       }
 
-      if (pt.y >= actualTarget.y && pt.y <= actualTarget.y + actualTarget.height) {
+      if (pt.y >= actualTarget.y - tol && pt.y <= actualTarget.y + actualTarget.height + tol) {
         y2 = pt.y;
       }
     }
@@ -149,9 +151,12 @@ export function TopToBottom(
     const t = Math.max(actualSource.y, actualTarget.y);
     const b = Math.min(actualSource.y + actualSource.height, actualTarget.y + actualTarget.height);
 
+    // Use tolerance for floating point comparison (0.5px)
+    const tol = 0.5;
+
     let x = getRoutingCenterX(actualSource);
 
-    if (pt != null && pt.x >= actualSource.x && pt.x <= actualSource.x + actualSource.width) {
+    if (pt != null && pt.x >= actualSource.x - tol && pt.x <= actualSource.x + actualSource.width + tol) {
       x = pt.x;
     }
 
@@ -161,7 +166,7 @@ export function TopToBottom(
       result.push({ x, y });
     }
 
-    if (pt != null && pt.x >= actualTarget.x && pt.x <= actualTarget.x + actualTarget.width) {
+    if (pt != null && pt.x >= actualTarget.x - tol && pt.x <= actualTarget.x + actualTarget.width + tol) {
       x = pt.x;
     } else {
       x = getRoutingCenterX(actualTarget);

@@ -1,5 +1,5 @@
 import type { MxStyle } from '../../parser.ts';
-import { measureMultilineText } from '../../text/index.ts';
+import { measureMultilineText, measureTextLayout } from '../../text/index.ts';
 import { DEFAULT_FONT_FAMILY } from '../../text/index.ts';
 
 export interface TextBounds {
@@ -14,7 +14,8 @@ export function measureTextBoundsAtPosition(
   style: MxStyle,
   x: number,
   y: number,
-  defaultFontSize: number
+  defaultFontSize: number,
+  containerWidth?: number
 ): TextBounds {
   const fontSize = parseFloat(style.fontSize as string) || defaultFontSize;
   const fontFamily = (style.fontFamily as string) || DEFAULT_FONT_FAMILY;
@@ -35,10 +36,21 @@ export function measureTextBoundsAtPosition(
         .replace(/&apos;/g, "'")
     : value;
 
-  // Pass the decoded value directly - DOM will render HTML correctly
-  const { width: textWidth, height: textHeight } = measureMultilineText(
-    textValue, fontSize, fontFamily, fontWeight, fontStyle, 1.2, isHtml
-  );
+  // Use measureTextLayout when wrap is enabled and container width is provided
+  const whiteSpaceWrap = style.whiteSpace === 'wrap';
+  let textWidth: number;
+  let textHeight: number;
+  
+  if (whiteSpaceWrap && containerWidth !== undefined && containerWidth > 0) {
+    const layout = measureTextLayout(textValue, fontSize, fontFamily, fontWeight, fontStyle, containerWidth, isHtml);
+    textWidth = layout.width;
+    textHeight = layout.height;
+  } else {
+    const result = measureMultilineText(textValue, fontSize, fontFamily, fontWeight, fontStyle, 1.2, isHtml);
+    textWidth = result.width;
+    textHeight = result.height;
+  }
+  
   const halfWidth = textWidth / 2;
   const halfHeight = textHeight / 2;
 

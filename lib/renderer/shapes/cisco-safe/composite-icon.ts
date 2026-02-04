@@ -17,7 +17,7 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -55,7 +55,7 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
         height,
         undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
     }
@@ -114,9 +114,9 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
           __ty + 0.26 * height,
           0.48 * width,
           0.48 * height,
-          f,
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
       }
@@ -149,9 +149,9 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
             __ty + 0.01 * height,
             0.98 * width,
             0.98 * height,
-            '#ffffff',
+            undefined,
             style,
-            getStencilSvg,
+            getStencilShape,
             renderStencilShape
           );
         } else {
@@ -161,9 +161,9 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
             __ty + 1,
             width - 2,
             height - 2,
-            '#ffffff',
+            undefined,
             style,
-            getStencilSvg,
+            getStencilShape,
             renderStencilShape
           );
         }
@@ -179,9 +179,9 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
           __ty + 0.25 * height,
           0.5 * width,
           0.5 * height,
-          h,
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
       } else {
@@ -191,9 +191,9 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
           __ty + 0,
           width,
           height,
-          h,
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
       }
@@ -209,10 +209,10 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
     height: number,
     fillColor: string | undefined,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
-    if (!getStencilSvg || !renderStencilShape) return;
+    if (!getStencilShape || !renderStencilShape) return;
     if (!name) return;
     const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
     const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
@@ -238,8 +238,9 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
       strokeColor: 'none',
       ...(aspect ? { aspect } : {}),
     } as any;
-    const svg = getStencilSvg(stencilStyle);
-    if (!svg) return;
-    renderStencilShape({ x, y, width, height, style: stencilStyle }, svg);
+    const stencilShape = getStencilShape(stencilStyle.shape);
+    if (!stencilShape) return;
+    const ctx = { x, y, width, height, style: stencilStyle };
+    renderStencilShape(ctx, stencilShape);
   }
 }

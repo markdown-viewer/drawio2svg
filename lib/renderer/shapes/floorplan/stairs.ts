@@ -17,7 +17,7 @@ export class FloorplanStairsHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -35,7 +35,7 @@ export class FloorplanStairsHandler extends BaseShapeHandler {
       Math.max(width, 50),
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape
     );
     builder.restore();
@@ -48,7 +48,7 @@ export class FloorplanStairsHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

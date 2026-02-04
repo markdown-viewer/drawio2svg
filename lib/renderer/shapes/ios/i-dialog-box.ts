@@ -17,7 +17,7 @@ export class IosIDialogBoxHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -34,9 +34,9 @@ export class IosIDialogBoxHandler extends BaseShapeHandler {
     c = Math.max(c, 15);
     builder.translate(x, y);
     rSize = 7.5;
-    this.renderBackground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape, rSize);
+    this.renderBackground(builder, x, y, b, c, style, getStencilShape, renderStencilShape, rSize);
     builder.setShadow(!1);
-    this.renderForeground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape, rSize);
+    this.renderForeground(builder, x, y, b, c, style, getStencilShape, renderStencilShape, rSize);
     builder.restore();
   }
 
@@ -47,7 +47,7 @@ export class IosIDialogBoxHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {
@@ -66,7 +66,7 @@ export class IosIDialogBoxHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {

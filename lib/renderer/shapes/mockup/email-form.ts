@@ -17,7 +17,7 @@ export class MockupFormsEmailFormHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -43,9 +43,9 @@ export class MockupFormsEmailFormHandler extends BaseShapeHandler {
     b = Math.max(b, 5 * f);
     c = Math.max(c, 10.5 * f + l * f * 3);
     builder.translate(x, y);
-    this.renderBackground(builder, b, c, f, k, style, getStencilSvg, renderStencilShape, g, h);
+    this.renderBackground(builder, b, c, f, k, style, getStencilShape, renderStencilShape, g, h);
     builder.setShadow(!1);
-    this.renderForeground(builder, b, c, f, k, style, getStencilSvg, renderStencilShape, g, h);
+    this.renderForeground(builder, b, c, f, k, style, getStencilShape, renderStencilShape, g, h);
     builder.restore();
   }
 
@@ -56,7 +56,7 @@ export class MockupFormsEmailFormHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any
@@ -91,7 +91,7 @@ export class MockupFormsEmailFormHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any

@@ -17,7 +17,7 @@ export class ErHierarchyHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -36,7 +36,7 @@ export class ErHierarchyHandler extends BaseShapeHandler {
     builder.translate(x, y);
     b = Math.max(b, 20);
     c = Math.max(c, 20);
-    this.renderBackground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape, 10, h);
+    this.renderBackground(builder, x, y, b, c, style, getStencilShape, renderStencilShape, 10, h);
     builder.setShadow(!1);
     this.render_shapeText(builder, x, y, b, c, f, g, k, h);
     builder.restore();
@@ -49,7 +49,7 @@ export class ErHierarchyHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any

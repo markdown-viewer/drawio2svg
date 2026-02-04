@@ -17,7 +17,7 @@ export class ErBachmansHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -31,7 +31,7 @@ export class ErBachmansHandler extends BaseShapeHandler {
     const g = this.getStyleValue(style, 'fontSize', '17');
 
     builder.translate(x, y);
-    this.renderBackground(builder, x, y, width, height, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, x, y, width, height, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
     this.renderForeground(
       builder,
@@ -40,7 +40,7 @@ export class ErBachmansHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
       g,
       f
@@ -55,7 +55,7 @@ export class ErBachmansHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -75,7 +75,7 @@ export class ErBachmansHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any

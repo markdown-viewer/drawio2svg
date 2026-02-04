@@ -17,7 +17,7 @@ export class MockupContainersHorTabBarHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -63,7 +63,7 @@ export class MockupContainersHorTabBarHandler extends BaseShapeHandler {
     b = Math.max(b, l);
     c = Math.max(c, h + 5);
     builder.translate(x, y);
-    this.renderBackground(builder, b, c, 5, h, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, b, c, 5, h, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
     this.render_backTabs(builder, b, c, 5, h, 10, 5, 10, k, m, n);
     this.render_focusTab(builder, b, c, 5, h, 10, 5, 10, k, m, n);
@@ -78,7 +78,7 @@ export class MockupContainersHorTabBarHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

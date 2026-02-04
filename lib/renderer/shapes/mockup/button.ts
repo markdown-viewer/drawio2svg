@@ -17,7 +17,7 @@ export class MockupButtonHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -34,7 +34,7 @@ export class MockupButtonHandler extends BaseShapeHandler {
     g = this.getStyleValue(style, 'textColor', '#666666').toString();
     h = this.getStyleValue(style, 'textSize', '17').toString();
     builder.translate(x, y);
-    this.renderBackground(builder, x, y, width, height, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, x, y, width, height, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
     this.render_mainText(builder, x, y, width, height, f, h, g);
     builder.restore();
@@ -47,7 +47,7 @@ export class MockupButtonHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

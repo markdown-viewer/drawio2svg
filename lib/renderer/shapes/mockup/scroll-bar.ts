@@ -17,7 +17,7 @@ export class MockupNavigationScrollBarHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -32,9 +32,9 @@ export class MockupNavigationScrollBarHandler extends BaseShapeHandler {
     c = 20;
     b = Math.max(b, 40);
     builder.translate(x, y);
-    this.renderBackground(builder, 0, 0, b, c, style, getStencilSvg, renderStencilShape, 20);
+    this.renderBackground(builder, 0, 0, b, c, style, getStencilShape, renderStencilShape, 20);
     builder.setShadow(!1);
-    this.renderForeground(builder, 0, 0, b, c, style, getStencilSvg, renderStencilShape, 20);
+    this.renderForeground(builder, 0, 0, b, c, style, getStencilShape, renderStencilShape, 20);
     builder.restore();
   }
 
@@ -45,7 +45,7 @@ export class MockupNavigationScrollBarHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {
@@ -67,7 +67,7 @@ export class MockupNavigationScrollBarHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {

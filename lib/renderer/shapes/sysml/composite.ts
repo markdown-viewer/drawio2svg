@@ -9,7 +9,7 @@ export class SysmlCompositeHandler extends RectangleShapeHandler {
   }
 
   render(attrs: ShapeAttrs): void {
-    const { builder, currentGroup, x, y, width, height, style, getStencilSvg, renderStencilShape } = this.renderCtx;
+    const { builder, currentGroup, x, y, width, height, style, getStencilShape, renderStencilShape } = this.renderCtx;
     if (!builder || !currentGroup) return;
     if (width <= 0 || height <= 0) return;
 
@@ -22,7 +22,7 @@ export class SysmlCompositeHandler extends RectangleShapeHandler {
       width,
       height,
       attrs,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
       baseDirection
     );
@@ -71,7 +71,7 @@ export class SysmlCompositeHandler extends RectangleShapeHandler {
         symbolWidth,
         symbolHeight,
         attrs,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape,
         direction
       );
@@ -86,23 +86,23 @@ export class SysmlCompositeHandler extends RectangleShapeHandler {
     width: number,
     height: number,
     attrs: ShapeAttrs,
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     direction: string = 'east'
   ): void {
     const normalized = String(symbol || '').trim();
     if (!normalized) return;
 
-    if (normalized.startsWith('mxgraph.') && getStencilSvg && renderStencilShape) {
+    if (normalized.startsWith('mxgraph.') && getStencilShape && renderStencilShape) {
       const stencilStyle = {
         shape: normalized,
         fillColor: attrs.fillColor === 'none' ? '#ffffff' : attrs.fillColor,
         strokeColor: attrs.strokeColor === 'none' ? '#000000' : attrs.strokeColor,
         aspect: 'fixed',
       } as any;
-      const svg = getStencilSvg(stencilStyle);
-      if (svg) {
-        renderStencilShape({ x, y, width, height, style: stencilStyle }, svg);
+      const stencilShapeData = getStencilShape(normalized);
+      if (stencilShapeData) {
+        renderStencilShape({ x, y, width, height, style: stencilStyle }, stencilShapeData);
         return;
       }
     }

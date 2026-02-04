@@ -17,7 +17,7 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -59,7 +59,7 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           0.76 * height,
           undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -75,7 +75,7 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           0.76 * height,
           undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         m = 'mxgraph.gcp2.outline_blank_3';
@@ -89,7 +89,7 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           0.74 * height,
           undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -105,9 +105,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0 * height,
           0.96 * width,
           height,
-          'none',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         m = 'mxgraph.gcp2.outline_blank_2';
@@ -118,9 +118,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.01 * height,
           0.72 * width,
           0.98 * height,
-          'none',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         builder.setAlpha(h / 100);
@@ -131,9 +131,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.12 * height,
           0.74 * width,
           0.76 * height,
-          '#ffffff',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         style['strokeWidth'] = k;
@@ -150,9 +150,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0 * height,
           0.96 * width,
           height,
-          'none',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         builder.setAlpha((0.7 * h) / 100);
@@ -162,9 +162,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.06 * height,
           0.85 * width,
           0.88 * height,
-          'none',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         builder.setAlpha(h / 100);
@@ -175,9 +175,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.12 * height,
           0.74 * width,
           0.76 * height,
-          '#ffffff',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         style['strokeWidth'] = k;
@@ -192,9 +192,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.01 * height,
           0.72 * width,
           0.98 * height,
-          '#ffffff',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         m = 'mxgraph.gcp2.outline_blank_1';
@@ -208,9 +208,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.12 * height,
           0.74 * width,
           0.76 * height,
-          '#ffffff',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         style['strokeWidth'] = k;
@@ -224,9 +224,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.01 * height,
           0.72 * width,
           0.98 * height,
-          '#ffffff',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         m = 'mxgraph.gcp2.outline_blank_1';
@@ -240,9 +240,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.12 * height,
           0.74 * width,
           0.76 * height,
-          '#ffffff',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         style['strokeWidth'] = k;
@@ -257,9 +257,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.56 * height,
           width,
           0.28 * height,
-          '#ffffff',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -273,9 +273,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.16 * height,
           width,
           0.28 * height,
-          '#ffffff',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -288,9 +288,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
           __ty + 0.11 * height,
           0.76 * width,
           0.78 * height,
-          '#FCC64D',
+          undefined,
           style,
-          getStencilSvg,
+          getStencilShape,
           renderStencilShape
         );
         break;
@@ -310,9 +310,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         __ty + 0.16 * height,
         0.66 * width,
         0.68 * height,
-        e,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
     }
@@ -354,10 +354,10 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
     height: number,
     fillColor: string | undefined,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
-    if (!getStencilSvg || !renderStencilShape) return;
+    if (!getStencilShape || !renderStencilShape) return;
     if (!name) return;
     const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
     const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
@@ -383,8 +383,9 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
       strokeColor: 'none',
       ...(aspect ? { aspect } : {}),
     } as any;
-    const svg = getStencilSvg(stencilStyle);
-    if (!svg) return;
-    renderStencilShape({ x, y, width, height, style: stencilStyle }, svg);
+    const stencilShape = getStencilShape(stencilStyle.shape);
+    if (!stencilShape) return;
+    const ctx = { x, y, width, height, style: stencilStyle };
+    renderStencilShape(ctx, stencilShape);
   }
 }

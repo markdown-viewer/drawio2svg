@@ -17,7 +17,7 @@ export class RackGeneralRackCabinetHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -42,9 +42,9 @@ export class RackGeneralRackCabinetHandler extends BaseShapeHandler {
       builder.translate(x, y);
     }
     c = b * f + 42;
-    this.renderBackground(builder, 0, 0, c, height, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, 0, 0, c, height, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
-    this.renderForeground(builder, 0, 0, c, height, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(builder, 0, 0, c, height, style, getStencilShape, renderStencilShape);
     if (h !== 'off') {
       this.render_sideText(builder, c, b, f, g, h);
     }
@@ -58,7 +58,7 @@ export class RackGeneralRackCabinetHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -74,7 +74,7 @@ export class RackGeneralRackCabinetHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

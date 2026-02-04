@@ -10,9 +10,9 @@
 import type { ParsedDrawio, Diagram, MxCell, MxStyle } from './parser.ts';
 import { getPerimeterPoint, type Point, type CellState } from './edge-router.ts';
 import { SvgBuilder } from './svg/index.ts';
-import type { StencilBundle } from './stencil/index.ts';
-import { convertStencilXmlToSvgs } from './stencil/index.ts';
-import pako from 'pako';
+import type { StencilBundle, StencilShape, DrawOp, PathCmd } from './stencil/index.ts';
+import { parseInlineStencil } from './stencil/index.ts';
+import { decompressContent } from './decompress.ts';
 import {
   normalizeColor,
   normalizeColorId,
@@ -44,6 +44,105 @@ import type { LabelOverrides } from './renderer/shape-registry.ts';
 import { registerHandlers } from './renderer/shapes/index.ts';
  
 import { normalizeImageUrl, isPlaceholderImageUrl } from './renderer/image-url.ts';
+
+/**
+ * Convert SVG arc to cubic bezier curves
+ * This matches draw.io's internal conversion for consistent rendering
+ */
+function arcToCurves(
+  x0: number,
+  y0: number,
+  rx: number,
+  ry: number,
+  angle: number,
+  largeArcFlag: number,
+  sweepFlag: number,
+  x: number,
+  y: number
+): number[] | null {
+  x -= x0;
+  y -= y0;
+
+  if (rx === 0 || ry === 0) {
+    return null;
+  }
+
+  rx = Math.abs(rx);
+  ry = Math.abs(ry);
+
+  let dx = -x / 2;
+  let dy = -y / 2;
+  let cos = Math.cos((angle * Math.PI) / 180);
+  let sin = Math.sin((angle * Math.PI) / 180);
+  let x1 = cos * dx + sin * dy;
+  let y1 = -sin * dx + cos * dy;
+
+  let x1Sq = x1 * x1;
+  let y1Sq = y1 * y1;
+  let rxSq = rx * rx;
+  let rySq = ry * ry;
+  let lamda = x1Sq / rxSq + y1Sq / rySq;
+  let sign: number;
+
+  if (lamda > 1) {
+    rx *= Math.sqrt(lamda);
+    ry *= Math.sqrt(lamda);
+    sign = 0;
+  } else {
+    sign = 1;
+    if (largeArcFlag === sweepFlag) {
+      sign = -1;
+    }
+    sign *= Math.sqrt((rxSq * rySq - rxSq * y1Sq - rySq * x1Sq) / (rxSq * y1Sq + rySq * x1Sq));
+  }
+
+  let cx1 = (sign * rx * y1) / ry;
+  let cy1 = (-sign * ry * x1) / rx;
+  let cx = cos * cx1 - sin * cy1 + x / 2;
+  let cy = sin * cx1 + cos * cy1 + y / 2;
+
+  let startAngle = Math.atan2((y1 - cy1) / ry, (x1 - cx1) / rx) - Math.atan2(0, 1);
+  startAngle = startAngle >= 0 ? startAngle : 2 * Math.PI + startAngle;
+  let delta = Math.atan2((-y1 - cy1) / ry, (-x1 - cx1) / rx) - Math.atan2((y1 - cy1) / ry, (x1 - cx1) / rx);
+  delta = delta >= 0 ? delta : 2 * Math.PI + delta;
+
+  if (sweepFlag === 0 && delta > 0) {
+    delta -= 2 * Math.PI;
+  } else if (sweepFlag !== 0 && delta < 0) {
+    delta += 2 * Math.PI;
+  }
+
+  let segments = Math.ceil(Math.abs((2 * delta) / Math.PI));
+  if (segments === 0) segments = 1;
+  const segAngle = delta / segments;
+  const t = (8 / 3) * Math.sin(segAngle / 4) * Math.sin(segAngle / 4) / Math.sin(segAngle / 2);
+
+  let c1 = cos * rx;
+  let c2 = cos * ry;
+  let s1 = sin * rx;
+  let s2 = sin * ry;
+  let ca = Math.cos(startAngle);
+  let sa = Math.sin(startAngle);
+  let qx = -t * (c1 * sa + s2 * ca);
+  let qy = -t * (s1 * sa - c2 * ca);
+
+  const out: number[] = [];
+
+  for (let i = 0; i < segments; i++) {
+    startAngle += segAngle;
+    ca = Math.cos(startAngle);
+    sa = Math.sin(startAngle);
+    const x2 = c1 * ca - s2 * sa + cx;
+    const y2 = s1 * ca + c2 * sa + cy;
+    const rx2 = -t * (c1 * sa + s2 * ca);
+    const ry2 = -t * (s1 * sa - c2 * ca);
+    out.push(qx + x0, qy + y0, x2 - rx2 + x0, y2 - ry2 + y0, x2 + x0, y2 + y0);
+    qx = x2 + rx2;
+    qy = y2 + ry2;
+  }
+
+  return out;
+}
 
 const STATIC_LABEL_OVERRIDES: Record<string, LabelOverrides> = {
   'mxgraph.android.quickscroll2': {
@@ -256,8 +355,8 @@ export interface RenderContext extends ShapeContext {
   normalizeImageUrl: (url: string) => string;
   isPlaceholderImageUrl: (url: string) => boolean;
   createPlaceholderInlineSvg: (x: number, y: number, width: number, height: number) => Element | null;
-  getStencilSvg: (style: MxStyle) => string | null;
-  renderStencilShape: (ctx: ShapeContext, svg: string) => void;
+  getStencilShape: (shape: string) => StencilShape | null;
+  renderStencilShape: (ctx: ShapeContext, shape: StencilShape) => void;
   applyShapeAttrsToElement: (el: Element, attrs: ShapeAttrs) => void;
   applyShapeAttrsToBuilder: (builder: SvgBuilder, attrs: ShapeAttrs) => void;
   getTextMeasureProvider: typeof getTextMeasureProvider;
@@ -274,7 +373,6 @@ export class SvgRenderer {
   private glassGradients: Set<string> = new Set();
   private crossHatchPatterns: Set<string> = new Set();
   private stencils: StencilBundle | null = null;
-  private inlineStencilCache = new Map<string, string>();
   private shapeRegistry: ShapeRegistry = new ShapeRegistry();
   
   // DOM building context
@@ -361,7 +459,7 @@ export class SvgRenderer {
       normalizeImageUrl,
       isPlaceholderImageUrl,
       createPlaceholderInlineSvg: this.createPlaceholderInlineSvg.bind(this),
-      getStencilSvg: this.getStencilSvg.bind(this),
+      getStencilShape: this.getStencilShape.bind(this),
       renderStencilShape: this.renderStencilShape.bind(this),
       applyShapeAttrsToElement: this.applyShapeAttrsToElement.bind(this),
       applyShapeAttrsToBuilder: this.applyShapeAttrsToBuilder.bind(this),
@@ -472,8 +570,16 @@ export class SvgRenderer {
     const offsetEpsilon = 1e-6;
     const offsetBaseX = -firstPassBounds.minX + padding;
     const offsetBaseY = -firstPassBounds.minY + padding;
-    this.offsetX = Math.floor(offsetBaseX + (offsetBaseX >= 0 ? offsetEpsilon : 0));
-    this.offsetY = Math.floor(offsetBaseY + (offsetBaseY >= 0 ? offsetEpsilon : 0));
+    // Handle floating-point precision issues when the offset is very close to an integer
+    // e.g., -38.00000000000006 should be treated as -38, not -39
+    const adjustedOffsetBaseX = Math.abs(offsetBaseX - Math.round(offsetBaseX)) < offsetEpsilon 
+      ? Math.round(offsetBaseX) 
+      : offsetBaseX;
+    const adjustedOffsetBaseY = Math.abs(offsetBaseY - Math.round(offsetBaseY)) < offsetEpsilon 
+      ? Math.round(offsetBaseY) 
+      : offsetBaseY;
+    this.offsetX = Math.floor(adjustedOffsetBaseX + (adjustedOffsetBaseX >= 0 ? offsetEpsilon : 0));
+    this.offsetY = Math.floor(adjustedOffsetBaseY + (adjustedOffsetBaseY >= 0 ? offsetEpsilon : 0));
     if (hasRotatedBoldTextOverflow) {
       this.offsetX -= 1;
     }
@@ -1586,6 +1692,15 @@ export class SvgRenderer {
             const arrowMargin = growSize / 2 + strokeWidth;
             strokeMargin = Math.max(strokeMargin, arrowMargin);
           }
+          // mxArrow-derived shapes (VERTEX_EDGE_SHAPE_SKIP) need additional margin
+          // mxArrow.augmentBoundingBox: bbox.grow((Math.max(arrowWidth, endSize) / 2 + strokewidth) * scale)
+          // ARROW_WIDTH = 30, ARROW_SIZE = 30, so grow = (30/2 + 1) * 1 = 16
+          if (shapeType && VERTEX_EDGE_SHAPE_SKIP.has(shapeType)) {
+            const arrowWidth = 30; // mxConstants.ARROW_WIDTH
+            const endSize = 30;    // mxConstants.ARROW_SIZE
+            const arrowMargin = Math.max(arrowWidth, endSize) / 2 + strokeWidth;
+            strokeMargin = Math.max(strokeMargin, arrowMargin);
+          }
           
           let boundsX = x;
           let boundsY = y;
@@ -1606,7 +1721,6 @@ export class SvgRenderer {
           if (!skipBounds) {
             updateBoundsForRotatedRect(bounds, boundsX, boundsY, boundsW, boundsH, rotation, strokeMargin);
           }
-
 
           // Extend bounds for text shapes based on actual text height (line-height 1.2)
           if (!skipBounds && isTextShape && cell.value) {
@@ -2038,29 +2152,24 @@ export class SvgRenderer {
     return { bounds: finalizeBounds(bounds) };
   }
 
-  private getStencilSvg(style: MxStyle): string | null {
-    const shape = style.shape as string | undefined;
-    if (!shape) return null;
-
-    const inlineStencilSvg = this.getInlineStencilSvg(shape);
-    if (inlineStencilSvg) return inlineStencilSvg;
-
-    return this.getStencilSvgFromResource(shape);
-  }
-
-  private getStencilSvgFromResource(shape: string): string | null {
+  /**
+   * Get stencil shape from bundle (JSON format) or inline stencil
+   */
+  private getStencilShape(shape: string): StencilShape | null {
+    // Handle inline stencil: shape=stencil(base64data)
+    if (shape.startsWith('stencil(') && shape.endsWith(')')) {
+      const base64data = shape.substring(8, shape.length - 1);
+      const xml = decompressContent(base64data);
+      if (xml) {
+        return parseInlineStencil(xml);
+      }
+      return null;
+    }
+    
     if (!this.stencils) return null;
     if (!shape.startsWith('mxgraph.')) return null;
     
-    // The shape name format is "mxgraph.{package}.{name}" where package may have dots
-    // e.g., "mxgraph.veeam2.1u_server" -> key="veeam2.1u_server"
-    // e.g., "mxgraph.weblogos.identi.ca" -> key="weblogos.identi.ca"
-    // 
-    // Resource keys are stored in the same format (without "mxgraph." prefix)
-    // We need to find which group file contains the key
     const key = shape.slice('mxgraph.'.length);
-    
-    // Extract the first part as potential group for lookup
     const parts = key.split('.');
     const group = parts[0];
     
@@ -2068,11 +2177,11 @@ export class SvgRenderer {
     const direct = this.stencils.get(group, key);
     if (direct) return direct;
     
-    // Try all groups in case the key is stored in a different group file
+    // Try all groups
     const groupData = this.stencils.getGroup(group);
     if (groupData && groupData[key]) return groupData[key];
     
-    // Fallback: search all groups for this key
+    // Fallback: search all groups
     const allGroups = this.stencils.groups();
     for (const g of allGroups) {
       const data = this.stencils.getGroup(g);
@@ -2082,112 +2191,31 @@ export class SvgRenderer {
     return null;
   }
 
-  private getInlineStencilSvg(shape: string): string | null {
-    if (!shape.startsWith('stencil(') || !shape.endsWith(')')) return null;
-    const data = shape.slice('stencil('.length, -1).trim();
-    if (!data) return null;
-    const cached = this.inlineStencilCache.get(data);
-    if (cached) return cached;
-    const xml = this.decodeInlineStencilData(data);
-    if (!xml) return null;
-    const wrapped = xml.trim().startsWith('<shapes') ? xml : `<shapes>${xml}</shapes>`;
-    try {
-      const shapes = convertStencilXmlToSvgs(wrapped, 1);
-      if (!shapes.length) return null;
-      const svg = shapes[0].svg;
-      this.inlineStencilCache.set(data, svg);
-      return svg;
-    } catch {
-      return null;
-    }
-  }
-
-  private decodeInlineStencilData(data: string): string | null {
-    try {
-      const buffer = Buffer.from(data, 'base64');
-      const inflated = pako.inflateRaw(buffer, { to: 'string' }) as string;
-      try {
-        return decodeURIComponent(inflated);
-      } catch {
-        return inflated;
-      }
-    } catch {
-      return null;
-    }
-  }
-
-  private renderStencilShape(ctx: ShapeContext, svg: string): void {
+  /**
+   * Render stencil shape from JSON format
+   */
+  private renderStencilShape(ctx: ShapeContext, shape: StencilShape): void {
     if (!this.builder || !this.currentGroup) return;
 
-    const doc = this.domParser.parseFromString(svg, 'image/svg+xml');
-    const svgEl = doc.documentElement;
-    if (!svgEl) return;
-
-    const viewBox = svgEl.getAttribute('viewBox');
-    let vbX = 0, vbY = 0, vbW = 0, vbH = 0;
-    if (viewBox) {
-      const nums = viewBox.split(/[\s,]+/).map(n => parseFloat(n));
-      [vbX, vbY, vbW, vbH] = nums.length >= 4 ? nums : [0, 0, 0, 0];
-    }
-    const widthAttr = parseFloat(svgEl.getAttribute('width') || '0');
-    const heightAttr = parseFloat(svgEl.getAttribute('height') || '0');
-    let srcW = vbW || widthAttr;
-    let srcH = vbH || heightAttr;
-    let exportOffsetX = 0;
-    let exportOffsetY = 0;
     const shapeName = ctx.style.shape as string | undefined;
-    if (srcW === 105 && srcH === 105 && !widthAttr && !heightAttr
-      && shapeName !== 'mxgraph.infographic.circularCallout2') {
-      const firstGroup = svgEl.firstElementChild;
-      if (firstGroup && firstGroup.tagName === 'g') {
-        const transform = firstGroup.getAttribute('transform') || '';
-        if (/translate\(\s*0\.5\s*,\s*0\.5\s*\)/.test(transform)) {
-          srcW = 100;
-          srcH = 100;
-          exportOffsetX = 2;
-          exportOffsetY = 2;
-        }
-      }
-    }
+    
+    const srcW = shape.width;
+    const srcH = shape.height;
     if (!srcW || !srcH) return;
 
-    const pointerEventsRaw = ctx.style.pointerEvents as string | number | undefined;
-    const hasPointerEvents = pointerEventsRaw === '1' || pointerEventsRaw === 'true' || pointerEventsRaw === 1;
-    const rectNodes = svgEl.getElementsByTagName('rect');
-    let hasSvgRect = false;
-    for (let i = 0; i < rectNodes.length; i++) {
-      const rect = rectNodes[i];
-      const w = parseFloat(rect.getAttribute('width') || '0');
-      const h = parseFloat(rect.getAttribute('height') || '0');
-      if (w > 0 && h > 0) {
-        hasSvgRect = true;
-        break;
-      }
-    }
-    const hasShadow = ctx.style.shadow === '1' || ctx.style.shadow === true;
-    const skipPointerRectForShadowedConcept = hasShadow && (shapeName === 'mxgraph.office.concepts.best_practices' || shapeName === 'mxgraph.office.concepts.help');
-    const needsPointerRect = !!shapeName && hasPointerEvents && !skipPointerRectForShadowedConcept && (
-      shapeName.startsWith('mxgraph.signs.')
-      || (shapeName.startsWith('mxgraph.aws4.') && shapeName !== 'mxgraph.aws4.resourceIcon')
-      || shapeName.startsWith('mxgraph.cisco_safe.')
-      || !hasSvgRect
-    );
-    if (needsPointerRect) {
-      const hitRect = this.builder.createRect(ctx.x, ctx.y, ctx.width, ctx.height, {
-        fill: 'none',
-        stroke: 'none',
-        'pointer-events': 'all'
-      });
-      this.currentGroup.appendChild(hitRect);
-    }
-    const isElectricalStencil = !!(shapeName && shapeName.startsWith('mxgraph.electrical.'));
+    // Calculate scaling
     let scaleX = ctx.width / srcW;
     let scaleY = ctx.height / srcH;
+    const isElectricalStencil = !!(shapeName && shapeName.startsWith('mxgraph.electrical.'));
     const aspectDiff = Math.abs(scaleX - scaleY);
     const forceVariableAspect = !!shapeName && shapeName.startsWith('mxgraph.cisco19.bg');
-    const fixedAspect = !forceVariableAspect && ((ctx.style.aspect as string) === 'fixed'
-      || (ctx.style.imageAspect as string) === '1'
-      || (isElectricalStencil && aspectDiff <= 0.05));
+    const fixedAspect = !forceVariableAspect && (
+      shape.aspect === 'fixed' ||
+      (ctx.style.aspect as string) === 'fixed' ||
+      (ctx.style.imageAspect as string) === '1' ||
+      (isElectricalStencil && aspectDiff <= 0.05)
+    );
+
     let extraX = 0;
     let extraY = 0;
     if (fixedAspect) {
@@ -2197,597 +2225,470 @@ export class SvgRenderer {
       extraX = (ctx.width - srcW * scale) / 2;
       extraY = (ctx.height - srcH * scale) / 2;
     }
-    let baseX = ctx.x + extraX - vbX * scaleX;
-    let baseY = ctx.y + extraY - vbY * scaleY;
-    if (shapeName === 'mxgraph.infographic.circularCallout2') {
-      baseX -= 6.857;
-      baseY -= 4.686;
-    }
-    if (shapeName === 'mxgraph.electrical.resistors.resistor_1') {
-      baseX += 1;
-    }
+
+    const baseX = ctx.x + extraX;
+    const baseY = ctx.y + extraY;
     const scaleStroke = Math.min(scaleX, scaleY);
 
+    // Get style colors
     const rawFillColor = (ctx.style.fillColor as string) || '#ffffff';
     const resolvedFillColor = (rawFillColor === 'default' || rawFillColor === 'inherit')
-      ? '#ffffff'
-      : rawFillColor;
-    let styleFill = this.normalizeColor(resolvedFillColor);
-    const stencilFillOverrides: Record<string, { color: string; onlyWhenMissing?: boolean }> = {
-      'mxgraph.citrix.laptop_1': { color: '#c7cdda', onlyWhenMissing: true },
-      'mxgraph.citrix.tablet_1': { color: '#bec5d5', onlyWhenMissing: true },
-      'mxgraph.citrix.laptop_2': { color: '#dedede' },
-      'mxgraph.citrix.pda': { color: '#5d5d5d' },
-      'mxgraph.citrix.users': { color: '#2782c2', onlyWhenMissing: true },
-      'mxgraph.citrix.firewall': { color: '#ffffff' },
-      'mxgraph.citrix.home_office': { color: '#bac1d3' },
-      'mxgraph.citrix.hq_enterprise': { color: '#b7bed1' },
-      'mxgraph.citrix.router': { color: '#9ea5b5' },
-      'mxgraph.citrix.cache_server': { color: '#abb4c5' },
-      'mxgraph.citrix.proxy_server': { color: '#abb4c5' },
-      'mxgraph.citrix.switch': { color: '#b7bed1' },
-      'mxgraph.citrix.site': { color: '#999ea4' }
-    };
-    const override = shapeName ? stencilFillOverrides[shapeName] : undefined;
-    if (override) {
-      const hasFill = (ctx.style.fillColor as string) !== undefined;
-      if (!override.onlyWhenMissing || !hasFill) {
-        styleFill = this.normalizeColor(override.color);
-      }
+      ? '#ffffff' : rawFillColor;
+    const normalizedFillColor = this.normalizeColor(resolvedFillColor);
+
+    // Check for gradient fill - stencils should use gradient when gradientColor is specified
+    const gradientColor = ctx.style.gradientColor as string | undefined;
+    const gradientDirection = ctx.style.gradientDirection as string | undefined;
+    const gradientToken = typeof gradientColor === 'string' ? gradientColor.trim().toLowerCase() : '';
+    const canUseGradient = gradientColor
+      && gradientToken !== 'none'
+      && gradientToken !== 'inherit'
+      && gradientToken !== 'default'
+      && resolvedFillColor !== 'none';
+
+    let styleFill: string;
+    if (canUseGradient) {
+      // Create gradient and use its URL reference
+      const startId = normalizeColorId(resolvedFillColor);
+      const endId = normalizeColorId(gradientColor as string);
+      const gradientDirectionKey = getGradientDirectionKey(gradientDirection);
+      const gradientId = `mx-gradient-${startId}-1-${endId}-1-${gradientDirectionKey}-0`;
+      const gradientStartColor = normalizedFillColor;
+      const gradientEndColor = this.normalizeColor(gradientColor as string);
+      this.ensureLinearGradient(gradientId, gradientStartColor, gradientEndColor, gradientDirectionKey);
+      styleFill = `url(#${gradientId})`;
+    } else {
+      styleFill = normalizedFillColor;
     }
+
     const rawStrokeColor = (ctx.style.strokeColor as string) || '#000000';
     const resolvedStrokeColor = (rawStrokeColor === 'default' || rawStrokeColor === 'inherit')
-      ? '#000000'
-      : rawStrokeColor;
-    let styleStroke = this.normalizeColor(resolvedStrokeColor);
-    const baseFillColor = styleFill;
-    const gradientColor = ctx.style.gradientColor as string | undefined;
-    const gradientToken = typeof gradientColor === 'string' ? gradientColor.trim().toLowerCase() : '';
-    if (gradientColor && gradientToken !== 'none' && gradientToken !== 'inherit' && gradientToken !== 'default' && baseFillColor !== 'none') {
-      const gradientStart = baseFillColor;
-      const gradientEnd = this.normalizeColor(gradientColor);
-      const directionKey = getGradientDirectionKey(ctx.style.gradientDirection as string | undefined);
-      const gradientId = `mx-gradient-${this.normalizeColorId(gradientStart)}-1-${this.normalizeColorId(gradientEnd)}-1-${directionKey}-0`;
-      this.ensureLinearGradient(gradientId, gradientStart, gradientEnd, directionKey);
-      styleFill = `url(#${gradientId})`;
-    }
+      ? '#000000' : rawStrokeColor;
+    const styleStroke = this.normalizeColor(resolvedStrokeColor);
+    const styleFontColor = this.normalizeColor((ctx.style.fontColor as string) || '#000000');
+
+    // Opacity: Use builder's current alpha if available, else fall back to style opacity
+    // This allows shape handlers to call builder.setAlpha() before rendering stencils
+    const builderAlpha = this.builder.getAlpha?.();
     const rawOpacity = parseFloat(ctx.style.opacity as string);
-    const rawFillOpacity = parseFloat(ctx.style.fillOpacity as string);
-    const rawStrokeOpacity = parseFloat(ctx.style.strokeOpacity as string);
-    // Also consider builder's alpha state (set via setAlpha() in handlers)
-    const builderAlpha = this.builder?.getAlpha();
-    const hasBuilderAlpha = builderAlpha !== undefined && builderAlpha < 1;
-    const styleOpacity = Number.isFinite(rawOpacity) ? rawOpacity : 100;
-    // If builder has alpha set, use it (converted from 0-1 to 0-100 scale)
-    let styleFillOpacity = Number.isFinite(rawFillOpacity) ? rawFillOpacity : styleOpacity;
-    if (hasBuilderAlpha) {
-      styleFillOpacity = builderAlpha * 100;
-    }
-    const styleStrokeOpacity = Number.isFinite(rawStrokeOpacity) ? rawStrokeOpacity : styleOpacity;
-    if (shapeName === 'mxgraph.ios7.misc.keyboard_(letters)') {
-      styleFill = this.normalizeColor('#e0e0e0');
-      styleStroke = 'none';
-    }
-    const labelBackgroundColor = ctx.style.labelBackgroundColor as string | undefined;
-    const timerStartFill = this.normalizeColor(labelBackgroundColor || (ctx.style.fillColor as string) || '#ffffff');
-    let timerStartCircleIndex = 0;
+    const styleOpacity = Number.isFinite(rawOpacity) ? rawOpacity / 100 : 1;
+    // If builder has a non-default alpha set (not 1), use it; otherwise use style opacity
+    const effectiveBaseOpacity = (builderAlpha !== undefined && builderAlpha !== 1) ? builderAlpha : styleOpacity;
 
-    const transformPoint = (x: number, y: number, relative: boolean): { x: number; y: number } => {
-      if (relative) {
-        return { x: x * scaleX, y: y * scaleY };
+    // Helper to resolve color token
+    const resolveColor = (color: string, defaultVal?: string, type: 'fill' | 'stroke' | 'font' = 'fill'): string => {
+      if (color === 'none' || color === 'transparent') return 'none';
+      if (color === 'fillColor' || color === 'fill') return styleFill;
+      if (color === 'strokeColor' || color === 'stroke') return styleStroke;
+      if (color === 'fontColor') return styleFontColor;
+      // currentColor: resolve to the current fill/stroke color based on context
+      // In stencil context, currentColor means "use the current state's color"
+      if (color === 'currentColor') {
+        if (type === 'fill') return state.fillColor;
+        if (type === 'stroke') return state.strokeColor;
+        return state.fontColor;
       }
-      const adjX = x - exportOffsetX;
-      const adjY = y - exportOffsetY;
-      return { x: baseX + adjX * scaleX, y: baseY + adjY * scaleY };
+      // fillColor2-8
+      const fillMatch = color.match(/^fillColor([2-8])$/);
+      if (fillMatch) {
+        const styleVal = ctx.style[`fillColor${fillMatch[1]}` as keyof typeof ctx.style] as string | undefined;
+        return styleVal ? this.normalizeColor(styleVal) : (defaultVal ? this.normalizeColor(defaultVal) : styleFill);
+      }
+      // strokeColor2-5
+      const strokeMatch = color.match(/^strokeColor([2-5])$/);
+      if (strokeMatch) {
+        const styleVal = ctx.style[`strokeColor${strokeMatch[1]}` as keyof typeof ctx.style] as string | undefined;
+        return styleVal ? this.normalizeColor(styleVal) : (defaultVal ? this.normalizeColor(defaultVal) : styleStroke);
+      }
+      // fontColor2-3
+      const fontMatch = color.match(/^fontColor([2-3])$/);
+      if (fontMatch) {
+        const styleVal = ctx.style[`fontColor${fontMatch[1]}` as keyof typeof ctx.style] as string | undefined;
+        return styleVal ? this.normalizeColor(styleVal) : (defaultVal ? this.normalizeColor(defaultVal) : styleFontColor);
+      }
+      // Hex or other color
+      if (color.startsWith('#') || color.startsWith('rgb')) {
+        return this.normalizeColor(color);
+      }
+      // Custom style property as color token (e.g., 'neutralFill')
+      // Per mxStencil.js getColorValue: look up in style, if not found return none (null -> fill=none)
+      const customStyleVal = ctx.style[color as keyof typeof ctx.style] as string | undefined;
+      if (customStyleVal) {
+        return this.normalizeColor(customStyleVal);
+      }
+      // If custom style not found, use default if provided, otherwise 'none' (mimics draw.io behavior)
+      return defaultVal ? this.normalizeColor(defaultVal) : 'none';
     };
 
-    const transformLengthX = (val: number): number => val * scaleX;
-    const transformLengthY = (val: number): number => val * scaleY;
-
-    // For rack stencils, strokeColor token should be replaced with 'none'
-    const isRackStencil = !!(shapeName && shapeName.startsWith('mxgraph.rack'));
-
-    const replaceColorToken = (val: string): string => {
-      // Handle {{token}} or {{token|default}} format
-      const match = val.match(/^\{\{([^}|]+)(?:\|([^}]+))?\}\}$/);
-      if (match) {
-        const [, token, defaultVal] = match;
-        const lower = token.toLowerCase();
-        // strokeColor and strokeColor2 use styleStroke
-        if (lower === 'strokecolor' || lower === 'strokecolor2') {
-          return isRackStencil ? 'none' : styleStroke;
-        }
-        // strokeColor3-5: use from style or fall back to default value, then styleStroke
-        const strokeMatch = lower.match(/^strokecolor([3-5])$/);
-        if (strokeMatch) {
-          const styleVal = ctx.style[`strokeColor${strokeMatch[1]}` as keyof typeof ctx.style] as string | undefined;
-          return styleVal || defaultVal || styleStroke;
-        }
-        // fillColor uses styleFill directly
-        if (lower === 'fillcolor') {
-          return styleFill;
-        }
-        // fillColor2-8: use from style or fall back to default value, then styleFill
-        const fillMatch = lower.match(/^fillcolor([2-8])$/);
-        if (fillMatch) {
-          const styleVal = ctx.style[`fillColor${fillMatch[1]}` as keyof typeof ctx.style] as string | undefined;
-          return styleVal || defaultVal || styleFill;
-        }
-        // Unknown token with default - return default
-        if (defaultVal) return defaultVal;
-      }
-      // Plain token format (legacy)
-      const lower = val.toLowerCase().replace(/^\{\{|\}\}$/g, '');
-      if (lower === 'strokecolor' || lower === 'strokecolor2') {
-        return isRackStencil ? 'none' : styleStroke;
-      }
-      if (lower === 'fillcolor' || lower === 'fillcolor2' || lower === 'fillcolor3' || lower === 'fillcolor4') return styleFill;
-      return val;
+    // Transform point
+    const transformPoint = (x: number, y: number): { x: number; y: number } => {
+      return { x: baseX + x * scaleX, y: baseY + y * scaleY };
     };
 
-    const transformPathData = (d: string): string => {
-      const tokens = [...d.matchAll(/([a-zA-Z])|([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/g)];
-      let i = 0;
-      let cmd = '';
-      let cx = 0;
-      let cy = 0;
-      let sx = 0;
-      let sy = 0;
-      const out: string[] = [];
-      const readNumber = () => parseFloat(tokens[i++][2]);
-      const toAbs = (x: number, y: number, rel: boolean) => rel ? { x: cx + x, y: cy + y } : { x, y };
-      const toOut = (x: number, y: number) => transformPoint(x, y, false);
-
-      while (i < tokens.length) {
-        const token = tokens[i];
-        if (token[1]) {
-          cmd = token[1];
-          i++;
-          if (cmd.toUpperCase() === 'Z') {
-            out.push('Z');
-            cx = sx;
-            cy = sy;
-          }
-          continue;
-        }
-
-        const rel = cmd === cmd.toLowerCase();
-        const upper = cmd.toUpperCase();
-
-        switch (upper) {
+    // Transform path commands to SVG d string
+    // Arc commands are converted to cubic bezier for consistent rendering with draw.io
+    const buildPathD = (commands: PathCmd[]): string => {
+      const parts: string[] = [];
+      // Track current point in source coordinates (before transform)
+      let cx = 0, cy = 0;
+      // Track start point for Z command
+      let sx = 0, sy = 0;
+      
+      for (const cmd of commands) {
+        switch (cmd[0]) {
           case 'M': {
-            const x = readNumber();
-            const y = readNumber();
-            const abs = toAbs(x, y, rel);
-            const pt = toOut(abs.x, abs.y);
-            out.push('M', `${pt.x}`, `${pt.y}`);
-            cx = abs.x;
-            cy = abs.y;
-            sx = abs.x;
-            sy = abs.y;
-            cmd = rel ? 'l' : 'L';
+            const pt = transformPoint(cmd[1], cmd[2]);
+            parts.push(`M ${pt.x} ${pt.y}`);
+            cx = cmd[1];
+            cy = cmd[2];
+            sx = cmd[1];
+            sy = cmd[2];
             break;
           }
-          case 'L':
-          case 'T': {
-            const x = readNumber();
-            const y = readNumber();
-            const abs = toAbs(x, y, rel);
-            const pt = toOut(abs.x, abs.y);
-            out.push('L', `${pt.x}`, `${pt.y}`);
-            cx = abs.x;
-            cy = abs.y;
-            break;
-          }
-          case 'H': {
-            const x = readNumber();
-            const abs = rel ? cx + x : x;
-            const pt = toOut(abs, cy);
-            out.push('L', `${pt.x}`, `${pt.y}`);
-            cx = abs;
-            break;
-          }
-          case 'V': {
-            const y = readNumber();
-            const abs = rel ? cy + y : y;
-            const pt = toOut(cx, abs);
-            out.push('L', `${pt.x}`, `${pt.y}`);
-            cy = abs;
+          case 'L': {
+            const pt = transformPoint(cmd[1], cmd[2]);
+            parts.push(`L ${pt.x} ${pt.y}`);
+            cx = cmd[1];
+            cy = cmd[2];
             break;
           }
           case 'C': {
-            const x1 = readNumber();
-            const y1 = readNumber();
-            const x2 = readNumber();
-            const y2 = readNumber();
-            const x = readNumber();
-            const y = readNumber();
-            const a1 = toAbs(x1, y1, rel);
-            const a2 = toAbs(x2, y2, rel);
-            const a = toAbs(x, y, rel);
-            const p1 = toOut(a1.x, a1.y);
-            const p2 = toOut(a2.x, a2.y);
-            const p = toOut(a.x, a.y);
-            out.push('C', `${p1.x}`, `${p1.y}`, `${p2.x}`, `${p2.y}`, `${p.x}`, `${p.y}`);
-            cx = a.x;
-            cy = a.y;
-            break;
-          }
-          case 'S': {
-            const x2 = readNumber();
-            const y2 = readNumber();
-            const x = readNumber();
-            const y = readNumber();
-            const a2 = toAbs(x2, y2, rel);
-            const a = toAbs(x, y, rel);
-            const p2 = toOut(a2.x, a2.y);
-            const p = toOut(a.x, a.y);
-            out.push('S', `${p2.x}`, `${p2.y}`, `${p.x}`, `${p.y}`);
-            cx = a.x;
-            cy = a.y;
+            const p1 = transformPoint(cmd[1], cmd[2]);
+            const p2 = transformPoint(cmd[3], cmd[4]);
+            const p3 = transformPoint(cmd[5], cmd[6]);
+            parts.push(`C ${p1.x} ${p1.y} ${p2.x} ${p2.y} ${p3.x} ${p3.y}`);
+            cx = cmd[5];
+            cy = cmd[6];
             break;
           }
           case 'Q': {
-            const x1 = readNumber();
-            const y1 = readNumber();
-            const x = readNumber();
-            const y = readNumber();
-            const a1 = toAbs(x1, y1, rel);
-            const a = toAbs(x, y, rel);
-            const p1 = toOut(a1.x, a1.y);
-            const p = toOut(a.x, a.y);
-            out.push('Q', `${p1.x}`, `${p1.y}`, `${p.x}`, `${p.y}`);
-            cx = a.x;
-            cy = a.y;
+            const p1 = transformPoint(cmd[1], cmd[2]);
+            const p2 = transformPoint(cmd[3], cmd[4]);
+            parts.push(`Q ${p1.x} ${p1.y} ${p2.x} ${p2.y}`);
+            cx = cmd[3];
+            cy = cmd[4];
             break;
           }
           case 'A': {
-            const rx = readNumber();
-            const ry = readNumber();
-            const xAxisRotation = readNumber();
-            const largeArc = readNumber();
-            const sweep = readNumber();
-            const x = readNumber();
-            const y = readNumber();
-            const a = toAbs(x, y, rel);
-            void rx;
-            void ry;
-            void xAxisRotation;
-            void largeArc;
-            void sweep;
-            const end = toOut(a.x, a.y);
-            out.push('L', `${end.x}`, `${end.y}`);
-            cx = a.x;
-            cy = a.y;
-            break;
-          }
-          default: {
-            i++;
-            break;
-          }
-        }
-      }
-
-      return out.join(' ');
-    };
-
-    const transformPointsAttr = (val: string): string => {
-      const nums = val.trim().split(/[\s,]+/).map(n => parseFloat(n));
-      const out: string[] = [];
-      for (let idx = 0; idx + 1 < nums.length; idx += 2) {
-        const pt = transformPoint(nums[idx], nums[idx + 1], false);
-        out.push(`${pt.x},${pt.y}`);
-      }
-      return out.join(' ');
-    };
-
-    const transformElement = (el: Element): boolean => {
-      if (el.hasAttribute('data-cell-id')) {
-        el.removeAttribute('data-cell-id');
-      }
-      if (el.hasAttribute('transform')) {
-        el.removeAttribute('transform');
-      }
-
-      const rawFill = el.getAttribute('fill') || '';
-      const rawStroke = el.getAttribute('stroke') || '';
-
-
-      if (el.hasAttribute('fill')) {
-        el.setAttribute('fill', replaceColorToken(rawFill));
-      }
-      if (el.hasAttribute('stroke')) {
-        el.setAttribute('stroke', replaceColorToken(rawStroke));
-      }
-      if (el.hasAttribute('fill')) {
-        const fillValue = (el.getAttribute('fill') || '').trim();
-        const fillUrlMatch = fillValue.match(/^url\(#([^\)]+)\)$/i);
-        if (fillUrlMatch) {
-          const rawGradientId = fillUrlMatch[1];
-          if (/gradient-light-dark/i.test(rawGradientId)) {
-            const fill2 = ctx.style.fillColor2 as string | undefined;
-            const fill3 = ctx.style.fillColor3 as string | undefined;
-            if (fill2 && fill3) {
-              const start = this.normalizeColor(fill2);
-              const end = this.normalizeColor(fill3);
-              const gradientId = `drawio-svg-fixed-${this.normalizeColorId(start)}-${this.normalizeColorId(end)}`;
-              this.ensureLinearGradient(gradientId, start, end, 's');
-              el.setAttribute('fill', `url(#${gradientId})`);
-            }
-          }
-        } else if (shapeName === 'mxgraph.infographic.circularCallout2') {
-          const normalizedFill = fillValue.toLowerCase();
-          const normalizedStyleFill = (styleFill || '').toLowerCase();
-          const hasExplicitFill = ctx.style.fillColor !== undefined && ctx.style.fillColor !== 'none';
-          if ((normalizedFill === '#000000' || normalizedFill === 'black')) {
-            if (hasExplicitFill &&
-                normalizedStyleFill &&
-                normalizedStyleFill !== '#000000' &&
-                normalizedStyleFill !== 'black' &&
-                normalizedStyleFill !== 'none') {
-              el.setAttribute('fill', styleFill);
-            } else if (!hasExplicitFill && styleStroke && styleStroke !== 'none') {
-              el.setAttribute('fill', styleStroke);
-            }
-          }
-        } else if (exportOffsetX !== 0 || exportOffsetY !== 0) {
-          const normalizedFill = fillValue.toLowerCase();
-          const normalizedStyleFill = (styleFill || '').toLowerCase();
-          const hasExplicitFill = ctx.style.fillColor !== undefined && ctx.style.fillColor !== 'none';
-          if ((normalizedFill === '#000000' || normalizedFill === 'black')) {
-            if (hasExplicitFill &&
-                normalizedStyleFill &&
-                normalizedStyleFill !== '#000000' &&
-                normalizedStyleFill !== 'black' &&
-                normalizedStyleFill !== 'none') {
-              el.setAttribute('fill', styleFill);
-            } else if (!hasExplicitFill && styleStroke && styleStroke !== 'none') {
-              el.setAttribute('fill', styleStroke);
-            }
-          }
-        }
-      }
-      if (el.hasAttribute('fill') && !el.hasAttribute('fill-opacity')) {
-        const fill = (el.getAttribute('fill') || '').trim().toLowerCase();
-        if (fill && fill !== 'none' && styleFillOpacity < 100) {
-          el.setAttribute('fill-opacity', String(styleFillOpacity / 100));
-        }
-      }
-      if (el.hasAttribute('stroke') && !el.hasAttribute('stroke-opacity')) {
-        const stroke = (el.getAttribute('stroke') || '').trim().toLowerCase();
-        if (stroke && stroke !== 'none' && styleStrokeOpacity < 100) {
-          el.setAttribute('stroke-opacity', String(styleStrokeOpacity / 100));
-        }
-      }
-      const shouldUseUnscaledStroke = exportOffsetX !== 0 || exportOffsetY !== 0;
-      if (el.hasAttribute('stroke-width')) {
-        const rawStrokeWidth = el.getAttribute('stroke-width') || '';
-        let sw = parseFloat(rawStrokeWidth);
-        if (!Number.isFinite(sw) && rawStrokeWidth.includes('{{strokeWidth}}')) {
-          const styleStrokeWidth = parseFloat(ctx.style.strokeWidth as string) || 1;
-          el.setAttribute('stroke-width', String(styleStrokeWidth));
-        } else if (Number.isFinite(sw)) {
-          const scaledStrokeWidth = shouldUseUnscaledStroke
-            ? Math.round(sw * 100) / 100
-            : Math.round(sw * scaleStroke * 100) / 100;
-          el.setAttribute('stroke-width', String(scaledStrokeWidth));
-        }
-      } else if (shouldUseUnscaledStroke) {
-        const stroke = (el.getAttribute('stroke') || '').trim().toLowerCase();
-        if (stroke && stroke !== 'none') {
-          const styleStrokeWidth = parseFloat(ctx.style.strokeWidth as string) || 1;
-          el.setAttribute('stroke-width', String(styleStrokeWidth));
-        }
-      }
-      if (el.hasAttribute('font-size')) {
-        const fs = parseFloat(el.getAttribute('font-size') || '0');
-        if (fs) el.setAttribute('font-size', String(fs * scaleStroke));
-      }
-
-      switch (el.tagName) {
-        case 'path': {
-          const d = el.getAttribute('d') || '';
-          const fill = el.getAttribute('fill') || '';
-          const stroke = el.getAttribute('stroke') || '';
-          const fillId = this.normalizeColorId(fill);
-          const strokeId = this.normalizeColorId(stroke);
-
-          if (shapeName === 'mxgraph.citrix.desktop' && stroke === 'none' && /fillcolor/i.test(rawFill)) {
-            return false;
-          }
-
-          if (shapeName === 'mxgraph.cisco.storage.cisco_file_engine' && fillId === 'ffffff' && strokeId === 'ffffff') {
-            el.setAttribute('fill', styleFill);
-          }
-
-          if ((shapeName === 'mxgraph.ios7.misc.check' || shapeName === 'mxgraph.cisco.computers_and_peripherals.workstation') &&
-              fill && fill !== 'none' && !/[Zz]/.test(d)) {
-            el.setAttribute('fill', 'none');
-          }
-
-          el.setAttribute('d', transformPathData(d));
-          if (shapeName === 'mxgraph.signs.travel.euro') {
-            const currentFill = (el.getAttribute('fill') || '').toLowerCase();
-            if (!currentFill || currentFill === 'none') {
-              el.setAttribute('fill', styleFill);
-            }
-            el.setAttribute('stroke', 'none');
-          }
-          break;
-        }
-        case 'rect': {
-          const x = parseFloat(el.getAttribute('x') || '0');
-          const y = parseFloat(el.getAttribute('y') || '0');
-          const width = parseFloat(el.getAttribute('width') || '0');
-          const height = parseFloat(el.getAttribute('height') || '0');
-          const pt = transformPoint(x, y, false);
-          el.setAttribute('x', String(pt.x));
-          el.setAttribute('y', String(pt.y));
-          el.setAttribute('width', String(transformLengthX(width)));
-          el.setAttribute('height', String(transformLengthY(height)));
-          if (el.hasAttribute('rx')) {
-            const rx = parseFloat(el.getAttribute('rx') || '0');
-            el.setAttribute('rx', String(transformLengthX(rx)));
-          }
-          if (el.hasAttribute('ry')) {
-            const ry = parseFloat(el.getAttribute('ry') || '0');
-            el.setAttribute('ry', String(transformLengthY(ry)));
-          }
-          break;
-        }
-        case 'ellipse': {
-          const cx = parseFloat(el.getAttribute('cx') || '0');
-          const cy = parseFloat(el.getAttribute('cy') || '0');
-          const rx = parseFloat(el.getAttribute('rx') || '0');
-          const ry = parseFloat(el.getAttribute('ry') || '0');
-          const pt = transformPoint(cx, cy, false);
-          el.setAttribute('cx', String(pt.x));
-          el.setAttribute('cy', String(pt.y));
-          el.setAttribute('rx', String(transformLengthX(rx)));
-          el.setAttribute('ry', String(transformLengthY(ry)));
-          if (shapeName === 'mxgraph.bpmn.timer_start') {
-            if (timerStartCircleIndex === 0) {
-              el.setAttribute('fill', timerStartFill);
-            }
-            timerStartCircleIndex += 1;
-          }
-          break;
-        }
-        case 'circle': {
-          const cx = parseFloat(el.getAttribute('cx') || '0');
-          const cy = parseFloat(el.getAttribute('cy') || '0');
-          const r = parseFloat(el.getAttribute('r') || '0');
-          const pt = transformPoint(cx, cy, false);
-          const rx = transformLengthX(r);
-          const ry = transformLengthY(r);
-          if (this.builder) {
-            const ellipse = this.builder.createEllipse(pt.x, pt.y, rx, ry);
-            for (let i = 0; i < el.attributes.length; i++) {
-              const attr = el.attributes[i];
-              if (attr.name === 'cx' || attr.name === 'cy' || attr.name === 'r') continue;
-              ellipse.setAttribute(attr.name, attr.value);
-            }
-            if (shapeName === 'mxgraph.bpmn.timer_start') {
-              if (timerStartCircleIndex === 0) {
-                ellipse.setAttribute('fill', timerStartFill);
+            // Arc: rx, ry, rotation, largeArc, sweep, x, y
+            // Convert to cubic bezier curves for consistent rendering with draw.io
+            const rx = cmd[1] * scaleX;
+            const ry = cmd[2] * scaleY;
+            const rotation = cmd[3];
+            const largeArc = cmd[4];
+            const sweep = cmd[5];
+            const destX = cmd[6];
+            const destY = cmd[7];
+            
+            // Transform current point and destination
+            const currPt = transformPoint(cx, cy);
+            const destPt = transformPoint(destX, destY);
+            
+            // Convert arc to bezier curves
+            const curves = arcToCurves(
+              currPt.x, currPt.y,
+              rx, ry,
+              rotation,
+              largeArc,
+              sweep,
+              destPt.x, destPt.y
+            );
+            
+            if (curves && curves.length) {
+              // curves is array of [cp1x, cp1y, cp2x, cp2y, endx, endy, ...]
+              for (let ci = 0; ci < curves.length; ci += 6) {
+                parts.push(`C ${curves[ci]} ${curves[ci + 1]} ${curves[ci + 2]} ${curves[ci + 3]} ${curves[ci + 4]} ${curves[ci + 5]}`);
               }
-              timerStartCircleIndex += 1;
+            } else {
+              // Fallback to line if arc conversion fails
+              parts.push(`L ${destPt.x} ${destPt.y}`);
             }
-            if (el.parentNode) {
-              el.parentNode.replaceChild(ellipse, el);
-            }
+            
+            cx = destX;
+            cy = destY;
             break;
           }
-          break;
+          case 'Z':
+            parts.push('Z');
+            cx = sx;
+            cy = sy;
+            break;
         }
-        case 'line': {
-          const x1 = parseFloat(el.getAttribute('x1') || '0');
-          const y1 = parseFloat(el.getAttribute('y1') || '0');
-          const x2 = parseFloat(el.getAttribute('x2') || '0');
-          const y2 = parseFloat(el.getAttribute('y2') || '0');
-          const p1 = transformPoint(x1, y1, false);
-          const p2 = transformPoint(x2, y2, false);
-          el.setAttribute('x1', String(p1.x));
-          el.setAttribute('y1', String(p1.y));
-          el.setAttribute('x2', String(p2.x));
-          el.setAttribute('y2', String(p2.y));
-          break;
+      }
+      return parts.join(' ');
+    };
+
+    // Rendering state
+    type RenderState = {
+      fillColor: string;
+      strokeColor: string;
+      strokeWidth: number;
+      fillAlpha: number;
+      strokeAlpha: number;
+      alpha: number;
+      dashed: boolean;
+      dashPattern?: string;
+      lineJoin?: string;
+      lineCap?: string;
+      miterLimit?: number;
+      fontFamily: string;
+      fontSize: number;
+      fontStyle: number;
+      fontColor: string;
+    };
+
+    // Per mxStencil.js drawShape():
+    // - When strokewidth == 'inherit': use cell's strokeWidth directly (NO scaling)
+    // - When strokewidth is a number (or default 1): use that number * minScale (WITH scaling)
+    const strokeWidthInherit = shape.strokeWidth === 'inherit';
+    // When shape.strokeWidth is undefined, treat it as default value 1 (per mxStencil.js line 314-315)
+    const stencilStrokeWidth = typeof shape.strokeWidth === 'number' ? shape.strokeWidth : 1;
+    const initialStrokeWidth = strokeWidthInherit
+      ? (parseFloat(ctx.style.strokeWidth as string) || 1)
+      : stencilStrokeWidth * scaleStroke;
+
+    const createInitialState = (): RenderState => ({
+      fillColor: styleFill,
+      strokeColor: styleStroke,
+      strokeWidth: initialStrokeWidth,
+      fillAlpha: 1,
+      strokeAlpha: 1,
+      alpha: effectiveBaseOpacity,
+      dashed: false,
+      fontFamily: (ctx.style.fontFamily as string) || 'Helvetica',
+      // draw.io uses DEFAULT_FONTSIZE = 11 (see mxConstants.js)
+      fontSize: 11,
+      fontStyle: 0,
+      fontColor: styleFontColor,
+    });
+
+    let state = createInitialState();
+    const stateStack: RenderState[] = [];
+
+    type PendingShape =
+      | { type: 'path'; d: string }
+      | { type: 'rect'; x: number; y: number; w: number; h: number; rx?: number }
+      | { type: 'ellipse'; cx: number; cy: number; rx: number; ry: number }
+      | { type: 'text'; x: number; y: number; str: string; align: string; valign: string };
+
+    let pending: PendingShape | null = null;
+
+    const flushPending = (paint: 'fillStroke' | 'stroke' | 'fill'): void => {
+      if (!pending || !this.builder) return;
+
+      const effectiveAlpha = state.alpha;
+      const attrs: Record<string, string | number> = {};
+
+      if (paint === 'fillStroke' || paint === 'fill') {
+        attrs.fill = state.fillColor;
+        const fillOp = state.fillAlpha * effectiveAlpha;
+        if (fillOp !== 1) attrs['fill-opacity'] = fillOp;
+      } else {
+        attrs.fill = 'none';
+      }
+
+      if (paint === 'fillStroke' || paint === 'stroke') {
+        attrs.stroke = state.strokeColor;
+        // strokeWidth is already correctly set in initialStrokeWidth:
+        // - 'inherit': cell's strokeWidth (no scaling)
+        // - number: shape's strokeWidth * scaleStroke (pre-scaled)
+        // So we just use state.strokeWidth directly here
+        attrs['stroke-width'] = state.strokeWidth;
+        const strokeOp = state.strokeAlpha * effectiveAlpha;
+        if (strokeOp !== 1) attrs['stroke-opacity'] = strokeOp;
+        if (state.dashed) {
+          // Per mxSvgCanvas2D.createDashPattern: scale factor is (fixDash ? 1 : strokeWidth) * state.scale
+          // In stencil rendering: fixDash defaults to false, state.scale is 1
+          // So dash scale factor = strokeWidth * 1 = strokeWidth (the current rendered strokeWidth)
+          const rawPattern = state.dashPattern || '3 3';
+          const dashScale = state.strokeWidth;
+          const scaledPattern = rawPattern
+            .split(' ')
+            .map((v) => {
+              const num = parseFloat(v);
+              return Number.isFinite(num) ? String(Math.round(num * dashScale * 100) / 100) : v;
+            })
+            .join(' ');
+          attrs['stroke-dasharray'] = scaledPattern;
         }
-        case 'polygon':
-        case 'polyline': {
-          const points = el.getAttribute('points') || '';
-          if (points) {
-            el.setAttribute('points', transformPointsAttr(points));
-          }
+        if (state.lineJoin) attrs['stroke-linejoin'] = state.lineJoin;
+        if (state.lineCap) attrs['stroke-linecap'] = state.lineCap;
+        if (state.miterLimit !== undefined) attrs['stroke-miterlimit'] = state.miterLimit;
+      } else {
+        attrs.stroke = 'none';
+      }
+
+      let el: Element;
+      switch (pending.type) {
+        case 'path':
+          el = this.builder.createPath(pending.d, attrs);
           break;
-        }
-        case 'image': {
-          const x = parseFloat(el.getAttribute('x') || '0');
-          const y = parseFloat(el.getAttribute('y') || '0');
-          const width = parseFloat(el.getAttribute('width') || '0');
-          const height = parseFloat(el.getAttribute('height') || '0');
-          const pt = transformPoint(x, y, false);
-          el.setAttribute('x', String(pt.x));
-          el.setAttribute('y', String(pt.y));
-          el.setAttribute('width', String(transformLengthX(width)));
-          el.setAttribute('height', String(transformLengthY(height)));
+        case 'rect':
+          if (pending.rx) attrs.rx = pending.rx;
+          el = this.builder.createRect(pending.x, pending.y, pending.w, pending.h, attrs);
           break;
-        }
+        case 'ellipse':
+          el = this.builder.createEllipse(pending.cx, pending.cy, pending.rx, pending.ry, attrs);
+          break;
         case 'text': {
-          const x = parseFloat(el.getAttribute('x') || '0');
-          let y = parseFloat(el.getAttribute('y') || '0');
-          const scaledFontSize = parseFloat(el.getAttribute('font-size') || '0');
-          const rawFontSize = scaleStroke ? scaledFontSize / scaleStroke : scaledFontSize;
-          const dominant = el.getAttribute('dominant-baseline');
-          const isCiscoToken = shapeName === 'mxgraph.cisco.misc.token';
-          if (dominant) {
-            if (dominant === 'middle') {
-              y += rawFontSize / (isCiscoToken ? 4 : 6);
-            } else if (dominant === 'hanging') {
-              y += rawFontSize - 1;
-            } else if (dominant === 'auto') {
-              y -= 1;
-            }
-            el.removeAttribute('dominant-baseline');
-          } else {
-            const textAnchor = el.getAttribute('text-anchor');
-            if (textAnchor === 'middle' && !el.hasAttribute('dy')) {
-              if (rawFontSize) {
-                y += rawFontSize / (isCiscoToken ? 4 : 6);
-              }
-            }
+          let textY = pending.y;
+          const fontSize = state.fontSize * scaleStroke;
+          // SVG text baseline is at y, so we need to adjust for vertical alignment
+          // Based on draw.io's mxSvgCanvas2D.js plainText function:
+          // Initial: cy = y + size - 1
+          // For stencil text (single line, no overflow/clip):
+          // - top: cy = y + size - 1 (no further adjustment)
+          // - middle: cy = y + size - 1 - textHeight/2 = y + fontSize/2 - 1
+          // - bottom: cy = y + size - 1 - textHeight - 1 = y - 2
+          if (pending.valign === 'middle') {
+            textY += fontSize / 2 - 1;
+          } else if (pending.valign === 'top') {
+            textY += fontSize - 1;
+          } else if (pending.valign === 'bottom') {
+            textY -= 2;
           }
-          const pt = transformPoint(x, y, false);
-          let outY = pt.y;
-          if (isCiscoToken && scaledFontSize) {
-            outY += scaledFontSize / 6;
+          const textAttrs: Record<string, string | number> = {
+            x: pending.x,
+            y: textY,
+            fill: state.fontColor,
+            'font-family': state.fontFamily,
+            'font-size': fontSize,
+          };
+          if (pending.align === 'center') textAttrs['text-anchor'] = 'middle';
+          else if (pending.align === 'right') textAttrs['text-anchor'] = 'end';
+          if (state.fontStyle & 1) textAttrs['font-weight'] = 'bold';
+          if (state.fontStyle & 2) textAttrs['font-style'] = 'italic';
+          if (effectiveAlpha !== 1) textAttrs['opacity'] = effectiveAlpha;
+
+          el = this.builder.doc.createElementNS('http://www.w3.org/2000/svg', 'text');
+          for (const [k, v] of Object.entries(textAttrs)) {
+            el.setAttribute(k, String(v));
           }
-          el.setAttribute('x', String(pt.x));
-          el.setAttribute('y', String(outY));
+          el.textContent = pending.str;
           break;
         }
         default:
-          break;
+          return;
       }
 
-      if (el.tagName === 'rect') {
-        const fill = el.getAttribute('fill') || '';
-        const stroke = el.getAttribute('stroke') || '';
-        const fillOpacity = parseFloat(el.getAttribute('fill-opacity') || '1');
-        const strokeOpacity = parseFloat(el.getAttribute('stroke-opacity') || '1');
-        const w = parseFloat(el.getAttribute('width') || '0');
-        const h = parseFloat(el.getAttribute('height') || '0');
-        const isBlack = (v: string) => v === '#000000' || v === 'rgb(0, 0, 0)';
-        if (w > 0 && h > 0 && fillOpacity < 1 && strokeOpacity < 1 && isBlack(fill) && isBlack(stroke)) {
-          return false;
-        }
-      }
-
-      for (let i = 0; i < el.children.length; i++) {
-        if (!transformElement(el.children[i])) {
-          el.children[i].remove();
-          i--;
-        }
-      }
-      return true;
+      g.appendChild(el);
+      pending = null;
     };
 
+    const processOp = (op: DrawOp): void => {
+      if (typeof op === 'string') {
+        switch (op) {
+          case 'save':
+            stateStack.push({ ...state });
+            break;
+          case 'restore':
+            state = stateStack.pop() ?? createInitialState();
+            break;
+          case 'fill':
+            flushPending('fill');
+            break;
+          case 'stroke':
+            flushPending('stroke');
+            break;
+          case 'fillStroke':
+            flushPending('fillStroke');
+            break;
+        }
+        return;
+      }
+
+      // Object operations
+      if ('path' in op) {
+        pending = { type: 'path', d: buildPathD(op.path) };
+      } else if ('rect' in op) {
+        const [x, y, w, h] = op.rect;
+        const pt = transformPoint(x, y);
+        pending = { type: 'rect', x: pt.x, y: pt.y, w: w * scaleX, h: h * scaleY };
+      } else if ('roundRect' in op) {
+        const [x, y, w, h, arcSize] = op.roundRect;
+        const pt = transformPoint(x, y);
+        const r = Math.min(w, h) * (arcSize / 100) / 2 * Math.min(scaleX, scaleY);
+        pending = { type: 'rect', x: pt.x, y: pt.y, w: w * scaleX, h: h * scaleY, rx: r };
+      } else if ('ellipse' in op) {
+        const [x, y, w, h] = op.ellipse;
+        const cx = x + w / 2;
+        const cy = y + h / 2;
+        const pt = transformPoint(cx, cy);
+        pending = { type: 'ellipse', cx: pt.x, cy: pt.y, rx: w / 2 * scaleX, ry: h / 2 * scaleY };
+      } else if ('text' in op) {
+        const pt = transformPoint(op.text.x, op.text.y);
+        pending = { type: 'text', x: pt.x, y: pt.y, str: op.text.str, align: op.text.align || 'left', valign: op.text.valign || 'top' };
+        flushPending('fill');
+      } else if ('fillColor' in op) {
+        state.fillColor = resolveColor(op.fillColor, op.default, 'fill');
+      } else if ('strokeColor' in op) {
+        state.strokeColor = resolveColor(op.strokeColor, op.default, 'stroke');
+      } else if ('strokeWidth' in op) {
+        // Per mxStencil.js: internal strokewidth operations should be scaled by minScale
+        // (unless fixed=1, which V2 format currently doesn't support)
+        state.strokeWidth = op.strokeWidth * scaleStroke;
+      } else if ('alpha' in op) {
+        state.alpha = op.alpha * styleOpacity;
+      } else if ('fillAlpha' in op) {
+        state.fillAlpha = op.fillAlpha;
+      } else if ('strokeAlpha' in op) {
+        state.strokeAlpha = op.strokeAlpha;
+      } else if ('dashed' in op) {
+        state.dashed = op.dashed;
+        // Apply custom dashpattern only when "pattern" attribute was used in stencil XML
+        // (mxStencil.js only reads "pattern" attr, ignores "dash" attr - see stencil/xml.ts)
+        // Per mxStencil.js: dashpattern values are scaled by minScale = Math.min(aspect.width, aspect.height)
+        if ('pattern' in op && op.pattern) {
+          state.dashPattern = op.pattern
+            .split(' ')
+            .map((v: string) => {
+              const num = parseFloat(v);
+              return Number.isFinite(num) ? String(Math.round(num * scaleStroke * 100) / 100) : v;
+            })
+            .join(' ');
+        }
+      } else if ('lineJoin' in op) {
+        state.lineJoin = op.lineJoin;
+      } else if ('lineCap' in op) {
+        state.lineCap = op.lineCap;
+      } else if ('miterLimit' in op) {
+        state.miterLimit = op.miterLimit;
+      } else if ('fontFamily' in op) {
+        state.fontFamily = op.fontFamily;
+      } else if ('fontSize' in op) {
+        state.fontSize = op.fontSize;
+      } else if ('fontStyle' in op) {
+        state.fontStyle = op.fontStyle;
+      } else if ('fontColor' in op) {
+        state.fontColor = resolveColor(op.fontColor, op.default, 'font');
+      }
+    };
+
+    // Create group
     const g = this.builder.createGroup();
-    if (hasShadow && (shapeName === 'mxgraph.office.concepts.best_practices' || shapeName === 'mxgraph.office.concepts.help')) {
-      const rect = this.builder.createRect(ctx.x, ctx.y, ctx.width, ctx.height, {
+
+    // Add pointer-events rect if pointerEvents=1 in style
+    // Per mxStencil.js: Only draw when STYLE_POINTER_EVENTS == '1' (default is '0' for stencils)
+    const pointerEvents = ctx.style.pointerEvents as string | undefined;
+    if (pointerEvents === '1' || pointerEvents === 1 as unknown as string) {
+      const rectEl = this.builder.createRect(ctx.x, ctx.y, ctx.width, ctx.height, {
         fill: 'none',
         stroke: 'none',
         'pointer-events': 'all'
       });
-      g.appendChild(rect);
+      g.appendChild(rectEl);
     }
-    for (let i = 0; i < svgEl.childNodes.length; i++) {
-      const node = svgEl.childNodes[i];
-      if (node.nodeType !== 1) continue;
-      const imported = this.builder.doc.importNode(node, true) as Element;
-      if (transformElement(imported)) {
-        g.appendChild(imported);
+
+    // Process background
+    if (shape.background) {
+      for (const op of shape.background) {
+        processOp(op);
       }
+    }
+
+    // Process foreground
+    for (const op of shape.foreground) {
+      processOp(op);
     }
 
     this.currentGroup.appendChild(g);
@@ -2890,7 +2791,7 @@ export class SvgRenderer {
     // DOM: Create cell group and set as current rendering target
     let cellGroup: Element | null = null;
     if (this.builder) {
-      const dataShape = shape && this.getStencilSvgFromResource(shape) ? shape : undefined;
+      const dataShape = shape && this.getStencilShape(shape) ? shape : undefined;
       cellGroup = createCellGroupHelper(this.builder, dataCellId, dataShape, (g) => this.pushGroup(g));
     }
 
@@ -3249,7 +3150,7 @@ export class SvgRenderer {
         getAbsolutePosition: this.getAbsolutePosition.bind(this),
         isEdgeChildLabel,
         measureMultilineTextSize,
-        getStencilSvg: this.getStencilSvg.bind(this),
+        getStencilShape: this.getStencilShape.bind(this),
         getPerimeterFn: this.getPerimeterFnForShape,
       },
       {
@@ -3279,7 +3180,7 @@ export class SvgRenderer {
         getAbsolutePosition: this.getAbsolutePosition.bind(this),
         isEdgeChildLabel,
         measureMultilineTextSize,
-        getStencilSvg: this.getStencilSvg.bind(this),
+        getStencilShape: this.getStencilShape.bind(this),
         getPerimeterFn: this.getPerimeterFnForShape,
       },
       {

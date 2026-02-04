@@ -17,7 +17,7 @@ export class IosIDeleteAppHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -37,12 +37,12 @@ export class IosIDeleteAppHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
       f
     );
     builder.setShadow(!1);
-    this.renderForeground(builder, x, y, width, height, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(builder, x, y, width, height, style, getStencilShape, renderStencilShape);
     builder.restore();
   }
 
@@ -53,7 +53,7 @@ export class IosIDeleteAppHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {
@@ -74,7 +74,7 @@ export class IosIDeleteAppHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

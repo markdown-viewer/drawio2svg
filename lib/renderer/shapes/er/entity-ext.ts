@@ -17,7 +17,7 @@ export class ErEntityExtHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -57,7 +57,7 @@ export class ErEntityExtHandler extends BaseShapeHandler {
     }
     b = Math.max(b, 20, n + 10);
     c = Math.max(c, 20, (g.length + 1) * p);
-    this.renderBackground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape, 10);
+    this.renderBackground(builder, x, y, b, c, style, getStencilShape, renderStencilShape, 10);
     builder.setShadow(!1);
     this.render_shapes(builder, x, y, b, c, k, l, m, 10, p);
     this.render_mainText(builder, x, y, b, c, f, k, m);
@@ -72,7 +72,7 @@ export class ErEntityExtHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {

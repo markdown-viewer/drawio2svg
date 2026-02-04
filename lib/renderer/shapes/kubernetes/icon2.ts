@@ -17,7 +17,7 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -47,9 +47,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
       __ty + 0,
       width,
       height,
-      h,
+      undefined,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape
     );
     builder.setFillColor(g as string);
@@ -59,9 +59,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
       __ty + 0.03 * height,
       0.94 * width,
       0.94 * height,
-      g,
+      undefined,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape
     );
     g = 'mxgraph.kubernetes2.' + f;
@@ -80,9 +80,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -95,9 +95,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -110,9 +110,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.25 * height,
         0.6 * h,
         0.5 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -125,9 +125,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -140,9 +140,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.5 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -155,9 +155,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -182,9 +182,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.3 * height,
         0.5 * h,
         0.3 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -197,9 +197,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -212,9 +212,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -227,9 +227,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.25 * height,
         0.6 * h,
         0.55 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -242,9 +242,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -257,9 +257,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -272,9 +272,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -287,9 +287,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -302,9 +302,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.1 * height,
         0.8 * h,
         0.8 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -317,9 +317,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -332,9 +332,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -347,9 +347,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -362,9 +362,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -377,9 +377,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -392,9 +392,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -407,9 +407,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -422,9 +422,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -437,9 +437,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -452,9 +452,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -467,9 +467,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -482,9 +482,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -497,9 +497,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -512,9 +512,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -527,9 +527,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -542,9 +542,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -557,9 +557,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -572,9 +572,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -587,9 +587,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -602,9 +602,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -617,9 +617,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -632,9 +632,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -647,9 +647,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -662,9 +662,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * h,
         0.6 * d,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
       if (1 == k) {
@@ -677,9 +677,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
         __ty + 0.2 * height,
         0.6 * width,
         0.6 * height,
-        h,
+        undefined,
         style,
-        getStencilSvg,
+        getStencilShape,
         renderStencilShape
       );
     }
@@ -694,10 +694,10 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     height: number,
     fillColor: string | undefined,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
-    if (!getStencilSvg || !renderStencilShape) return;
+    if (!getStencilShape || !renderStencilShape) return;
     if (!name) return;
     const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
     const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
@@ -723,8 +723,9 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
       strokeColor: 'none',
       ...(aspect ? { aspect } : {}),
     } as any;
-    const svg = getStencilSvg(stencilStyle);
-    if (!svg) return;
-    renderStencilShape({ x, y, width, height, style: stencilStyle }, svg);
+    const stencilShape = getStencilShape(stencilStyle.shape);
+    if (!stencilShape) return;
+    const ctx = { x, y, width, height, style: stencilStyle };
+    renderStencilShape(ctx, stencilShape);
   }
 }

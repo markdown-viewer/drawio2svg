@@ -17,7 +17,7 @@ export class ArchimateBusinessHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -28,10 +28,19 @@ export class ArchimateBusinessHandler extends BaseShapeHandler {
     applyShapeAttrsToBuilder(builder, attrs);
 
     builder.translate(x, y);
-    this.renderBackground(builder, 0, 0, width, height, style, getStencilSvg, renderStencilShape);
+    this.renderBackground(builder, 0, 0, width, height, style, getStencilShape, renderStencilShape);
     builder.setShadow(!1);
     builder.translate(width - 20, 5);
-    this.renderForeground(builder, width - 20, 5, 15, 15, style, getStencilSvg, renderStencilShape);
+    this.renderForeground(
+      builder,
+      width - 20,
+      5,
+      15,
+      15,
+      style,
+      getStencilShape,
+      renderStencilShape
+    );
     builder.restore();
   }
 
@@ -42,7 +51,7 @@ export class ArchimateBusinessHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
@@ -57,7 +66,7 @@ export class ArchimateBusinessHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;

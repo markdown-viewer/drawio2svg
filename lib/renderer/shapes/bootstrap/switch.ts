@@ -17,7 +17,7 @@ export class BootstrapSwitchHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -31,9 +31,9 @@ export class BootstrapSwitchHandler extends BaseShapeHandler {
 
     builder.translate(x, y);
     b = Math.max(b, 2 * height);
-    this.renderBackground(builder, x, y, b, height, style, getStencilSvg, renderStencilShape, f);
+    this.renderBackground(builder, x, y, b, height, style, getStencilShape, renderStencilShape, f);
     builder.setShadow(!1);
-    this.renderForeground(builder, x, y, b, height, style, getStencilSvg, renderStencilShape, f);
+    this.renderForeground(builder, x, y, b, height, style, getStencilShape, renderStencilShape, f);
     builder.restore();
   }
 
@@ -44,7 +44,7 @@ export class BootstrapSwitchHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {
@@ -67,7 +67,7 @@ export class BootstrapSwitchHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any
   ): void {

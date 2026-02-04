@@ -7,6 +7,7 @@ import {
   DIRECTION_MASK_SOUTH,
   DIRECTION_MASK_WEST
 } from '../../edge-router/styles/orthogonal/constants.ts';
+import type { StencilShape } from '../../stencil/index.ts';
 
 // Type for perimeter function lookup
 export type GetPerimeterFn = (shape: string | undefined) => ((bounds: CellState, next: Point, orthogonal: boolean, direction?: string) => Point) | null;
@@ -15,7 +16,7 @@ export interface EdgeTerminalContext {
   getAbsolutePosition: (cell: MxCell, cellMap: Map<string, MxCell>) => { x: number; y: number };
   isEdgeChildLabel: (cell: MxCell, cellMap: Map<string, MxCell>) => boolean;
   measureMultilineTextSize: (value: string, style: MxStyle, fontSize: number) => { width: number; height: number };
-  getStencilSvg?: (style: MxStyle) => string | null;
+  getStencilShape?: (shape: string) => StencilShape | null;
   getPerimeterFn?: GetPerimeterFn;
 }
 
@@ -133,60 +134,6 @@ export function buildEdgeTerminal(
     };
     state.portConstraintMask = getPortConstraintMask(terminalCell.style, edgeStyle, rotation, kind === 'source');
 
-    const shapeName = terminalCell.style.shape as string | undefined;
-    const isStencil = !!(shapeName && shapeName.startsWith('mxgraph.'));
-    const isElectricalStencil = !!(shapeName && shapeName.startsWith('mxgraph.electrical.'));
-    const hasFixedAspectStyle = (terminalCell.style.aspect as string) === 'fixed'
-      || (terminalCell.style.imageAspect as string) === '1';
-
-    if (isStencil && ctx.getStencilSvg) {
-      const stencilSvg = ctx.getStencilSvg(terminalCell.style);
-      if (stencilSvg) {
-        const viewBoxMatch = stencilSvg.match(/viewBox\s*=\s*"([^"]+)"/i);
-        const widthMatch = stencilSvg.match(/\bwidth\s*=\s*"([^"]+)"/i);
-        const heightMatch = stencilSvg.match(/\bheight\s*=\s*"([^"]+)"/i);
-        let srcW = 0;
-        let srcH = 0;
-        if (viewBoxMatch) {
-          const nums = viewBoxMatch[1].split(/[\s,]+/).map((n) => parseFloat(n));
-          if (nums.length >= 4) {
-            srcW = nums[2];
-            srcH = nums[3];
-          }
-        }
-        if (!srcW || !srcH) {
-          const w = widthMatch ? parseFloat(widthMatch[1]) : 0;
-          const h = heightMatch ? parseFloat(heightMatch[1]) : 0;
-          srcW = Number.isFinite(w) ? w : 0;
-          srcH = Number.isFinite(h) ? h : 0;
-        }
-        if (srcW > 0 && srcH > 0 && state.width > 0 && state.height > 0) {
-          const scaleX = state.width / srcW;
-          const scaleY = state.height / srcH;
-          const aspectDiff = Math.abs(scaleX - scaleY);
-          const fixedAspect = hasFixedAspectStyle || (isElectricalStencil && aspectDiff <= 0.05);
-          const skipFixedAspectShapes = new Set([
-            'mxgraph.citrix2.citrix_gateway_service',
-            'mxgraph.citrix2.switch',
-            'mxgraph.citrix2.thin_client',
-            'mxgraph.citrix2.web_saas_apps'
-          ]);
-          const allowFixedAspectAdjustment = !skipFixedAspectShapes.has(shapeName || '');
-          if (fixedAspect && allowFixedAspectAdjustment) {
-            const scale = Math.min(scaleX, scaleY);
-            const renderW = srcW * scale;
-            const renderH = srcH * scale;
-            const extraX = (state.width - renderW) / 2;
-            const extraY = (state.height - renderH) / 2;
-            state.x += extraX;
-            state.y += extraY;
-            state.width = renderW;
-            state.height = renderH;
-          }
-        }
-      }
-    }
-
     const isText = shapeType === 'text' || terminalCell.style.text === true || terminalCell.style.text === '1';
     if (isText && terminalCell.value && state.width === 0 && state.height === 0) {
       const fontSize = parseFloat(terminalCell.style.fontSize as string) || 12;
@@ -216,6 +163,31 @@ export function buildEdgeTerminal(
         width: state.width,
         height: state.height
       };
+
+      // For stencils with aspect="fixed", adjust bounds to match the actual rendered shape
+      // This mimics mxGraphView.getPerimeterBounds() behavior in draw.io
+      const shapeName = terminalCell.style.shape as string | undefined;
+      const stencilShape = shapeName && ctx.getStencilShape ? ctx.getStencilShape(shapeName) : null;
+      const isFixedAspect = stencilShape?.aspect === 'fixed' ||
+        (terminalCell.style.aspect as string) === 'fixed' ||
+        (terminalCell.style.imageAspect as string) === '1';
+
+      if (isFixedAspect && stencilShape?.width && stencilShape?.height) {
+        const srcW = stencilShape.width;
+        const srcH = stencilShape.height;
+        const scaleX = bounds.width / srcW;
+        const scaleY = bounds.height / srcH;
+        const scale = Math.min(scaleX, scaleY);
+        const extraX = (bounds.width - srcW * scale) / 2;
+        const extraY = (bounds.height - srcH * scale) / 2;
+        bounds = {
+          x: bounds.x + extraX,
+          y: bounds.y + extraY,
+          width: srcW * scale,
+          height: srcH * scale
+        };
+      }
+
       const perimeterSpacing = Number.isFinite(state.perimeterSpacing as number)
         ? (state.perimeterSpacing as number)
         : 0;
@@ -252,12 +224,6 @@ export function buildEdgeTerminal(
 
       let flipH = terminalCell.style.flipH === '1' || terminalCell.style.flipH === true;
       let flipV = terminalCell.style.flipV === '1' || terminalCell.style.flipV === true;
-      if (shapeName && shapeName.startsWith('mxgraph.')) {
-        const stencilFlipH = terminalCell.style.stencilFlipH === '1' || terminalCell.style.stencilFlipH === true;
-        const stencilFlipV = terminalCell.style.stencilFlipV === '1' || terminalCell.style.stencilFlipV === true;
-        flipH = flipH || stencilFlipH;
-        flipV = flipV || stencilFlipV;
-      }
 
       if (direction === 'north' || direction === 'south') {
         const temp = flipH;

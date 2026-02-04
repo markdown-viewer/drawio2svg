@@ -22,14 +22,14 @@ export function getEllipsePerimeterPoint(
   const px = next.x;
   const py = next.y;
 
-  const dx = parseInt(String(px - cx));
-  const dy = parseInt(String(py - cy));
+  const dx = px - cx;
+  const dy = py - cy;
 
-  if (dx === 0 && dy !== 0) {
+  if (Math.abs(dx) < 1e-6 && Math.abs(dy) > 1e-6) {
     return { x: cx, y: cy + b * dy / Math.abs(dy) };
   }
 
-  if (dx === 0 && dy === 0) {
+  if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) {
     return { x: px, y: py };
   }
 

@@ -17,7 +17,7 @@ export class MockupVideoPlayerHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -38,7 +38,7 @@ export class MockupVideoPlayerHandler extends BaseShapeHandler {
     b = Math.max(b, 5 * m);
     c = Math.max(c, m + 10);
     builder.translate(x, y);
-    this.renderBackground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape, f, h);
+    this.renderBackground(builder, x, y, b, c, style, getStencilShape, renderStencilShape, f, h);
     builder.setShadow(!1);
     this.render_otherShapes(builder, x, y, b, c, g, h, k, l, m);
     builder.restore();
@@ -51,7 +51,7 @@ export class MockupVideoPlayerHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any

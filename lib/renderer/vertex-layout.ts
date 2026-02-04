@@ -37,9 +37,6 @@ export function createCellGroup(
   if (dataCellId) {
     cellGroup.setAttribute('data-cell-id', dataCellId);
   }
-  if (styleShape) {
-    cellGroup.setAttribute('data-shape', String(styleShape));
-  }
   pushGroup(cellGroup);
   return cellGroup;
 }

@@ -17,7 +17,7 @@ export class MockupBrowserWindowHandler extends BaseShapeHandler {
       width,
       height,
       style,
-      getStencilSvg,
+      getStencilShape,
       renderStencilShape,
     } = this.renderCtx;
     if (!builder || !currentGroup) return;
@@ -36,7 +36,7 @@ export class MockupBrowserWindowHandler extends BaseShapeHandler {
     b = Math.max(b, 260);
     c = Math.max(c, 110);
     builder.translate(x, y);
-    this.renderBackground(builder, x, y, b, c, style, getStencilSvg, renderStencilShape, f, g);
+    this.renderBackground(builder, x, y, b, c, style, getStencilShape, renderStencilShape, f, g);
     builder.setShadow(!1);
     this.render_otherShapes(builder, x, y, b, c, g, k, h);
     builder.restore();
@@ -49,7 +49,7 @@ export class MockupBrowserWindowHandler extends BaseShapeHandler {
     width: number,
     height: number,
     style: RenderContext['style'],
-    getStencilSvg?: RenderContext['getStencilSvg'],
+    getStencilShape?: RenderContext['getStencilShape'],
     renderStencilShape?: RenderContext['renderStencilShape'],
     extra1?: any,
     extra2?: any

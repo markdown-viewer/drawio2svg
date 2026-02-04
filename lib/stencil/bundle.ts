@@ -1,65 +1,24 @@
+/**
+ * Stencil Bundle V2
+ * 
+ * Provides loading and access for V2 stencil JSON format.
+ */
+
 import pako from 'pako';
+import type { StencilShape } from './xml.ts';
 
 export interface StencilBundle {
-  get(groupOrPath: string, key?: string): string | null;
-  getGroup(group: string): Record<string, string> | null;
+  get(groupOrPath: string, key?: string): StencilShape | null;
+  getGroup(group: string): Record<string, StencilShape> | null;
   keys(group: string): string[];
   groups(): string[];
   isLoaded(group: string): boolean;
+  version: 2;
 }
 
 export interface StencilGroupSource {
   groups(): string[];
   load(group: string): string | null;
-}
-
-/**
- * Style properties for stencil color replacement
- */
-export interface StencilColorStyle {
-  fillColor?: string;
-  strokeColor?: string;
-  fontColor?: string;
-  fillColor2?: string;
-  fillColor3?: string;
-  fillColor4?: string;
-  fillColor5?: string;
-  fillColor6?: string;
-  fillColor7?: string;
-  fillColor8?: string;
-  strokeColor2?: string;
-  strokeColor3?: string;
-  strokeColor4?: string;
-  strokeColor5?: string;
-}
-
-/**
- * Replace color placeholders in stencil SVG with actual colors from style
- * 
- * Supports placeholders:
- * - {{fillColor}}, {{strokeColor}}, {{fontColor}}
- * - {{fillColor2}} ~ {{fillColor8}}
- * - {{strokeColor2}} ~ {{strokeColor5}}
- * 
- * @param svg SVG string with placeholders
- * @param style Style object with color values
- * @returns SVG with colors applied
- */
-export function applyStencilColors(svg: string, style: StencilColorStyle): string {
-  const fill = style.fillColor || '#ffffff';
-  const stroke = style.strokeColor || '#000000';
-  const font = style.fontColor || '#000000';
-  
-  return svg
-    .replace(/\{\{fillColor\}\}/gi, fill)
-    .replace(/\{\{strokeColor\}\}/gi, stroke)
-    .replace(/\{\{fontColor\}\}/gi, font)
-    // fillColor2-8: {{fillColorN}} or {{fillColorN|default}}
-    .replace(/\{\{fillColor([2-8])(?:\|([^}]+))?\}\}/gi, (_, n, defaultVal) => 
-      style[`fillColor${n}` as keyof StencilColorStyle] || defaultVal || fill)
-    // strokeColor2-5: {{strokeColorN}} or {{strokeColorN|default}}
-    .replace(/\{\{strokeColor([2-5])(?:\|([^}]+))?\}\}/gi, (_, n, defaultVal) => 
-      style[`strokeColor${n}` as keyof StencilColorStyle] || defaultVal || stroke);
 }
 
 function decodeBase64(data: string): Uint8Array {
@@ -72,17 +31,17 @@ function decodeBase64(data: string): Uint8Array {
   return bytes;
 }
 
-function inflateGroup(data: string): Record<string, string> {
+function inflateGroup(data: string): Record<string, StencilShape> {
   const bytes = decodeBase64(data);
   const inflated = pako.inflate(bytes);
   const text = new TextDecoder().decode(inflated);
-  return JSON.parse(text) as Record<string, string>;
+  return JSON.parse(text) as Record<string, StencilShape>;
 }
 
 export function createStencilBundle(source: StencilGroupSource): StencilBundle {
-  const cache: Record<string, Record<string, string>> = {};
+  const cache: Record<string, Record<string, StencilShape>> = {};
 
-  const decompressGroup = (group: string): Record<string, string> | null => {
+  const decompressGroup = (group: string): Record<string, StencilShape> | null => {
     if (cache[group]) return cache[group];
     const data = source.load(group);
     if (!data) return null;
@@ -91,7 +50,8 @@ export function createStencilBundle(source: StencilGroupSource): StencilBundle {
   };
 
   return {
-    get(groupOrPath: string, key?: string): string | null {
+    version: 2,
+    get(groupOrPath: string, key?: string): StencilShape | null {
       if (key === undefined) {
         const idx = groupOrPath.indexOf('/');
         if (idx === -1) return null;
@@ -103,7 +63,7 @@ export function createStencilBundle(source: StencilGroupSource): StencilBundle {
       const groupData = decompressGroup(groupOrPath);
       return groupData ? groupData[key] || null : null;
     },
-    getGroup(group: string): Record<string, string> | null {
+    getGroup(group: string): Record<string, StencilShape> | null {
       return decompressGroup(group);
     },
     keys(group: string): string[] {
