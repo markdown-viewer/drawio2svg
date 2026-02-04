@@ -22,14 +22,16 @@ export function getEllipsePerimeterPoint(
   const px = next.x;
   const py = next.y;
 
-  const dx = px - cx;
-  const dy = py - cy;
+  // Platform uses parseInt to truncate to integer, treating small differences as zero
+  // This ensures that when next is nearly aligned with center, we return center coordinate
+  const dx = Math.trunc(px - cx);
+  const dy = Math.trunc(py - cy);
 
-  if (Math.abs(dx) < 1e-6 && Math.abs(dy) > 1e-6) {
+  if (dx === 0 && dy !== 0) {
     return { x: cx, y: cy + b * dy / Math.abs(dy) };
   }
 
-  if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) {
+  if (dx === 0 && dy === 0) {
     return { x: px, y: py };
   }
 
