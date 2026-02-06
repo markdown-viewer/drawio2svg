@@ -230,6 +230,7 @@ const STYLE_REGISTRY: Record<string, MxStyle> = {
 
   blue: {
     shadow: '1',
+    glass: '1',
     gradientColor: '#7EA6E0',
     fillColor: '#DAE8FC',
     strokeColor: '#6C8EBF',

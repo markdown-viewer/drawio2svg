@@ -1807,16 +1807,18 @@ export class SvgRenderer {
                 const align = (style.align as string) || 'center';
                 const rawValue = cell.value || '';
                 const hasSpan = /<span\b/i.test(rawValue);
-                if (verticalAlign === 'middle' && align === 'center' && !hasSpan) {
+                if (verticalAlign === 'middle' && !hasSpan) {
                   const isSingleChar = rawValue.trim().length <= 1;
                   const hasBoldTag = /<b\b/i.test(rawValue);
                   const fontStyleRaw = parseInt(style.fontStyle as string) || 0;
                   const hasBoldStyle = (fontStyleRaw & 1) !== 0;
                   const hasLineBreak = /<br\b|<div\b|<p\b|\n/i.test(rawValue);
-                  const shouldAdjust = hasBoldTag || (hasBoldStyle && (hasLineBreak || isSingleChar));
+                  // Apply spacing offset for bold text (center-aligned), or overflow=hidden text shapes
+                  const shouldAdjust = (align === 'center' && (hasBoldTag || (hasBoldStyle && (hasLineBreak || isSingleChar))))
+                    || (isTextShape && style.overflow === 'hidden');
                   if (shouldAdjust) {
                     let adjust = Math.floor(spacingTop / 2);
-                    if (hasBoldStyle && hasLineBreak && !hasBoldTag && !isSingleChar) {
+                    if (align === 'center' && hasBoldStyle && hasLineBreak && !hasBoldTag && !isSingleChar) {
                       adjust = Math.ceil(spacingTop / 2);
                     }
                     updateBounds(boundsX, boundsY + adjust);
