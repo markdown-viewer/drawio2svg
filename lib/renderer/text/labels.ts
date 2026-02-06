@@ -169,17 +169,6 @@ export function renderNativeTextLabel(
     }
   }
 
-  // Use measureTextLayout for precise dimensions instead of manual HTML parsing
-  const isHtmlContent = style.html === '1' || style.html === true;
-  const textLayout = measureTextLayout(
-    value,
-    fontSize,
-    fontFamily,
-    isBold ? 'bold' : 'normal',
-    isItalic ? 'italic' : 'normal',
-    undefined,
-    isHtmlContent
-  );
   // Use fixed line height formula matching drawio's LINE_HEIGHT constant (1.2)
   // instead of measured lineHeight for consistent positioning
   const measuredLineHeight = Math.round(fontSize * 1.2);
@@ -189,10 +178,17 @@ export function renderNativeTextLabel(
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/&#x0*a;|&#10;/gi, '\n');
   const lines = rawValue.split(/\r\n|\r|\n/);
-  while (lines.length > 1 && lines[lines.length - 1] === '') {
-    lines.pop();
-  }
-  const lineCount = lines.length;
+  // Count trailing empty lines for vertical centering when label bounds
+  // are not reduced by markers. When markers reduce labelH, trailing
+  // empty lines should not be counted as they overlap with marker space.
+  const hasLabelReduction = labelH < height - 1;
+  const lineCount = hasLabelReduction ? (() => {
+    const trimmed = [...lines];
+    while (trimmed.length > 1 && trimmed[trimmed.length - 1] === '') {
+      trimmed.pop();
+    }
+    return trimmed.length;
+  })() : lines.length;
 
   // Create text group with styling
   const textGroup = builder.createGroup();
