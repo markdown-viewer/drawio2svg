@@ -3,7 +3,7 @@ import type { SvgBuilder } from '../../svg/index.ts';
 import type { LabelOverrides } from '../shape-registry.ts';
 import { measureText, measureMultilineText, measureTextLayout } from '../../text/index.ts';
 import { DEFAULT_FONT_FAMILY } from '../../text/index.ts';
-import { getLabelBounds } from './label-bounds.ts';
+import { getLabelBounds, getAlignmentAsPoint } from './label-bounds.ts';
 
 export interface ClipPathRect {
   x: number;
@@ -718,7 +718,7 @@ export function renderHtmlLabel(
   // This handles isPaintBoundsInverted which swaps offsets and dimensions
   const hasExternalLabelPosition = labelPosition === 'left' || labelPosition === 'right' ||
     verticalLabelPosition === 'top' || verticalLabelPosition === 'bottom';
-  if (!isHorizontalLabel && hasExternalLabelPosition && !whiteSpaceWrap) {
+  if (!isHorizontalLabel && hasExternalLabelPosition) {
     const labelBounds = getLabelBounds({
       cellX: x,
       cellY: y,
@@ -732,15 +732,25 @@ export function renderHtmlLabel(
       spacingTop,
       spacingBottom,
     });
-    marginLeft = Math.round(labelBounds.x);
-    paddingTop = Math.round(labelBounds.y);
-    labelWidth = 1;
-    labelHeight = 1;
+    if (whiteSpaceWrap) {
+      // For wrap mode: convert center-point bounds to left-edge + width format
+      // rotateLabelBounds shifts x by -margin.x * width for alignment;
+      // undo that to get the raw left edge for the flex container
+      const alignPt = getAlignmentAsPoint(align, valign);
+      marginLeft = Math.round(labelBounds.x + alignPt.x * labelBounds.width) - 1;
+      labelWidth = Math.round(labelBounds.width) + 2;
+      paddingTop = Math.round(labelBounds.y);
+    } else {
+      marginLeft = Math.round(labelBounds.x);
+      paddingTop = Math.round(labelBounds.y);
+      labelWidth = 1;
+      labelHeight = 1;
+    }
   }
 
   // Handle external label positions (labels outside the shape)
   // Skip if already handled by getLabelBounds above
-  const skipExternalLabelCalc = !isHorizontalLabel && hasExternalLabelPosition && !whiteSpaceWrap;
+  const skipExternalLabelCalc = !isHorizontalLabel && hasExternalLabelPosition;
   if (labelPosition === 'left' && !skipExternalLabelCalc) {
     // Label is to the left of the shape
     if (width === 0 && height === 0 && !whiteSpaceWrap) {
