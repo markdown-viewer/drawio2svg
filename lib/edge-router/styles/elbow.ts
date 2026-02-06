@@ -86,8 +86,8 @@ export function SideToSide(
     let y2 = getRoutingCenterY(actualTarget);
 
     if (pt != null) {
-      // Use tolerance for floating point comparison (0.5px)
-      const tol = 0.5;
+      // Use minimal tolerance for floating point precision only
+      const tol = 1e-6;
       if (pt.y >= actualSource.y - tol && pt.y <= actualSource.y + actualSource.height + tol) {
         y1 = pt.y;
       }
@@ -151,8 +151,8 @@ export function TopToBottom(
     const t = Math.max(actualSource.y, actualTarget.y);
     const b = Math.min(actualSource.y + actualSource.height, actualTarget.y + actualTarget.height);
 
-    // Use tolerance for floating point comparison (0.5px)
-    const tol = 0.5;
+    // Use minimal tolerance for floating point precision only
+    const tol = 1e-6;
 
     let x = getRoutingCenterX(actualSource);
 
