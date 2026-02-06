@@ -4,6 +4,7 @@ import type { LabelOverrides } from '../shape-registry.ts';
 import { measureText, measureMultilineText, measureTextLayout } from '../../text/index.ts';
 import { DEFAULT_FONT_FAMILY } from '../../text/index.ts';
 import { getLabelBounds, getAlignmentAsPoint } from './label-bounds.ts';
+import { getTextLayoutInfo } from './metrics.ts';
 
 export interface ClipPathRect {
   x: number;
@@ -556,9 +557,12 @@ export function renderHtmlLabel(
 
   // Convert value to XHTML early for layout decisions
   const content = ctx.convertToXhtml(value);
-  const lineBreakMatches = content.match(/<br\s*\/?>/gi);
-  const htmlLineCount = (lineBreakMatches ? lineBreakMatches.length : 0) + 1;
   const isTableHtml = /<table/i.test(content) || isOverflowFill;
+
+  // Use WebView measurement for line count instead of <br> regex counting
+  const containerWidth = whiteSpaceWrap ? Math.max(1, labelW - 2) : undefined;
+  const textLayout = getTextLayoutInfo(value, style, containerWidth);
+  const htmlLineCount = textLayout.lineCount;
 
   // This is the key insight: padding-top determines vertical position
   let marginLeft = labelX + 1;

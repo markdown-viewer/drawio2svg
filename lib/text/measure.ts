@@ -199,24 +199,6 @@ export function measureMultilineText(
 
 import { measureTextLayout as measureTextLayoutWithDom } from './webview-measure.ts';
 
-// Cache for text layout measurements
-const textLayoutCache = new Map<string, TextLayoutResult>();
-
-/**
- * Get cache key for text layout measurement
- */
-function getLayoutCacheKey(
-  text: string,
-  fontSize: number,
-  fontFamily: string,
-  fontWeight: string,
-  fontStyle: string,
-  containerWidth: number | undefined,
-  isHtml: boolean
-): string {
-  return `layout|${text}|${fontSize}|${fontFamily}|${fontWeight}|${fontStyle}|${containerWidth ?? 'auto'}|${isHtml ? 'html' : 'text'}`;
-}
-
 /**
  * Measure text layout with line information
  * 
@@ -247,13 +229,6 @@ export function measureTextLayout(
     return { width: 0, height: defaultLineHeight, lineCount: 1, lineHeight: defaultLineHeight };
   }
 
-  // Check cache first
-  const cacheKey = getLayoutCacheKey(sourceText, fontSize, fontFamily, fontWeight, fontStyle, containerWidth, isHtml);
-  const cached = textLayoutCache.get(cacheKey);
-  if (cached) {
-    return cached;
-  }
-
   let result: TextLayoutResult;
 
   // Use custom provider if set and supports measureTextLayout
@@ -271,13 +246,6 @@ export function measureTextLayout(
       );
     }
   }
-
-  // Cache the result (limit cache size)
-  if (textLayoutCache.size > 1000) {
-    const keysToDelete = Array.from(textLayoutCache.keys()).slice(0, 500);
-    keysToDelete.forEach(k => textLayoutCache.delete(k));
-  }
-  textLayoutCache.set(cacheKey, result);
 
   return result;
 }

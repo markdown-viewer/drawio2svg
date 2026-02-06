@@ -1770,8 +1770,8 @@ export class SvgRenderer {
               }
 
               const verticalAlign = (style.verticalAlign as string) || defaultVerticalAlign;
-              const hasSubOrSup = /<\s*(sub|sup)\b/i.test(cell.value || '');
-              if ((style.html as string | undefined) === '1' && verticalAlign === 'top' && !hasSubOrSup && style.overflow !== 'hidden') {
+              // sub/sup detection removed: WebView textHeight already includes sub/sup impact
+              if ((style.html as string | undefined) === '1' && verticalAlign === 'top' && style.overflow !== 'hidden') {
                 const whiteSpaceWrap = style.whiteSpace === 'wrap';
                 const overflow = style.overflow as string | undefined;
                 const spacingTop = parseFloat(style.spacingTop as string) || 0;
@@ -1812,13 +1812,14 @@ export class SvgRenderer {
                   const hasBoldTag = /<b\b/i.test(rawValue);
                   const fontStyleRaw = parseInt(style.fontStyle as string) || 0;
                   const hasBoldStyle = (fontStyleRaw & 1) !== 0;
-                  const hasLineBreak = /<br\b|<div\b|<p\b|\n/i.test(rawValue);
+                  // Use WebView lineCount instead of HTML regex for line break detection
+                  const hasMultipleLines = textLayoutNoWrap.lineCount > 1;
                   // Apply spacing offset for bold text (center-aligned), or overflow=hidden text shapes
-                  const shouldAdjust = (align === 'center' && (hasBoldTag || (hasBoldStyle && (hasLineBreak || isSingleChar))))
+                  const shouldAdjust = (align === 'center' && (hasBoldTag || (hasBoldStyle && (hasMultipleLines || isSingleChar))))
                     || (isTextShape && style.overflow === 'hidden');
                   if (shouldAdjust) {
                     let adjust = Math.floor(spacingTop / 2);
-                    if (align === 'center' && hasBoldStyle && hasLineBreak && !hasBoldTag && !isSingleChar) {
+                    if (align === 'center' && hasBoldStyle && hasMultipleLines && !hasBoldTag && !isSingleChar) {
                       adjust = Math.ceil(spacingTop / 2);
                     }
                     updateBounds(boundsX, boundsY + adjust);
@@ -1842,11 +1843,12 @@ export class SvgRenderer {
                 textWidth > 0
               ) {
                 const rawValue = cell.value || '';
-                const hasHtmlBlocks = /<br\b|<div\b|<p\b|<li\b|<ul\b|<ol\b/i.test(rawValue);
+                // Use WebView lineCount instead of HTML block element regex
+                const hasMultipleLines = textLayoutNoWrap.lineCount > 1;
                 const plainText = rawValue.replace(/<[^>]+>/g, '');
                 const hasBreakableSpace = /\s/.test(plainText);
                 const allowWrapOverflow = !whiteSpaceWrap || !hasBreakableSpace;
-                if (!hasHtmlBlocks && allowWrapOverflow) {
+                if (!hasMultipleLines && allowWrapOverflow) {
                   const align = (style.align as string) || 'left';
                   const spacing = parseFloat(style.spacing as string) || 0;
                   const spacingLeft = parseFloat(style.spacingLeft as string) || 0;
@@ -1900,11 +1902,9 @@ export class SvgRenderer {
                 Number.isFinite(textWidth) &&
                 Number.isFinite(textHeight)
               ) {
-                const fontStyleRaw = parseInt(style.fontStyle as string) || 0;
-                const isBold = (fontStyleRaw & 1) !== 0 || style.fontStyle === 'bold';
-                const widthBoost = isBold ? 1.185 : 1;
-                const boostedWidth = textWidth * widthBoost;
-                const expandedWidth = Math.max(boundsW, boostedWidth);
+                // widthBoost removed: WebView already measures bold text with correct fontWeight,
+                // so the 1.185x multiplier was redundant (verified in Phase 1.2)
+                const expandedWidth = Math.max(boundsW, textWidth);
                 const expandedHeight = Math.max(boundsH, textHeight);
                 if (expandedWidth > boundsW || expandedHeight > boundsH) {
                   if (boundsW === 0 && boundsH === 0) {
