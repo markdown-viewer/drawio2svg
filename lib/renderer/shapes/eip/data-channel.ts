@@ -75,7 +75,8 @@ export class EipDataChannelHandler extends BaseShapeHandler {
     builder.setFillColor('#fffbc0' as string);
     builder.setStrokeWidth('1');
     for (x = 1; 20 * x + 10 < width - 14; x++) {
-      (builder.rect(20 * x, 0.5 * height - 5, 10, 10), builder.fillAndStroke());
+      builder.rect(20 * x, 0.5 * height - 5, 10, 10);
+      builder.fillAndStroke();
     }
   }
 }

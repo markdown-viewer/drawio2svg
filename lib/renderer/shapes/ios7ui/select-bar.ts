@@ -55,7 +55,9 @@ export class Ios7uiSelectBarHandler extends ActorShapeHandler {
     builder.stroke();
     f = d;
     for (builder.begin(); f < b - Math.max(20, e); ) {
-      (builder.moveTo(f, 0), builder.lineTo(f, c), (f += d));
+      builder.moveTo(f, 0);
+      builder.lineTo(f, c);
+      f += d;
     }
     builder.stroke();
     d = Math.min(Math.max(20, e), c);

@@ -389,6 +389,30 @@ export function updateBoundsForEdge(
   const arrowCount = (hasStartArrow ? 1 : 0) + (hasEndArrow ? 1 : 0);
 
   const strokeWidth = parseFloat(style.strokeWidth as string) || 1;
+
+  // mxArrow-based edge shapes: use mxArrow.augmentBoundingBox grow
+  // grow = strokeWidth/2 (mxShape) + (max(arrowWidth=30, endSize=30)/2 + strokeWidth) (mxArrow)
+  const MXARROW_EDGE_SHAPES = new Set([
+    'mxgraph.lean_mapping.electronic_info_flow_edge',
+    'mxgraph.lean_mapping.manual_info_flow_edge',
+    'mxgraph.networks.comm_link_edge'
+  ]);
+  const shapeName = style.shape as string | undefined;
+  if (shapeName && MXARROW_EDGE_SHAPES.has(shapeName)) {
+    const arrowWidth = 30; // mxConstants.ARROW_WIDTH default
+    const endSize = 30;    // mxConstants.ARROW_SIZE default
+    const mxArrowGrow = Math.max(arrowWidth, endSize) / 2 + strokeWidth;
+    const mxShapeGrow = strokeWidth / 2;
+    const totalGrow = mxShapeGrow + mxArrowGrow;
+    if (edgeMinX !== Infinity) {
+      // draw.io's updateBoundsFromPoints creates each point as mxRectangle(x, y, scale, scale)
+      // where scale=1, so maxX = max(pts.x) + 1, maxY = max(pts.y) + 1
+      updateBounds(bounds, edgeMinX - totalGrow, edgeMinY - totalGrow);
+      updateBounds(bounds, edgeMaxX + 1 + totalGrow, edgeMaxY + 1 + totalGrow);
+    }
+    return;
+  }
+
   const isOpenArrow = (arrow: unknown): boolean => {
     const value = typeof arrow === 'string' ? arrow : '';
     return value === 'open' || value === 'openThin' || value === 'openFilled';

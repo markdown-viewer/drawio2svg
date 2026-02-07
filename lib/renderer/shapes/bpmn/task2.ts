@@ -206,7 +206,8 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
         6,
         { ...attrs, fillColor: strokeColor, strokeColor: 'none' },
         getStencilShape,
-        renderStencilShape
+        renderStencilShape,
+        strokeColor as string
       );
       currXOffset += iconSpaceX;
       builder.setStrokeColor(strokeColor as string);
@@ -345,7 +346,7 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
     const fillColor = attrs.fillColor === 'none' ? '#ffffff' : attrs.fillColor;
 
     const rect = builder.createRect(x, y, markerW, markerH);
-    rect.setAttribute('fill', isFilled ? strokeColor : fillColor);
+    rect.setAttribute('fill', isFilled ? strokeColor : 'transparent');
     rect.setAttribute('stroke', isFilled ? fillColor : strokeColor);
     rect.setAttribute('pointer-events', 'all');
     this.renderCtx.currentGroup?.appendChild(rect);
@@ -366,10 +367,18 @@ export class BpmnTask2Handler extends RectangleShapeHandler {
     height: number,
     attrs: ShapeAttrs,
     getStencilShape?: RenderContext['getStencilShape'],
-    renderStencilShape?: RenderContext['renderStencilShape']
+    renderStencilShape?: RenderContext['renderStencilShape'],
+    fillOverride?: string
   ): void {
     if (!getStencilShape || !renderStencilShape) return;
-    const fillColor = attrs.fillColor === 'none' ? '#ffffff' : attrs.fillColor;
+    // Task marker stencils are drawn on top of the task background.
+    // Most use transparent fill so the background shows through.
+    // Service task (gear icon) needs white fill for its solid shape.
+    const opaqueStencils = new Set(['mxgraph.bpmn.service_task']);
+    const defaultFill = opaqueStencils.has(name)
+      ? (attrs.fillColor === 'none' ? '#ffffff' : attrs.fillColor)
+      : 'transparent';
+    const fillColor = fillOverride ?? defaultFill;
     const strokeColor = attrs.strokeColor === 'none' ? '#000000' : attrs.strokeColor;
     const stencilStyle = {
       shape: name,

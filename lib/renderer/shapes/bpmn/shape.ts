@@ -952,33 +952,62 @@ function renderGateway2(renderCtx: RenderContext, attrs: ShapeAttrs): void {
 
   const symbol = (style.symbol as string) || '';
   const outline = (style.outline as string) || '';
-  if (symbol === 'error' && outline.startsWith('event')) {
-    const innerR = Math.min(width, height) * 0.3;
-    const inner = builder.createEllipse(cx, cy, innerR, innerR);
-    inner.setAttribute('fill', attrs.fillColor === 'none' ? 'none' : attrs.fillColor);
-    inner.setAttribute('stroke', attrs.strokeColor === 'none' ? 'none' : attrs.strokeColor);
-    inner.setAttribute('pointer-events', 'all');
-    currentGroup.appendChild(inner);
 
-    const errorPoints = [
-      { x: round2(cx + innerR * -0.576), y: round2(cy + innerR * 0.5) },
-      { x: round2(cx + innerR * -0.1945), y: round2(cy + innerR * -0.3895) },
-      { x: round2(cx + innerR * 0.1425), y: round2(cy + innerR * 0.129) },
-      { x: round2(cx + innerR * 0.584), y: round2(cy + innerR * -0.514) },
-      { x: round2(cx + innerR * 0.1925), y: round2(cy + innerR * 0.438) },
-      { x: round2(cx + innerR * -0.145), y: round2(cy + innerR * -0.0005) }
-    ];
+  const outlineRx = r * 0.6;
+  const outlineRy = (height / 2) * 0.6;
+  // Outlines that render ellipse(s) within the gateway2 diamond
+  const isEllipseOutline = outline === 'standard' || outline === 'eventInt' || outline === 'eventNonint' ||
+    outline === 'catching' || outline === 'boundInt' || outline === 'boundNonint' ||
+    outline === 'throwing' || outline === 'end';
 
-    builder.setCanvasRoot(currentGroup);
-    builder.save();
-    builder.setFillColor(attrs.fillColor === 'none' ? 'none' : attrs.fillColor);
-    builder.setStrokeColor(attrs.strokeColor === 'none' ? 'none' : attrs.strokeColor);
-    builder.setStrokeWidth(attrs.strokeWidth);
-    builder.setMiterLimit(7);
-    builder.begin();
-    builder.addPoints(errorPoints, false, 0, true);
-    builder.fillAndStroke();
-    builder.restore();
+  // Render outline (concentric circles) within gateway2 diamond
+  if (outline && isEllipseOutline) {
+    const outlineStroke = attrs.strokeColor === 'none' ? '#000000' : attrs.strokeColor;
+    const outlineFill = attrs.fillColor === 'none' ? 'none' : attrs.fillColor;
+
+    // Outer ellipse
+    const outer = builder.createEllipse(cx, cy, outlineRx, outlineRy);
+    outer.setAttribute('fill', outlineFill);
+    outer.setAttribute('stroke', outlineStroke);
+    if (outline === 'end') {
+      outer.setAttribute('stroke-width', String(Math.max(3, attrs.strokeWidth * 3)));
+    }
+    if (outline === 'eventNonint' || outline === 'boundNonint') {
+      outer.setAttribute('stroke-dasharray', '3 3');
+    }
+    outer.setAttribute('pointer-events', 'all');
+    currentGroup.appendChild(outer);
+
+    // Inner ellipse for catching/boundInt/boundNonint/throwing
+    if (outline === 'catching' || outline === 'boundInt' || outline === 'boundNonint' || outline === 'throwing') {
+      const inset = 2;
+      const inner = builder.createEllipse(cx, cy, Math.max(0, outlineRx - inset), Math.max(0, outlineRy - inset));
+      inner.setAttribute('fill', 'none');
+      inner.setAttribute('stroke', outlineStroke);
+      inner.setAttribute('stroke-width', String(attrs.strokeWidth));
+      if (outline === 'boundNonint') {
+        inner.setAttribute('stroke-dasharray', '3 3');
+      }
+      inner.setAttribute('pointer-events', 'all');
+      currentGroup.appendChild(inner);
+    }
+  }
+
+  // Render symbol within gateway2 diamond
+  if (symbol && outline) {
+    if (isEllipseOutline) {
+      // Symbol constrained to the outline ellipse
+      const constrainedCtx = {
+        ...renderCtx,
+        x: cx - outlineRx,
+        y: cy - outlineRy,
+        width: outlineRx * 2,
+        height: outlineRy * 2,
+      };
+      renderSymbolLayer(constrainedCtx, attrs, symbol, outline);
+    } else {
+      // Symbol at full diamond size (e.g., outline=event)
+      renderSymbolLayer(renderCtx, attrs, symbol, outline);
+    }
   }
 }
-

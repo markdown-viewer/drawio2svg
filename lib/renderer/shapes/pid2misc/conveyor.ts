@@ -62,10 +62,10 @@ export class Pid2miscConveyorHandler extends BaseShapeHandler {
     y = 0.9 * x;
     height = 0.7 * x;
     for (f = 0; f < width; f += height) {
-      (builder.rect(y + f, 0, 0.2 * x, 0.1 * x),
-        builder.fillAndStroke(),
-        builder.rect(y + f, 0.9 * x, 0.2 * x, 0.1 * x),
-        builder.fillAndStroke());
+      builder.rect(y + f, 0, 0.2 * x, 0.1 * x);
+      builder.fillAndStroke();
+      builder.rect(y + f, 0.9 * x, 0.2 * x, 0.1 * x);
+      builder.fillAndStroke();
     }
   }
 }

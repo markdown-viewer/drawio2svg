@@ -231,6 +231,12 @@ const STATIC_LABEL_OVERRIDES: Record<string, LabelOverrides> = {
 };
 
 const VERTEX_EDGE_SHAPE_SKIP = new Set<string>([
+  'filledEdge',
+  'flexArrow',
+  'link',
+  'pipe',
+  'tableLine',
+  'wire',
   'mxgraph.lean_mapping.electronic_info_flow_edge',
   'mxgraph.lean_mapping.manual_info_flow_edge',
   'mxgraph.networks.comm_link_edge'
@@ -1692,14 +1698,19 @@ export class SvgRenderer {
             const arrowMargin = growSize / 2 + strokeWidth;
             strokeMargin = Math.max(strokeMargin, arrowMargin);
           }
-          // mxArrow-derived shapes (VERTEX_EDGE_SHAPE_SKIP) need additional margin
-          // mxArrow.augmentBoundingBox: bbox.grow((Math.max(arrowWidth, endSize) / 2 + strokewidth) * scale)
-          // ARROW_WIDTH = 30, ARROW_SIZE = 30, so grow = (30/2 + 1) * 1 = 16
+          // Edge-like vertex shapes: use shape-specific augmentBoundingBox margins
+          // mxArrowConnector (link, flexArrow): grow by (edgeWidth/2 + strokeWidth)
+          // mxConnector (filledEdge, wire, pipe) and tableLine: just strokeWidth/2 (default)
           if (shapeType && VERTEX_EDGE_SHAPE_SKIP.has(shapeType)) {
-            const arrowWidth = 30; // mxConstants.ARROW_WIDTH
-            const endSize = 30;    // mxConstants.ARROW_SIZE
-            const arrowMargin = Math.max(arrowWidth, endSize) / 2 + strokeWidth;
-            strokeMargin = Math.max(strokeMargin, arrowMargin);
+            if (shapeType === 'link' || shapeType === 'flexArrow') {
+              // mxArrowConnector.augmentBoundingBox: bbox.grow((edgeWidth/2 + strokewidth) * scale)
+              const defaultWidth = shapeType === 'flexArrow' ? 10 : 4;
+              const edgeWidth = (parseFloat(style.width as string) || defaultWidth) + Math.max(0, strokeWidth - 1);
+              const arrowMargin = edgeWidth / 2 + strokeWidth;
+              strokeMargin = Math.max(strokeMargin, arrowMargin);
+            }
+            // Other edge-like shapes (filledEdge, wire, pipe, tableLine, stencil edges):
+            // use only strokeWidth/2 from shape, already computed above
           }
           
           let boundsX = x;
@@ -1720,6 +1731,22 @@ export class SvgRenderer {
 
           if (!skipBounds) {
             updateBoundsForRotatedRect(bounds, boundsX, boundsY, boundsW, boundsH, rotation, strokeMargin);
+          }
+
+          // Edge-like vertex shapes: extend bounds to include text label
+          // draw.io uses union of shape.boundingBox and text.boundingBox
+          if (!skipBounds && shapeType && VERTEX_EDGE_SHAPE_SKIP.has(shapeType) && cell.value) {
+            const fontSize = parseFloat(style.fontSize as string) || 12;
+            const textHeight = fontSize * 1.2;
+            const textCenterY = boundsY + boundsH / 2;
+            const textTop = textCenterY - textHeight / 2;
+            const textBottom = textCenterY + textHeight / 2;
+            const shapeMinY = boundsY - strokeMargin;
+            const shapeMaxY = boundsY + boundsH + strokeMargin;
+            if (textTop < shapeMinY || textBottom > shapeMaxY) {
+              // Text extends beyond shape bounds, include text bounds
+              updateBoundsForRotatedRect(bounds, boundsX, textTop, boundsW, textHeight, 0, 0);
+            }
           }
 
           // Extend bounds for text shapes based on actual text height (line-height 1.2)
@@ -2484,7 +2511,8 @@ export class SvgRenderer {
       if (paint === 'fillStroke' || paint === 'fill') {
         attrs.fill = state.fillColor;
         const fillOp = state.fillAlpha * effectiveAlpha;
-        if (fillOp !== 1) attrs['fill-opacity'] = fillOp;
+        // Skip fill-opacity when fill is 'none' (no visual effect, matches draw.io behavior)
+        if (fillOp !== 1 && state.fillColor !== 'none') attrs['fill-opacity'] = fillOp;
       } else {
         attrs.fill = 'none';
       }
@@ -3002,13 +3030,20 @@ export class SvgRenderer {
       this.popGroup();
     }
 
-    renderVertexLabel(
-      {
-        renderLabel: this.renderLabel.bind(this),
-        renderSwimlaneLabel: this.renderSwimlaneLabel.bind(this),
-      },
-      buildLabelParams(x, y, width, height)
-    );
+    // Edge-like vertex shapes use edge-style label positioning (center point)
+    if (shouldSkipEdgeShapeRendering && cell.value) {
+      const centerX = x + width / 2;
+      const centerY = y + height / 2;
+      this.renderEdgeLabel(cell.value, centerX, centerY, style);
+    } else {
+      renderVertexLabel(
+        {
+          renderLabel: this.renderLabel.bind(this),
+          renderSwimlaneLabel: this.renderSwimlaneLabel.bind(this),
+        },
+        buildLabelParams(x, y, width, height)
+      );
+    }
 
     // DOM: Pop cell group
     popLinkWrapper();
@@ -3566,6 +3601,9 @@ export class SvgRenderer {
       }
     }
     const shapeName = style.shape as string | undefined;
+    // Save pre-trim endpoints for bounds calculation (lean_mapping edges trim normalizedPoints)
+    const preShapeStart = { ...normalizedPoints[0] };
+    const preShapeEnd = { ...normalizedPoints[normalizedPoints.length - 1] };
     if (shapeName === 'mxgraph.lean_mapping.electronic_info_flow_edge' && normalizedPoints.length >= 2) {
       const start = normalizedPoints[0];
       const end = normalizedPoints[normalizedPoints.length - 1];
@@ -3694,8 +3732,12 @@ export class SvgRenderer {
     const { startAngle, endAngle } = getEdgeAngles(normalizedPoints);
 
     // Save original endpoints for bounds calculation (before arrow lineOffset adjustment)
-    const originalStartPoint = { ...startPoint };
-    const originalEndPoint = { ...endPoint };
+    // For lean_mapping edges, use the pre-trim endpoints since the shape-specific
+    // trimming reduces the visible path but doesn't change the logical edge extent.
+    const isLeanMappingEdge = shapeName === 'mxgraph.lean_mapping.electronic_info_flow_edge'
+      || shapeName === 'mxgraph.lean_mapping.manual_info_flow_edge';
+    const originalStartPoint = isLeanMappingEdge ? { ...preShapeStart } : { ...startPoint };
+    const originalEndPoint = isLeanMappingEdge ? { ...preShapeEnd } : { ...endPoint };
 
     const linkShapeName = style.shape as string | undefined;
     const hasMarkers = (startArrow && startArrow !== 'none') || (endArrow && endArrow !== 'none');
@@ -4351,6 +4393,15 @@ export class SvgRenderer {
     );
     if (domBoundPointsOverride) {
       boundPointsOverride = domBoundPointsOverride;
+    }
+
+    // mxArrow-based edge shapes: use only original routing endpoints for bounds
+    // mxArrow.augmentBoundingBox grows bbox from these points (not the rendered zigzag/trim path)
+    const isMxArrowEdge = shapeName === 'mxgraph.lean_mapping.electronic_info_flow_edge'
+      || shapeName === 'mxgraph.lean_mapping.manual_info_flow_edge'
+      || shapeName === 'mxgraph.networks.comm_link_edge';
+    if (isMxArrowEdge) {
+      boundPointsOverride = [originalStartPoint, originalEndPoint];
     }
 
     const { labelPosition } = renderEdgeLabelIfAny(

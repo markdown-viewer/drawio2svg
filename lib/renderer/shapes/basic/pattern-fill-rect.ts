@@ -53,7 +53,9 @@ export class BasicPatternFillRectHandler extends ActorShapeHandler {
     } else if ('vert' == g || 'grid' == g) {
       builder.begin();
       for (h = 0; h <= width; ) {
-        (builder.moveTo(h, 0), builder.lineTo(h, height), (h += f));
+        builder.moveTo(h, 0);
+        builder.lineTo(h, height);
+        h += f;
       }
       builder.stroke();
     }
@@ -84,7 +86,9 @@ export class BasicPatternFillRectHandler extends ActorShapeHandler {
     } else if ('hor' == g || 'grid' == g) {
       builder.begin();
       for (h = 0; h <= height; ) {
-        (builder.moveTo(0, h), builder.lineTo(width, h), (h += f));
+        builder.moveTo(0, h);
+        builder.lineTo(width, h);
+        h += f;
       }
       builder.stroke();
     }

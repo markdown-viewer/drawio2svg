@@ -1507,6 +1507,19 @@ export class SvgBuilder {
     return this.canvasState.fillColor ?? null;
   }
 
+  getCurrentStrokeColor(): string | null {
+    return this.canvasState.strokeColor ?? null;
+  }
+
+  // Get current accumulated translate offsets (used by stencil rendering)
+  getTranslateX(): number {
+    return this.canvasState.dx;
+  }
+
+  getTranslateY(): number {
+    return this.canvasState.dy;
+  }
+
   setStrokeColor(value: string | null): void {
     this.canvasState.strokeColor = value === 'none' ? null : value;
   }

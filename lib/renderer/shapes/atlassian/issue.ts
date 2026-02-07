@@ -33,8 +33,6 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
     builder.begin();
     builder.rect(x, y, width, height);
     builder.fillAndStroke();
-    const __tx = d;
-    const __ty = e;
     builder.translate(d, e);
     c = this.getStyleValue(style, 'issueType', 'task');
     e = this.getStyleValue(style, 'issuePriority', 'minor');
@@ -47,8 +45,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#61B659' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -64,8 +62,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#5EA3E4' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -81,8 +79,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#5EA3E4' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -98,8 +96,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#61B659' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -115,8 +113,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#CE0000' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -132,8 +130,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#999C95' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -149,8 +147,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#9E4ADD' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -166,8 +164,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#61B659' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -183,8 +181,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#F8902F' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -200,8 +198,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#9E4ADD' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -217,8 +215,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#F8902F' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -234,8 +232,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#61B659' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -251,8 +249,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#5EA3E4' as string);
           this.renderStencilByName(
             c,
-            __tx + 5,
-            __ty + 5,
+            5,
+            5,
             10,
             10,
             undefined,
@@ -269,8 +267,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#CE0000' as string);
           this.renderStencilByName(
             c,
-            __tx + 85,
-            __ty + 5,
+            85,
+            5,
             10,
             10,
             undefined,
@@ -286,8 +284,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#CE0000' as string);
           this.renderStencilByName(
             c,
-            __tx + 86,
-            __ty + 3,
+            86,
+            3,
             8,
             14,
             undefined,
@@ -303,8 +301,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#CE0000' as string);
           this.renderStencilByName(
             c,
-            __tx + 85,
-            __ty + 5,
+            85,
+            5,
             10,
             10,
             undefined,
@@ -320,8 +318,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#2A8735' as string);
           this.renderStencilByName(
             c,
-            __tx + 85,
-            __ty + 5,
+            85,
+            5,
             10,
             10,
             undefined,
@@ -337,8 +335,8 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
           builder.setFillColor('#9AA1B2' as string);
           this.renderStencilByName(
             c,
-            __tx + 85,
-            __ty + 5,
+            85,
+            5,
             10,
             10,
             undefined,
@@ -372,54 +370,13 @@ export class AtlassianIssueHandler extends RectangleShapeHandler {
         builder.text(width - 25, 15, 0, 0, 'DONE', 'center', 'middle', 0, 0, 0);
         break;
       default:
-        ((e = this.getStyleValue(style, 'issueStatusWidth', 6.5 * d.length)),
-          builder.rect(width - e - 5, 5, e, 20),
-          builder.fill(),
-          builder.text(width - 7, 15, 0, 0, d, 'right', 'middle', 0, null, 0, 0, 0));
+        e = this.getStyleValue(style, 'issueStatusWidth', 6.5 * d.length);
+        builder.rect(width - e - 5, 5, e, 20);
+        builder.fill();
+        builder.text(width - 7, 15, 0, 0, d, 'right', 'middle', 0, 0, 0);
     }
     builder.restore();
   }
 
-  private renderStencilByName(
-    name: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    fillColor: string | undefined,
-    style: RenderContext['style'],
-    getStencilShape?: RenderContext['getStencilShape'],
-    renderStencilShape?: RenderContext['renderStencilShape']
-  ): void {
-    if (!getStencilShape || !renderStencilShape) return;
-    if (!name) return;
-    const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
-    const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
-    const rawFill = typeof fillColor === 'string' ? fillColor : undefined;
-    let resolvedFill = rawFill ?? builderFill ?? styleFill;
-    if (rawFill && builderFill && rawFill === styleFill && builderFill !== styleFill) {
-      resolvedFill = builderFill;
-    }
-    if (
-      (style.shape as string | undefined) === 'mxgraph.gcp2.hexIcon' &&
-      rawFill === '#FCC64D' &&
-      builderFill
-    ) {
-      resolvedFill = builderFill;
-    }
-    const shapeName = style.shape as string | undefined;
-    const isGcpHexStencil =
-      shapeName === 'mxgraph.gcp2.hexIcon' && String(name).startsWith('mxgraph.gcp2.');
-    const aspect = isGcpHexStencil ? (style.aspect as any) : 'fixed';
-    const stencilStyle = {
-      shape: String(name),
-      fillColor: resolvedFill,
-      strokeColor: 'none',
-      ...(aspect ? { aspect } : {}),
-    } as any;
-    const stencilShape = getStencilShape(stencilStyle.shape);
-    if (!stencilShape) return;
-    const ctx = { x, y, width, height, style: stencilStyle };
-    renderStencilShape(ctx, stencilShape);
-  }
+  // renderStencilByName is inherited from BaseShapeHandler
 }

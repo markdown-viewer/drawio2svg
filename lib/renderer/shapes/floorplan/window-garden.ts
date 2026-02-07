@@ -35,10 +35,10 @@ export class FloorplanWindowGardenHandler extends BaseShapeHandler {
     builder.lineTo(width - 5 - 2, height);
     builder.lineTo(width - 5 - 2, 2);
     for (d = 1; d < f; d++) {
-      (builder.lineTo(width - 5 - 2 - d * g - 2 * (d - 1), 2),
-        builder.lineTo(width - 5 - 2 - d * g - 2 * (d - 1), height),
-        builder.lineTo(width - 5 - 4 - 2 * (d - 1) - d * g, height),
-        builder.lineTo(width - 5 - 4 - 2 * (d - 1) - d * g, 2));
+      builder.lineTo(width - 5 - 2 - d * g - 2 * (d - 1), 2);
+      builder.lineTo(width - 5 - 2 - d * g - 2 * (d - 1), height);
+      builder.lineTo(width - 5 - 4 - 2 * (d - 1) - d * g, height);
+      builder.lineTo(width - 5 - 4 - 2 * (d - 1) - d * g, 2);
     }
     builder.lineTo(7, 2);
     builder.lineTo(7, height);

@@ -133,6 +133,51 @@ export abstract class BaseShapeHandler implements ShapeHandler {
   isRoundable(): boolean {
     return false;
   }
+
+  // Render an embedded stencil by name, resolving fill color from multiple sources
+  protected renderStencilByName(
+    name: string, x: number, y: number, width: number, height: number,
+    fillColor: string | undefined,
+    style: RenderContext['style'],
+    getStencilShape?: RenderContext['getStencilShape'],
+    renderStencilShape?: RenderContext['renderStencilShape'],
+  ): void {
+    if (!getStencilShape || !renderStencilShape) return;
+    if (!name) return;
+    const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
+    const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
+    const rawFill = typeof fillColor === 'string' ? fillColor : undefined;
+    let resolvedFill = rawFill ?? builderFill ?? styleFill;
+    if (rawFill && builderFill && rawFill === styleFill && builderFill !== styleFill) {
+      resolvedFill = builderFill;
+    }
+    if ((style.shape as string | undefined) === 'mxgraph.gcp2.hexIcon' && rawFill === '#FCC64D' && builderFill) {
+      resolvedFill = builderFill;
+    }
+    const shapeName = style.shape as string | undefined;
+    const isGcpHexStencil = shapeName === 'mxgraph.gcp2.hexIcon' && String(name).startsWith('mxgraph.gcp2.');
+    const aspect = isGcpHexStencil ? (style.aspect as any) : undefined;
+    // When builder has fillColor='none', switch to stroke-only rendering
+    // (used by gcp2 hexIcon shared/replica outlines)
+    const builderStroke = this.renderCtx.builder?.getCurrentStrokeColor?.() ?? null;
+    // Stencil colors should match the builder's current canvas state
+    // (matching draw.io where stencils render with the canvas's current fill/stroke)
+    const stencilFill = builderFill === null ? 'none' : resolvedFill;
+    const stencilStroke = builderStroke ?? 'none';
+    const stencilStyle = {
+      shape: String(name), fillColor: stencilFill, strokeColor: stencilStroke,
+      ...(stencilStroke !== 'none' && style.strokeWidth !== undefined ? { strokeWidth: style.strokeWidth } : {}),
+      ...(aspect ? { aspect } : {}),
+    } as any;
+    const stencilShape = getStencilShape(stencilStyle.shape);
+    if (!stencilShape) return;
+    // Add builder's accumulated translate to convert from canvas-local to absolute coordinates
+    // Stencil coordinates are passed in canvas-local space (matching draw.io's canvas model)
+    const builderDx = this.renderCtx.builder?.getTranslateX?.() ?? 0;
+    const builderDy = this.renderCtx.builder?.getTranslateY?.() ?? 0;
+    const ctx = { x: x + builderDx, y: y + builderDy, width, height, style: stencilStyle };
+    renderStencilShape(ctx, stencilShape);
+  }
 }
 
 // ============================================================================

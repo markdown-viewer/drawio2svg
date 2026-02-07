@@ -69,37 +69,45 @@ export function renderVertexLabel(ctx: VertexLabelContext, params: VertexLabelPa
   }
 
   if (shape === 'label' && style.image) {
-    const imageAlign = (style.imageAlign as string) || 'left';
-    const imageValign = (style.imageVerticalAlign as string) || 'middle';
-    const parsedImageWidth = parseFloat(style.imageWidth as string);
-    const parsedImageHeight = parseFloat(style.imageHeight as string);
-    const imageWidth = Number.isFinite(parsedImageWidth) ? parsedImageWidth : 42;
-    const imageHeight = Number.isFinite(parsedImageHeight) ? parsedImageHeight : 42;
-    const spacingRaw = parseFloat(style.spacing as string);
-    const imageSpacing = Number.isFinite(spacingRaw) ? spacingRaw : 2;
-    const totalSpacing = imageSpacing + 5;
+    // Named style 'label;' (style.label=true) uses left-aligned text
+    // with bounds adjusted for the image. Explicit 'shape=label;' uses
+    // center-aligned text with full cell bounds (image is just an overlay).
+    const isNamedLabelStyle = style.label === true || style.label === '1';
+    if (isNamedLabelStyle) {
+      const imageAlign = (style.imageAlign as string) || 'left';
+      const imageValign = (style.imageVerticalAlign as string) || 'middle';
+      const parsedImageWidth = parseFloat(style.imageWidth as string);
+      const parsedImageHeight = parseFloat(style.imageHeight as string);
+      const imageWidth = Number.isFinite(parsedImageWidth) ? parsedImageWidth : 42;
+      const imageHeight = Number.isFinite(parsedImageHeight) ? parsedImageHeight : 42;
+      const spacingRaw = parseFloat(style.spacing as string);
+      const imageSpacing = Number.isFinite(spacingRaw) ? spacingRaw : 2;
+      const totalSpacing = imageSpacing + 5;
 
-    let labelX = x;
-    let labelY = y;
-    let labelWidth = width;
-    let labelHeight = height;
-    const imageSpace = imageWidth + totalSpacing + 5;
+      let labelX = x;
+      let labelY = y;
+      let labelWidth = width;
+      let labelHeight = height;
+      const imageSpace = imageWidth + totalSpacing + 5;
 
-    if (imageAlign === 'left') {
-      labelX = x + imageSpace;
-      labelWidth = width - imageSpace;
-    } else if (imageAlign === 'right') {
-      labelWidth = width - imageSpace;
+      if (imageAlign === 'left') {
+        labelX = x + imageSpace;
+        labelWidth = width - imageSpace;
+      } else if (imageAlign === 'right') {
+        labelWidth = width - imageSpace;
+      }
+
+      if (imageValign === 'top') {
+        labelY = y + imageHeight + totalSpacing;
+        labelHeight = height - imageHeight - totalSpacing;
+      } else if (imageValign === 'bottom') {
+        labelHeight = height - imageHeight - totalSpacing;
+      }
+
+      ctx.renderLabel(cell.value, labelX, labelY, labelWidth, labelHeight, style);
+    } else {
+      ctx.renderLabel(cell.value, x, y, width, height, style);
     }
-
-    if (imageValign === 'top') {
-      labelY = y + imageHeight + totalSpacing;
-      labelHeight = height - imageHeight - totalSpacing;
-    } else if (imageValign === 'bottom') {
-      labelHeight = height - imageHeight - totalSpacing;
-    }
-
-    ctx.renderLabel(cell.value, labelX, labelY, labelWidth, labelHeight, style);
     return;
   }
 

@@ -32,7 +32,7 @@ export function renderInlineImage(ctx: InlineImageRenderContext, params: InlineI
   const imageHeight = Number.isFinite(parsedHeight) ? parsedHeight : imageWidth;
 
   const spacingRaw = parseFloat(style.spacing as string);
-  const baseSpacing = Number.isFinite(spacingRaw) ? spacingRaw : (isLabelShape ? 2 : 2);
+  const baseSpacing = Number.isFinite(spacingRaw) ? spacingRaw : 0;
   const spacing = baseSpacing + 5;
 
   const align = (style.imageAlign as string) || (isLabelShape ? 'left' : 'center');

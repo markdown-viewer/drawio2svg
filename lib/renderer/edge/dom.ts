@@ -44,6 +44,13 @@ export function renderEdgeDom(ctx: EdgeDomContext, params: EdgeDomParams): EdgeD
   } = params;
 
   if (!ctx.builder) {
+    // Even in first pass (no builder), compute comm_link_edge bounds
+    // so the zigzag extent is included in the overall SVG bounds.
+    // Include original start/end points for correct edge extent.
+    if (isCommLinkEdge) {
+      const { boundPoints } = buildCommLinkPath(startPoint, endPoint);
+      return { boundPointsOverride: [startPoint, endPoint, ...boundPoints] };
+    }
     return { boundPointsOverride: null };
   }
 
@@ -52,7 +59,7 @@ export function renderEdgeDom(ctx: EdgeDomContext, params: EdgeDomParams): EdgeD
     return { boundPointsOverride: null };
   }
 
-  const useCrispTranslate = !isCommLinkEdge && ctx.shouldApplyCrispTranslate(strokeWidth, strokeColor, false, false);
+  const useCrispTranslate = ctx.shouldApplyCrispTranslate(strokeWidth, strokeColor, false, false);
   const shadowStyle = 'filter: drop-shadow(rgba(0, 0, 0, 0.25) 2px 3px 2px);';
   let shadowGroupPushed = false;
   if (hasShadow && !useCrispTranslate) {
@@ -88,7 +95,7 @@ export function renderEdgeDom(ctx: EdgeDomContext, params: EdgeDomParams): EdgeD
     pathEl.setAttribute('pointer-events', 'all');
     ctx.getCurrentGroup()?.appendChild(pathEl);
 
-    boundPointsOverride = boundPoints;
+    boundPointsOverride = [startPoint, endPoint, ...boundPoints];
   } else {
     const pathEl = ctx.builder.createPath(pathD);
     pathEl.setAttribute('fill', 'none');

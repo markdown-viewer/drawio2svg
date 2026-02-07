@@ -67,7 +67,9 @@ export class IosIBgStripedHandler extends BaseShapeHandler {
     builder.setStrokeColor(y as string);
     y = 5;
     for (builder.begin(); y < width; ) {
-      (builder.moveTo(y, 0), builder.lineTo(y, height), (y += 5));
+      builder.moveTo(y, 0);
+      builder.lineTo(y, height);
+      y += 5;
     }
     builder.stroke();
     builder.setStrokeColor(x as string);

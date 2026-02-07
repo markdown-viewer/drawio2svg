@@ -48,13 +48,15 @@ export class AndroidMenuBarHandler extends BaseShapeHandler {
     builder.setShadow(!1);
     builder.begin();
     for (l = 1; l < h; l++) {
-      ((d = (l * g * c) / k), builder.moveTo(0, d), builder.lineTo(width, d));
+      d = (l * g * c) / k;
+      builder.moveTo(0, d);
+      builder.lineTo(width, d);
     }
     builder.stroke();
     for (l = 0; l < h; l++) {
-      ((m += 2.5),
-        (d = ((l * g + 0.5 * g) * c) / k),
-        builder.text(10, d, 0, 0, f[l], 'left', 'middle', 0, null, 0, 0, 0));
+      m += 2.5;
+      d = ((l * g + 0.5 * g) * c) / k;
+      builder.text(10, d, 0, 0, f[l], 'left', 'middle', 0, 0, 0);
     }
     builder.restore();
   }

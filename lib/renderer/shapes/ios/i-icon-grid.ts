@@ -78,7 +78,8 @@ export class IosIIconGridHandler extends BaseShapeHandler {
     height /= parseInt(extra1[1], 10) + 0.5 * (extra1[1] - 1);
     for (c = 0; c < extra1[0]; c++) {
       for (f = 0; f < extra1[1]; f++) {
-        (builder.rect(1.5 * width * c, 1.5 * height * f, width, height), builder.fillAndStroke());
+        builder.rect(1.5 * width * c, 1.5 * height * f, width, height);
+        builder.fillAndStroke();
       }
     }
   }
@@ -101,12 +102,12 @@ export class IosIIconGridHandler extends BaseShapeHandler {
     height /= parseInt(extra1[1], 10) + 0.5 * (extra1[1] - 1);
     for (c = 0; c < extra1[0]; c++) {
       for (f = 0; f < extra1[1]; f++) {
-        (builder.begin(),
-          builder.moveTo(1.5 * width * c, 1.5 * height * f),
-          builder.lineTo(1.5 * width * c + width, 1.5 * height * f + height),
-          builder.moveTo(1.5 * width * c + width, 1.5 * height * f),
-          builder.lineTo(1.5 * width * c, 1.5 * height * f + height),
-          builder.stroke());
+        builder.begin();
+        builder.moveTo(1.5 * width * c, 1.5 * height * f);
+        builder.lineTo(1.5 * width * c + width, 1.5 * height * f + height);
+        builder.moveTo(1.5 * width * c + width, 1.5 * height * f);
+        builder.lineTo(1.5 * width * c, 1.5 * height * f + height);
+        builder.stroke();
       }
     }
   }

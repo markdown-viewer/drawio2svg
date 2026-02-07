@@ -57,7 +57,8 @@ export class FloorplanStairsHandler extends BaseShapeHandler {
     builder.setShadow(!1);
     builder.begin();
     for (x = 25; x < width; x += 25) {
-      (builder.moveTo(x, 0), builder.lineTo(x, height));
+      builder.moveTo(x, 0);
+      builder.lineTo(x, height);
     }
     builder.stroke();
     builder.begin();

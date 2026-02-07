@@ -79,23 +79,23 @@ export class CubeHandler extends RectangleShapeHandler {
       group.appendChild(base);
 
       const darkOpacityValue = parseFloat(style.darkOpacity as string);
-      const darkOpacity = Number.isFinite(darkOpacityValue) ? darkOpacityValue : 0.05;
+      const darkOpacity = Number.isFinite(darkOpacityValue) ? darkOpacityValue : 0;
       const darkOpacity2Value = parseFloat(style.darkOpacity2 as string);
-      const darkOpacity2 = Number.isFinite(darkOpacity2Value) ? darkOpacity2Value : 0.1;
+      const darkOpacity2 = Number.isFinite(darkOpacity2Value) ? darkOpacity2Value : 0;
 
       const topShade = builder.createPath(topShadePath);
       topShade.setAttribute('fill', '#000000');
       topShade.setAttribute('fill-opacity', String(darkOpacity));
       topShade.setAttribute('stroke', 'none');
       topShade.setAttribute('pointer-events', 'all');
-      group.appendChild(topShade);
+      if (darkOpacity > 0) group.appendChild(topShade);
 
       const sideShade = builder.createPath(sideShadePath);
       sideShade.setAttribute('fill', '#000000');
       sideShade.setAttribute('fill-opacity', String(darkOpacity2));
       sideShade.setAttribute('stroke', 'none');
       sideShade.setAttribute('pointer-events', 'all');
-      group.appendChild(sideShade);
+      if (darkOpacity2 > 0) group.appendChild(sideShade);
 
       const outline = builder.createPath(outlinePath);
       applyShapeAttrsToElement(outline, attrs);

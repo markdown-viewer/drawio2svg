@@ -103,7 +103,8 @@ export class RackGeneralRackNumberingHandler extends BaseShapeHandler {
     builder.setStrokeColor('#dddddd' as string);
     builder.begin();
     for (p1 = 0; p1 < p3 + 1; p1++) {
-      (builder.moveTo(0, p1 * p4), builder.lineTo(3 * p5, p1 * p4));
+      builder.moveTo(0, p1 * p4);
+      builder.lineTo(3 * p5, p1 * p4);
     }
     builder.stroke();
   }

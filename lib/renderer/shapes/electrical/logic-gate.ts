@@ -41,10 +41,10 @@ export class ElectricalLogicGatesLogicGateHandler extends BaseShapeHandler {
     builder.stroke();
     switch (g) {
       case 'xor':
-        (builder.begin(),
-          builder.moveTo(0.1 * width, 0),
-          builder.arcTo(0.6 * width, height, 0, 0, 1, 0.1 * width, height),
-          builder.stroke());
+        builder.begin();
+        builder.moveTo(0.1 * width, 0);
+        builder.arcTo(0.6 * width, height, 0, 0, 1, 0.1 * width, height);
+        builder.stroke();
       case 'or':
         builder.begin();
         builder.moveTo(0.4 * width, 0);
@@ -56,13 +56,13 @@ export class ElectricalLogicGatesLogicGateHandler extends BaseShapeHandler {
         builder.fillAndStroke();
         break;
       default:
-        (builder.begin(),
-          builder.moveTo(0.2 * width, 0),
-          builder.lineTo(0.5 * width, 0),
-          builder.arcTo(0.3 * width, 0.5 * height, 0, 0, 1, 0.5 * width, height),
-          builder.lineTo(0.2 * width, height),
-          builder.close(),
-          builder.fillAndStroke());
+        builder.begin();
+        builder.moveTo(0.2 * width, 0);
+        builder.lineTo(0.5 * width, 0);
+        builder.arcTo(0.3 * width, 0.5 * height, 0, 0, 1, 0.5 * width, height);
+        builder.lineTo(0.2 * width, height);
+        builder.close();
+        builder.fillAndStroke();
     }
     if ('1' == this.getStyleValue(style, 'negating', '0')) {
       if (style['negSize']) {

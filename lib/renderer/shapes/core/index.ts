@@ -82,6 +82,7 @@ export function registerCoreHandlers(registry: ShapeRegistry): void {
   registry.register('orEllipse', OrEllipseHandler);
   registry.register('parallelMarker', ParallelMarkerHandler);
   registry.register('parallelogram', ParallelogramHandler);
+  registry.register('process', Process2Handler);
   registry.register('process2', Process2Handler);
   registry.register('providedRequiredInterface', ProvidedRequiredInterfaceHandler);
   registry.register('rectangle', RectangleHandler);

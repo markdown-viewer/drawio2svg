@@ -40,8 +40,6 @@ export class Cisco19RectHandler extends BaseShapeHandler {
       'router csr_1000v wireless_router l3_modular3 ucs_express router_with_voice router_with_firewall netflow_router secure_router ip_telephone_router asr_9000 clock vbond vmanage vsmart vts2'.split(
         ' '
       );
-    const __tx = d;
-    const __ty = y;
     builder.translate(d, y);
     if (['l2_modular', 'l3_modular', '6500_vss', 'nexus_9500', 'nexus_7k'].includes(f)) {
       h = 'mxgraph.cisco19.bg2';
@@ -75,8 +73,8 @@ export class Cisco19RectHandler extends BaseShapeHandler {
       d = 'mxgraph.cisco19.acibg';
       this.renderStencilByName(
         d,
-        __tx + 0.195 * width,
-        __ty + 0.195 * height,
+        0.195 * width,
+        0.195 * height,
         0.61 * width,
         0.61 * height,
         undefined,
@@ -92,8 +90,8 @@ export class Cisco19RectHandler extends BaseShapeHandler {
       if (null != d) {
         this.renderStencilByName(
           d,
-          __tx + 0,
-          __ty + 0,
+          0,
+          0,
           width,
           height,
           undefined,
@@ -109,8 +107,8 @@ export class Cisco19RectHandler extends BaseShapeHandler {
     if (null != f) {
       this.renderStencilByName(
         f,
-        __tx + 0,
-        __ty + 0,
+        0,
+        0,
         width,
         height,
         undefined,
@@ -122,46 +120,5 @@ export class Cisco19RectHandler extends BaseShapeHandler {
     builder.restore();
   }
 
-  private renderStencilByName(
-    name: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    fillColor: string | undefined,
-    style: RenderContext['style'],
-    getStencilShape?: RenderContext['getStencilShape'],
-    renderStencilShape?: RenderContext['renderStencilShape']
-  ): void {
-    if (!getStencilShape || !renderStencilShape) return;
-    if (!name) return;
-    const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
-    const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
-    const rawFill = typeof fillColor === 'string' ? fillColor : undefined;
-    let resolvedFill = rawFill ?? builderFill ?? styleFill;
-    if (rawFill && builderFill && rawFill === styleFill && builderFill !== styleFill) {
-      resolvedFill = builderFill;
-    }
-    if (
-      (style.shape as string | undefined) === 'mxgraph.gcp2.hexIcon' &&
-      rawFill === '#FCC64D' &&
-      builderFill
-    ) {
-      resolvedFill = builderFill;
-    }
-    const shapeName = style.shape as string | undefined;
-    const isGcpHexStencil =
-      shapeName === 'mxgraph.gcp2.hexIcon' && String(name).startsWith('mxgraph.gcp2.');
-    const aspect = isGcpHexStencil ? (style.aspect as any) : 'fixed';
-    const stencilStyle = {
-      shape: String(name),
-      fillColor: resolvedFill,
-      strokeColor: 'none',
-      ...(aspect ? { aspect } : {}),
-    } as any;
-    const stencilShape = getStencilShape(stencilStyle.shape);
-    if (!stencilShape) return;
-    const ctx = { x, y, width, height, style: stencilStyle };
-    renderStencilShape(ctx, stencilShape);
-  }
+  // renderStencilByName is inherited from BaseShapeHandler
 }

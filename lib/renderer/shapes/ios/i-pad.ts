@@ -116,21 +116,21 @@ export class IosIPadHandler extends BaseShapeHandler {
     y = this.getStyleValue(style, 'bgStyle', 'bgGreen');
     builder.setStrokeWidth(1);
     if (y === 'bgWhite') {
-      (builder.setFillColor('#ffffff'),
-        builder.rect(0.0928 * width, 0.08 * height, 0.8144 * width, 0.816 * height),
-        builder.fill());
+      builder.setFillColor('#ffffff' as string);
+      builder.rect(0.0928 * width, 0.08 * height, 0.8144 * width, 0.816 * height);
+      builder.fill();
     } else if (y === 'bgGreen') {
-      (builder.setFillColor('#1f2923'),
-        builder.rect(0.0928 * width, 0.08 * height, 0.8144 * width, 0.816 * height),
-        builder.fill());
+      builder.setFillColor('#1f2923' as string);
+      builder.rect(0.0928 * width, 0.08 * height, 0.8144 * width, 0.816 * height);
+      builder.fill();
     } else if (y === 'bgGray') {
-      (builder.setFillColor('#dddddd'),
-        builder.rect(0.0928 * width, 0.08 * height, 0.8144 * width, 0.816 * height),
-        builder.fill());
+      builder.setFillColor('#dddddd' as string);
+      builder.rect(0.0928 * width, 0.08 * height, 0.8144 * width, 0.816 * height);
+      builder.fill();
     } else if (y === 'bgFlat') {
-      (builder.setFillColor(x),
-        builder.rect(0.0928 * width, 0.08 * height, 0.8144 * width, 0.816 * height),
-        builder.fill());
+      builder.setFillColor(x as string);
+      builder.rect(0.0928 * width, 0.08 * height, 0.8144 * width, 0.816 * height);
+      builder.fill();
     } else if (y === 'bgStriped') {
       x = width;
       y = height;
@@ -143,7 +143,9 @@ export class IosIPadHandler extends BaseShapeHandler {
       builder.setStrokeColor('#657E8F' as string);
       g = 7;
       for (builder.begin(); g < width; ) {
-        (builder.moveTo(g, 0), builder.lineTo(g, height), (g += 7));
+        builder.moveTo(g, 0);
+        builder.lineTo(g, height);
+        g += 7;
       }
       builder.stroke();
       builder.setStrokeColor('#18211b' as string);

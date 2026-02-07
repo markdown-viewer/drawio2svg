@@ -36,15 +36,13 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     g = this.getStyleValue(style, 'fillColor', '#ffffff');
     h = this.getStyleValue(style, 'strokeColor', '#ffffff');
     k = this.getStyleValue(style, 'kubernetesLabel', 0);
-    const __tx = d;
-    const __ty = y;
     builder.translate(d, y);
     d = 'mxgraph.kubernetes.frame';
     builder.setFillColor(h as string);
     this.renderStencilByName(
       d,
-      __tx + 0,
-      __ty + 0,
+      0,
+      0,
       width,
       height,
       undefined,
@@ -55,8 +53,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     builder.setFillColor(g as string);
     this.renderStencilByName(
       d,
-      __tx + 0.03 * width,
-      __ty + 0.03 * height,
+      0.03 * width,
+      0.03 * height,
       0.94 * width,
       0.94 * height,
       undefined,
@@ -76,8 +74,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     if ('api' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -91,8 +89,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('c_c_m' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -106,8 +104,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('cm' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.25 * height,
+        0.5 * width - 0.3 * h,
+        0.25 * height,
         0.6 * h,
         0.5 * d,
         undefined,
@@ -121,8 +119,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('c_m' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -136,8 +134,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('c_role' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.25 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.25 * h,
+        0.2 * height,
         0.5 * h,
         0.6 * d,
         undefined,
@@ -151,8 +149,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('control_plane' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -178,8 +176,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('crb' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.25 * h),
-        __ty + 0.3 * height,
+        0.5 * width - 0.25 * h,
+        0.3 * height,
         0.5 * h,
         0.3 * d,
         undefined,
@@ -193,8 +191,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('crd' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.25 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.25 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -208,8 +206,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('cronjob' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -223,8 +221,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('deploy' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.27 * h),
-        __ty + 0.25 * height,
+        0.5 * width - 0.27 * h,
+        0.25 * height,
         0.6 * h,
         0.55 * d,
         undefined,
@@ -238,8 +236,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('ds' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -253,8 +251,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('ep' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -268,8 +266,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('etcd' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -283,8 +281,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('group' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -298,8 +296,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('hpa' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.4 * h),
-        __ty + 0.1 * height,
+        0.5 * width - 0.4 * h,
+        0.1 * height,
         0.8 * h,
         0.8 * d,
         undefined,
@@ -313,8 +311,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('ing' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -328,8 +326,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('job' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -343,8 +341,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('k_proxy' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -358,8 +356,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('kubelet' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -373,8 +371,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('limits' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -388,8 +386,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('netpol' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -403,8 +401,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('node' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -418,8 +416,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('ns' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -433,8 +431,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('pod' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -448,8 +446,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('psp' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -463,8 +461,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('pv' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -478,8 +476,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('pvc' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -493,8 +491,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('quota' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -508,8 +506,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('rb' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -523,8 +521,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('role' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -538,8 +536,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('rs' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -553,8 +551,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('sa' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -568,8 +566,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('sc' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -583,8 +581,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('sched' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -598,8 +596,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('secret' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -613,8 +611,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('sts' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -628,8 +626,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('svc' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -643,8 +641,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('user' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -658,8 +656,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if ('vol' == f) {
       this.renderStencilByName(
         g,
-        __tx + (0.5 * width - 0.3 * h),
-        __ty + 0.2 * height,
+        0.5 * width - 0.3 * h,
+        0.2 * height,
         0.6 * h,
         0.6 * d,
         undefined,
@@ -673,8 +671,8 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     } else if (null != g) {
       this.renderStencilByName(
         g,
-        __tx + 0.2 * width,
-        __ty + 0.2 * height,
+        0.2 * width,
+        0.2 * height,
         0.6 * width,
         0.6 * height,
         undefined,
@@ -686,46 +684,5 @@ export class KubernetesIcon2Handler extends BaseShapeHandler {
     builder.restore();
   }
 
-  private renderStencilByName(
-    name: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    fillColor: string | undefined,
-    style: RenderContext['style'],
-    getStencilShape?: RenderContext['getStencilShape'],
-    renderStencilShape?: RenderContext['renderStencilShape']
-  ): void {
-    if (!getStencilShape || !renderStencilShape) return;
-    if (!name) return;
-    const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
-    const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
-    const rawFill = typeof fillColor === 'string' ? fillColor : undefined;
-    let resolvedFill = rawFill ?? builderFill ?? styleFill;
-    if (rawFill && builderFill && rawFill === styleFill && builderFill !== styleFill) {
-      resolvedFill = builderFill;
-    }
-    if (
-      (style.shape as string | undefined) === 'mxgraph.gcp2.hexIcon' &&
-      rawFill === '#FCC64D' &&
-      builderFill
-    ) {
-      resolvedFill = builderFill;
-    }
-    const shapeName = style.shape as string | undefined;
-    const isGcpHexStencil =
-      shapeName === 'mxgraph.gcp2.hexIcon' && String(name).startsWith('mxgraph.gcp2.');
-    const aspect = isGcpHexStencil ? (style.aspect as any) : 'fixed';
-    const stencilStyle = {
-      shape: String(name),
-      fillColor: resolvedFill,
-      strokeColor: 'none',
-      ...(aspect ? { aspect } : {}),
-    } as any;
-    const stencilShape = getStencilShape(stencilStyle.shape);
-    if (!stencilShape) return;
-    const ctx = { x, y, width, height, style: stencilStyle };
-    renderStencilShape(ctx, stencilShape);
-  }
+  // renderStencilByName is inherited from BaseShapeHandler
 }

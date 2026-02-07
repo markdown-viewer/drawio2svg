@@ -44,7 +44,8 @@ export class MockupNavigationBreadcrumbHandler extends BaseShapeHandler {
       q < m;
       q++
     ) {
-      ((n[q] = this.measureTextSize(f[q], k, 'Arial,Helvetica,sans-serif', 0).width), (p += n[q]));
+      n[q] = this.measureTextSize(f[q], k, 'Arial,Helvetica,sans-serif', 0).width;
+      p += n[q];
     }
     c = Math.max(c, 1.5 * k, 20);
     p = 20 * m + p;

@@ -79,14 +79,14 @@ export class Pid2miscColumnHandler extends BaseShapeHandler {
       y = (x % g) * 0.5 + 25;
       builder.begin();
       for (height = 0; height <= x - g; height += g) {
-        (builder.moveTo(0, height + y + 0.1 * g),
-          builder.lineTo(width, height + y + 0.1 * g),
-          builder.moveTo(0, height + y + 0.9 * g),
-          builder.lineTo(width, height + y + 0.9 * g),
-          builder.moveTo(0, height + y + 0.1 * g),
-          builder.lineTo(width, height + y + 0.9 * g),
-          builder.moveTo(0, height + y + 0.9 * g),
-          builder.lineTo(width, height + y + 0.1 * g));
+        builder.moveTo(0, height + y + 0.1 * g);
+        builder.lineTo(width, height + y + 0.1 * g);
+        builder.moveTo(0, height + y + 0.9 * g);
+        builder.lineTo(width, height + y + 0.9 * g);
+        builder.moveTo(0, height + y + 0.1 * g);
+        builder.lineTo(width, height + y + 0.9 * g);
+        builder.moveTo(0, height + y + 0.9 * g);
+        builder.lineTo(width, height + y + 0.1 * g);
       }
       builder.stroke();
     } else if (f === 'tray') {
@@ -96,7 +96,8 @@ export class Pid2miscColumnHandler extends BaseShapeHandler {
       builder.setDashed(!0);
       builder.begin();
       for (height = 0; height <= x; height += g) {
-        (builder.moveTo(0, height + y), builder.lineTo(width, height + y));
+        builder.moveTo(0, height + y);
+        builder.lineTo(width, height + y);
       }
       builder.stroke();
     } else if (f === 'fluid') {
@@ -129,7 +130,8 @@ export class Pid2miscColumnHandler extends BaseShapeHandler {
           m = 0.5 * f;
         }
         for (l = m; l < width; l += f) {
-          (builder.ellipse(l, height, h, h), builder.fillAndStroke());
+          builder.ellipse(l, height, h, h);
+          builder.fillAndStroke();
         }
         k++;
       }

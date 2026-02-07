@@ -68,14 +68,14 @@ export class SysmlPortHandler extends BaseShapeHandler {
         builder.stroke();
         break;
       case 'doubleV':
-        (builder.begin(),
-          builder.moveTo(0.25 * width, 0.6 * height),
-          builder.lineTo(0.5 * width, 0.85 * height),
-          builder.lineTo(0.75 * width, 0.6 * height),
-          builder.moveTo(0.25 * width, 0.4 * height),
-          builder.lineTo(0.5 * width, 0.15 * height),
-          builder.lineTo(0.75 * width, 0.4 * height),
-          builder.stroke());
+        builder.begin();
+        builder.moveTo(0.25 * width, 0.6 * height);
+        builder.lineTo(0.5 * width, 0.85 * height);
+        builder.lineTo(0.75 * width, 0.6 * height);
+        builder.moveTo(0.25 * width, 0.4 * height);
+        builder.lineTo(0.5 * width, 0.15 * height);
+        builder.lineTo(0.75 * width, 0.4 * height);
+        builder.stroke();
     }
     builder.restore();
   }

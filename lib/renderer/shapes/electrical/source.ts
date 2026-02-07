@@ -29,14 +29,14 @@ export class ElectricalSignalSourcesSourceHandler extends BaseShapeHandler {
         builder.fillAndStroke();
         break;
       case 'dependent':
-        (builder.begin(),
-          builder.moveTo(0, 0.5 * height),
-          builder.lineTo(0.5 * width, 0),
-          builder.lineTo(width, 0.5 * height),
-          builder.lineTo(0.5 * width, height),
-          builder.lineTo(0, 0.5 * height),
-          builder.close(),
-          builder.fillAndStroke());
+        builder.begin();
+        builder.moveTo(0, 0.5 * height);
+        builder.lineTo(0.5 * width, 0);
+        builder.lineTo(width, 0.5 * height);
+        builder.lineTo(0.5 * width, height);
+        builder.lineTo(0, 0.5 * height);
+        builder.close();
+        builder.fillAndStroke();
     }
     switch (e) {
       case 'ac':

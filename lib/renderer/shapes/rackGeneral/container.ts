@@ -125,7 +125,8 @@ export class RackGeneralContainerHandler extends BaseShapeHandler {
     }
     builder.begin();
     for (c = 0; c < p2 + 1; c++) {
-      (builder.moveTo(-2 * p3, 21 + c * f), builder.lineTo(0, 21 + c * f));
+      builder.moveTo(-2 * p3, 21 + c * f);
+      builder.lineTo(0, 21 + c * f);
     }
     builder.stroke();
   }

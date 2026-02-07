@@ -65,11 +65,11 @@ export class RackGeneralHorCableDuctHandler extends BaseShapeHandler {
     width = 10 + Math.floor((width - 20 - 33 * height) / 2);
     if (0 < height) {
       for (b = 0; b <= height; b++) {
-        (builder.rect(width, 0, 3, 7),
-          builder.stroke(),
-          builder.rect(width, 7, 3, 7.8),
-          builder.stroke(),
-          (width += 33));
+        builder.rect(width, 0, 3, 7);
+        builder.stroke();
+        builder.rect(width, 7, 3, 7.8);
+        builder.stroke();
+        width += 33;
       }
     }
   }

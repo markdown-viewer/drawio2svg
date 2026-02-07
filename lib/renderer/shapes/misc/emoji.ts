@@ -2,6 +2,20 @@
 import type { RenderContext, ShapeAttrs } from '../../../renderer.ts';
 import { BaseShapeHandler } from '../../shape-registry.ts';
 
+const EMOJI_COMPONENTS: Record<string, string> = {
+  medium_light_skin_tone: '🏼',
+  light_skin_tone: '🏻',
+  medium_skin_tone: '🏽',
+  medium_dark_skin_tone: '🏾',
+  dark_skin_tone: '🏿',
+  red_hair: '‍🦰',
+  curly_hair: '‍🦱',
+  white_hair: '‍🦳',
+  bald: '‍🦲',
+};
+
+const EMOJIS: Record<string, string> = {};
+
 export class EmojiHandler extends BaseShapeHandler {
   constructor(renderCtx: RenderContext) {
     super(renderCtx);

@@ -165,7 +165,8 @@ export class RackGeneralRackCabinet3Handler extends BaseShapeHandler {
     builder.setStrokeColor(k as string);
     builder.begin();
     for (p2 = 0; p2 < p3 + 1; p2++) {
-      (builder.moveTo(m - 2 * p5, 21 + p2 * p4), builder.lineTo(m, 21 + p2 * p4));
+      builder.moveTo(m - 2 * p5, 21 + p2 * p4);
+      builder.lineTo(m, 21 + p2 * p4);
     }
     builder.stroke();
   }

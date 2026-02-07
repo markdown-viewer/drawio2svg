@@ -40,8 +40,6 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
     h = this.getStyleValue(style, 'fillColor', '#ffffff');
     k = this.getStyleValue(style, 'shadow', !1);
     l = parseFloat(this.getStyleValue(style, 'opacity', !1));
-    const __tx = d;
-    const __ty = e;
     builder.translate(d, e);
     d = this.getStyleValue(style, 'bgIcon', '');
     e = this.getStyleValue(style, 'resIcon', '');
@@ -49,8 +47,8 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
     if (null != m && 'mxgraph.cisco_safe.architecture.generic_appliance' != d) {
       this.renderStencilByName(
         m,
-        __tx + 0,
-        __ty + 0,
+        0,
+        0,
         width,
         height,
         undefined,
@@ -71,25 +69,25 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
       }
       builder.fill();
     } else if ('threat1' == d) {
-      (builder.begin(),
-        builder.ellipse(0.18 * width, 0.16 * height, 0.66 * width, 0.65 * height),
-        builder.fill());
+      builder.begin();
+      builder.ellipse(0.18 * width, 0.16 * height, 0.66 * width, 0.65 * height);
+      builder.fill();
     } else if ('threat2' == d) {
-      (builder.begin(),
-        builder.ellipse(0.01 * width, 0.01 * height, 0.98 * width, 0.6 * height),
-        builder.fill());
+      builder.begin();
+      builder.ellipse(0.01 * width, 0.01 * height, 0.98 * width, 0.6 * height);
+      builder.fill();
     } else if ('threat3' == d) {
-      (builder.begin(),
-        builder.ellipse(0.18 * width, 0.2 * height, 0.64 * width, 0.79 * height),
-        builder.fill());
+      builder.begin();
+      builder.ellipse(0.18 * width, 0.2 * height, 0.64 * width, 0.79 * height);
+      builder.fill();
     } else if ('threat4' == d) {
-      (builder.begin(),
-        builder.ellipse(0.09 * width, 0.03 * height, 0.82 * width, 0.77 * height),
-        builder.fill());
+      builder.begin();
+      builder.ellipse(0.09 * width, 0.03 * height, 0.82 * width, 0.77 * height);
+      builder.fill();
     } else if ('threat5' == d) {
-      (builder.begin(),
-        builder.ellipse(0.16 * width, 0.01 * height, 0.67 * width, 0.72 * height),
-        builder.fill());
+      builder.begin();
+      builder.ellipse(0.16 * width, 0.01 * height, 0.67 * width, 0.72 * height);
+      builder.fill();
     } else if ('mxgraph.cisco_safe.architecture.generic_appliance' == d) {
       builder.setShadow(k);
       builder.setFillColor(g as string);
@@ -110,8 +108,8 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
       if (null != m) {
         this.renderStencilByName(
           m,
-          __tx + 0.26 * width,
-          __ty + 0.26 * height,
+          0.26 * width,
+          0.26 * height,
           0.48 * width,
           0.48 * height,
           undefined,
@@ -145,8 +143,8 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
         if (100 > width) {
           this.renderStencilByName(
             m,
-            __tx + 0.01 * width,
-            __ty + 0.01 * height,
+            0.01 * width,
+            0.01 * height,
             0.98 * width,
             0.98 * height,
             undefined,
@@ -157,8 +155,8 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
         } else {
           this.renderStencilByName(
             m,
-            __tx + 1,
-            __ty + 1,
+            1,
+            1,
             width - 2,
             height - 2,
             undefined,
@@ -175,8 +173,8 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
       if ('mxgraph.cisco_safe.architecture.generic_appliance' == d) {
         this.renderStencilByName(
           m,
-          __tx + 0.25 * width,
-          __ty + 0.25 * height,
+          0.25 * width,
+          0.25 * height,
           0.5 * width,
           0.5 * height,
           undefined,
@@ -187,8 +185,8 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
       } else {
         this.renderStencilByName(
           m,
-          __tx + 0,
-          __ty + 0,
+          0,
+          0,
           width,
           height,
           undefined,
@@ -201,46 +199,5 @@ export class CiscoSafeCompositeIconHandler extends BaseShapeHandler {
     builder.restore();
   }
 
-  private renderStencilByName(
-    name: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    fillColor: string | undefined,
-    style: RenderContext['style'],
-    getStencilShape?: RenderContext['getStencilShape'],
-    renderStencilShape?: RenderContext['renderStencilShape']
-  ): void {
-    if (!getStencilShape || !renderStencilShape) return;
-    if (!name) return;
-    const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
-    const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
-    const rawFill = typeof fillColor === 'string' ? fillColor : undefined;
-    let resolvedFill = rawFill ?? builderFill ?? styleFill;
-    if (rawFill && builderFill && rawFill === styleFill && builderFill !== styleFill) {
-      resolvedFill = builderFill;
-    }
-    if (
-      (style.shape as string | undefined) === 'mxgraph.gcp2.hexIcon' &&
-      rawFill === '#FCC64D' &&
-      builderFill
-    ) {
-      resolvedFill = builderFill;
-    }
-    const shapeName = style.shape as string | undefined;
-    const isGcpHexStencil =
-      shapeName === 'mxgraph.gcp2.hexIcon' && String(name).startsWith('mxgraph.gcp2.');
-    const aspect = isGcpHexStencil ? (style.aspect as any) : 'fixed';
-    const stencilStyle = {
-      shape: String(name),
-      fillColor: resolvedFill,
-      strokeColor: 'none',
-      ...(aspect ? { aspect } : {}),
-    } as any;
-    const stencilShape = getStencilShape(stencilStyle.shape);
-    if (!stencilShape) return;
-    const ctx = { x, y, width, height, style: stencilStyle };
-    renderStencilShape(ctx, stencilShape);
-  }
+  // renderStencilByName is inherited from BaseShapeHandler
 }

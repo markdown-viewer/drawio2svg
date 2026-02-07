@@ -276,7 +276,17 @@ export class Archimate3ApplicationHandler extends BaseShapeHandler {
       } else if (f === 'meaning') {
         builder.translate(0, 2);
         height -= 4;
-        'mxgraph.basic.cloud_callout'.drawShape(builder, this, 0, 0, width, height);
+        this.renderStencilByName(
+          'mxgraph.basic.cloud_callout',
+          0,
+          0,
+          width,
+          height,
+          undefined,
+          style,
+          getStencilShape,
+          renderStencilShape
+        );
       } else if (f === 'distribution') {
         builder.translate(0, 4);
         this.renderExternal_mxArchiMate3Distribution_background(
@@ -318,7 +328,8 @@ export class Archimate3ApplicationHandler extends BaseShapeHandler {
         this.renderExternal_mxArchiMate3Path_background(builder, x, y, width, height - 10, style);
       } else if (f === 'amValue') {
         builder.translate(0, 3);
-        mxEllipse.prototype.paintVertexShape(builder, 0, 0, width, height - 6);
+        builder.ellipse(0, 0, width, height - 6);
+        builder.fillAndStroke();
       } else if (f === 'valueStream') {
         builder.translate(0, 2);
         this.renderExternal_mxArchiMate3ValueStream_background(
@@ -1511,4 +1522,6 @@ export class Archimate3ApplicationHandler extends BaseShapeHandler {
     builder.close();
     builder.fillAndStroke();
   }
+
+  // renderStencilByName is inherited from BaseShapeHandler
 }

@@ -146,23 +146,21 @@ export class MockupFormsCalendarHandler extends BaseShapeHandler {
         q += 7;
       }
       for (k = 0; k < q; k++) {
-        ((l = 0.0625 * width + k * h),
-          builder.rect(l, 0.2686 * height, h, 0.1143 * height),
-          builder.fillAndStroke(),
-          builder.text(
-            l + 0.5 * h,
-            0.2686 * height + 0.5 * h,
-            0,
-            0,
-            (p - q + k + 1).toString(),
-            'center',
-            'middle',
-            0,
-            null,
-            0,
-            0,
-            0
-          ));
+        l = 0.0625 * width + k * h;
+        builder.rect(l, 0.2686 * height, h, 0.1143 * height);
+        builder.fillAndStroke();
+        builder.text(
+          l + 0.5 * h,
+          0.2686 * height + 0.5 * h,
+          0,
+          0,
+          (p - q + k + 1).toString(),
+          'center',
+          'middle',
+          0,
+          0,
+          0
+        );
       }
       w = q;
     }

@@ -123,6 +123,34 @@ export class UmlLifelineHandler extends RectangleShapeHandler {
         false
       );
       builder.stroke();
+    } else if (participant === 'umlBoundary') {
+      // Vertical bar on the left
+      builder.begin();
+      builder.addPoints(
+        [
+          { x, y: y + actualSize / 4 },
+          { x, y: y + actualSize * 3 / 4 }
+        ],
+        false,
+        0,
+        false
+      );
+      builder.stroke();
+      // Horizontal connector from bar to ellipse
+      builder.begin();
+      builder.addPoints(
+        [
+          { x, y: y + actualSize / 2 },
+          { x: x + width / 6, y: y + actualSize / 2 }
+        ],
+        false,
+        0,
+        false
+      );
+      builder.stroke();
+      // Ellipse occupying the right 5/6 of width
+      builder.ellipse(x + width / 6, y, width * 5 / 6, actualSize);
+      builder.fillAndStroke();
     } else if (attrs.rounded) {
       let r: number;
       const absoluteArcSize = style.absoluteArcSize === '1' || style.absoluteArcSize === true;

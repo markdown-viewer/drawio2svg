@@ -14,7 +14,7 @@ export class SysmlCompositeHandler extends RectangleShapeHandler {
     if (width <= 0 || height <= 0) return;
 
     const baseSymbol = this.getStyleValue(style, 'symbol0', 'rect');
-    const baseDirection = this.getStyleValue(style, 'symbol0Direction', 'east');
+    // symbol0 (base shape) always renders without rotation in draw.io
     this.renderSymbol(
       baseSymbol,
       x,
@@ -24,7 +24,7 @@ export class SysmlCompositeHandler extends RectangleShapeHandler {
       attrs,
       getStencilShape,
       renderStencilShape,
-      baseDirection
+      'east'
     );
 
     let counter = 1;

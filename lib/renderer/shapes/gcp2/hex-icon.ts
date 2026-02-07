@@ -35,8 +35,6 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
     let k;
     let l;
     let m;
-    const __tx = d;
-    const __ty = e;
     builder.translate(d, e);
     f = this.getStyleValue(style, 'prIcon', 'compute_engine');
     g = this.getStyleValue(style, 'prType', '');
@@ -53,8 +51,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setStrokeColor('none' as string);
         this.renderStencilByName(
           g,
-          __tx + 0.21 * width,
-          __ty + 0.12 * height,
+          0.21 * width,
+          0.12 * height,
           0.58 * width,
           0.76 * height,
           undefined,
@@ -69,8 +67,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setStrokeColor('none' as string);
         this.renderStencilByName(
           g,
-          __tx + 0.21 * width,
-          __ty + 0.12 * height,
+          0.21 * width,
+          0.12 * height,
           0.58 * width,
           0.76 * height,
           undefined,
@@ -83,8 +81,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setStrokeColor('none' as string);
         this.renderStencilByName(
           m,
-          __tx + 0.17 * width,
-          __ty + 0.13 * height,
+          0.17 * width,
+          0.13 * height,
           0.66 * width,
           0.74 * height,
           undefined,
@@ -101,8 +99,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setFillColor('none' as string);
         this.renderStencilByName(
           g,
-          __tx + 0.02 * width,
-          __ty + 0 * height,
+          0.02 * width,
+          0 * height,
           0.96 * width,
           height,
           undefined,
@@ -114,8 +112,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setAlpha((0.7 * h) / 100);
         this.renderStencilByName(
           m,
-          __tx + 0.14 * width,
-          __ty + 0.01 * height,
+          0.14 * width,
+          0.01 * height,
           0.72 * width,
           0.98 * height,
           undefined,
@@ -127,8 +125,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setFillColor('#ffffff' as string);
         this.renderStencilByName(
           g,
-          __tx + 0.13 * width,
-          __ty + 0.12 * height,
+          0.13 * width,
+          0.12 * height,
           0.74 * width,
           0.76 * height,
           undefined,
@@ -146,8 +144,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setFillColor('none' as string);
         this.renderStencilByName(
           g,
-          __tx + 0.02 * width,
-          __ty + 0 * height,
+          0.02 * width,
+          0 * height,
           0.96 * width,
           height,
           undefined,
@@ -158,8 +156,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setAlpha((0.7 * h) / 100);
         this.renderStencilByName(
           g,
-          __tx + 0.075 * width,
-          __ty + 0.06 * height,
+          0.075 * width,
+          0.06 * height,
           0.85 * width,
           0.88 * height,
           undefined,
@@ -171,8 +169,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setFillColor('#ffffff' as string);
         this.renderStencilByName(
           g,
-          __tx + 0.13 * width,
-          __ty + 0.12 * height,
+          0.13 * width,
+          0.12 * height,
           0.74 * width,
           0.76 * height,
           undefined,
@@ -188,8 +186,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setStrokeColor('none' as string);
         this.renderStencilByName(
           g,
-          __tx + 0.14 * width,
-          __ty + 0.01 * height,
+          0.14 * width,
+          0.01 * height,
           0.72 * width,
           0.98 * height,
           undefined,
@@ -204,8 +202,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setFillColor('#ffffff' as string);
         this.renderStencilByName(
           m,
-          __tx + 0.13 * width,
-          __ty + 0.12 * height,
+          0.13 * width,
+          0.12 * height,
           0.74 * width,
           0.76 * height,
           undefined,
@@ -220,8 +218,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setStrokeColor('none' as string);
         this.renderStencilByName(
           g,
-          __tx + 0.14 * width,
-          __ty + 0.01 * height,
+          0.14 * width,
+          0.01 * height,
           0.72 * width,
           0.98 * height,
           undefined,
@@ -236,8 +234,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setFillColor('#ffffff' as string);
         this.renderStencilByName(
           m,
-          __tx + 0.13 * width,
-          __ty + 0.12 * height,
+          0.13 * width,
+          0.12 * height,
           0.74 * width,
           0.76 * height,
           undefined,
@@ -253,8 +251,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setStrokeColor('none' as string);
         this.renderStencilByName(
           g,
-          __tx + 0,
-          __ty + 0.56 * height,
+          0,
+          0.56 * height,
           width,
           0.28 * height,
           undefined,
@@ -269,8 +267,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setStrokeColor('none' as string);
         this.renderStencilByName(
           g,
-          __tx + 0,
-          __ty + 0.16 * height,
+          0,
+          0.16 * height,
           width,
           0.28 * height,
           undefined,
@@ -284,8 +282,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         builder.setFillColor('#FCC64D' as string);
         this.renderStencilByName(
           g,
-          __tx + 0.12 * width,
-          __ty + 0.11 * height,
+          0.12 * width,
+          0.11 * height,
           0.76 * width,
           0.78 * height,
           undefined,
@@ -295,9 +293,19 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
         );
         break;
       case 'input':
-        ((g = 'mxgraph.gcp2.outline_blank_1'),
-          builder.setFillColor('#A5DA40'),
-          g.drawShape(builder, this, 0.12 * width, 0.11 * height, 0.76 * width, 0.78 * height));
+        g = 'mxgraph.gcp2.outline_blank_1';
+        builder.setFillColor('#A5DA40' as string);
+        this.renderStencilByName(
+          g,
+          0.12 * width,
+          0.11 * height,
+          0.76 * width,
+          0.78 * height,
+          undefined,
+          style,
+          getStencilShape,
+          renderStencilShape
+        );
     }
     builder.setAlpha(h / 100);
     f = 'mxgraph.gcp2.' + f;
@@ -306,8 +314,8 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
       builder.setStrokeColor('none' as string);
       this.renderStencilByName(
         f,
-        __tx + 0.17 * width,
-        __ty + 0.16 * height,
+        0.17 * width,
+        0.16 * height,
         0.66 * width,
         0.68 * height,
         undefined,
@@ -346,46 +354,5 @@ export class Gcp2HexIconHandler extends BaseShapeHandler {
     builder.restore();
   }
 
-  private renderStencilByName(
-    name: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    fillColor: string | undefined,
-    style: RenderContext['style'],
-    getStencilShape?: RenderContext['getStencilShape'],
-    renderStencilShape?: RenderContext['renderStencilShape']
-  ): void {
-    if (!getStencilShape || !renderStencilShape) return;
-    if (!name) return;
-    const styleFill = this.getStyleValue(style, 'fillColor', '#ffffff') as string;
-    const builderFill = this.renderCtx.builder?.getCurrentFillColor?.() ?? null;
-    const rawFill = typeof fillColor === 'string' ? fillColor : undefined;
-    let resolvedFill = rawFill ?? builderFill ?? styleFill;
-    if (rawFill && builderFill && rawFill === styleFill && builderFill !== styleFill) {
-      resolvedFill = builderFill;
-    }
-    if (
-      (style.shape as string | undefined) === 'mxgraph.gcp2.hexIcon' &&
-      rawFill === '#FCC64D' &&
-      builderFill
-    ) {
-      resolvedFill = builderFill;
-    }
-    const shapeName = style.shape as string | undefined;
-    const isGcpHexStencil =
-      shapeName === 'mxgraph.gcp2.hexIcon' && String(name).startsWith('mxgraph.gcp2.');
-    const aspect = isGcpHexStencil ? (style.aspect as any) : 'fixed';
-    const stencilStyle = {
-      shape: String(name),
-      fillColor: resolvedFill,
-      strokeColor: 'none',
-      ...(aspect ? { aspect } : {}),
-    } as any;
-    const stencilShape = getStencilShape(stencilStyle.shape);
-    if (!stencilShape) return;
-    const ctx = { x, y, width, height, style: stencilStyle };
-    renderStencilShape(ctx, stencilShape);
-  }
+  // renderStencilByName is inherited from BaseShapeHandler
 }

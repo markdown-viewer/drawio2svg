@@ -200,10 +200,10 @@ export class ErEntityExtHandler extends BaseShapeHandler {
   ): void {
     if (!builder) return;
     for (p1 = 0; p1 < p5.length; p1++) {
-      (builder.begin(),
-        builder.setFontSize(p6),
-        builder.setFontColor(p7),
-        builder.text(0.5 * p9, (p1 + 1.5) * p8, 0, 0, p5[p1], 'left', 'middle', 0, null, 0, 0, 0));
+      builder.begin();
+      builder.setFontSize(Number.parseFloat(String(p6)) || 0);
+      builder.setFontColor(p7 as string);
+      builder.text(0.5 * p9, (p1 + 1.5) * p8, 0, 0, p5[p1], 'left', 'middle', 0, 0, 0);
     }
   }
 

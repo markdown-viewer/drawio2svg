@@ -60,7 +60,13 @@ export class ProcessHandler extends RectangleShapeHandler {
     builder.setCanvasRoot(currentGroup);
     builder.save();
     applyShapeAttrsToBuilder(builder, attrs);
-    builder.rect(x, y, width, height);
+    if (rounded) {
+      const arcSize = (parseFloat(style.arcSize as string) || 15) / 100;
+      const r = Math.min(width * arcSize, height * arcSize);
+      builder.roundrect(x, y, width, height, r, r);
+    } else {
+      builder.rect(x, y, width, height);
+    }
     builder.fillAndStroke();
 
     if (strokeColor !== 'none' && strokeWidth > 0) {

@@ -18,7 +18,9 @@ export class CornerHandler extends ActorShapeHandler {
     const dx = Math.min(width, Math.max(0, parseNumber(style.dx, width / 2)));
     const dy = Math.min(height, Math.max(0, parseNumber(style.dy, height / 2)));
     const rounded = style.rounded === '1' || style.rounded === true;
-    const radius = rounded ? Math.min(10, dx, dy, width / 2, height / 2) : 0;
+    // draw.io: arcSize defaults to LINE_ARCSIZE=20, radius = arcSize/2
+    const arcSizeVal = parseNumber(style.arcSize, 20);
+    const radius = rounded ? Math.min(arcSizeVal / 2, dx, dy, width / 2, height / 2) : 0;
 
     builder.setCanvasRoot(currentGroup);
     builder.save();

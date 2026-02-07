@@ -21,13 +21,19 @@ export class HexagonHandler extends HexagonShapeHandler {
     builder.begin();
     builder.translate(x, y);
     const arcSize = (parseFloat(style.arcSize as string) || 20) / 2;
+    // Read size from style (default 0.25 proportional, or fixedSize=20 in fixed mode)
+    const isFixedSize = style.fixedSize !== '0' && style.fixedSize !== undefined && style.fixedSize !== 0;
+    const sizeRaw = parseFloat(style.size as string);
+    const s = isFixedSize
+      ? Math.max(0, Math.min(width * 0.5, Number.isFinite(sizeRaw) ? sizeRaw : 20))
+      : width * Math.max(0, Math.min(1, Number.isFinite(sizeRaw) ? sizeRaw : 0.25));
     builder.addPoints(
       [
-        { x: 0.25 * width, y: 0 },
-        { x: 0.75 * width, y: 0 },
+        { x: s, y: 0 },
+        { x: width - s, y: 0 },
         { x: width, y: 0.5 * height },
-        { x: 0.75 * width, y: height },
-        { x: 0.25 * width, y: height },
+        { x: width - s, y: height },
+        { x: s, y: height },
         { x: 0, y: 0.5 * height }
       ],
       attrs.rounded,

@@ -324,13 +324,13 @@ export class Pid2valvesValveHandler extends BaseShapeHandler {
   ): void {
     if (!builder) return;
     if (p5 === 'balDiaph') {
-      (builder.translate(0.25 * p3, 0.1 * p4),
-        this.render_drawBalDiaphActFg(builder, 0.5 * p3, 0.6 * p4),
-        builder.translate(0.25 * -p3, 0.1 * -p4));
+      builder.translate(0.25 * p3, 0.1 * p4);
+      this.render_drawBalDiaphActFg(builder, 0.5 * p3, 0.6 * p4);
+      builder.translate(0.25 * -p3, 0.1 * -p4);
     } else if (p5 === 'singActing' || p5 === 'dblActing' || p5 === 'pilotCyl') {
-      (builder.translate(0.35 * p3, 0),
-        this.render_drawActingActFg(builder, 0.65 * p3, 0.7 * p4),
-        builder.translate(0.35 * -p3, 0));
+      builder.translate(0.35 * p3, 0);
+      this.render_drawActingActFg(builder, 0.65 * p3, 0.7 * p4);
+      builder.translate(0.35 * -p3, 0);
     }
   }
 

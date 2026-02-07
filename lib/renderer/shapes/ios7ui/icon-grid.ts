@@ -28,7 +28,8 @@ export class Ios7uiIconGridHandler extends BaseShapeHandler {
     c /= parseInt(d[1], 10) + 0.1 * (d[1] - 1);
     for (e = 0; e < d[0]; e++) {
       for (f = 0; f < d[1]; f++) {
-        (builder.rect(1.1 * b * e, 1.1 * c * f, b, c), builder.fill());
+        builder.rect(1.1 * b * e, 1.1 * c * f, b, c);
+        builder.fill();
       }
     }
     builder.restore();
