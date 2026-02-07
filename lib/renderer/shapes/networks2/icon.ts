@@ -60,9 +60,9 @@ export class Networks2IconHandler extends BaseShapeHandler {
         p3,
         p4,
         undefined,
-        style,
-        getStencilShape,
-        renderStencilShape
+        this.renderCtx.style,
+        this.renderCtx.getStencilShape,
+        this.renderCtx.renderStencilShape
       );
     }
   }
@@ -125,9 +125,9 @@ export class Networks2IconHandler extends BaseShapeHandler {
           p3 * f,
           p4 * h,
           undefined,
-          style,
-          getStencilShape,
-          renderStencilShape
+          this.renderCtx.style,
+          this.renderCtx.getStencilShape,
+          this.renderCtx.renderStencilShape
         );
       }
     } else if (null != g) {
@@ -138,9 +138,9 @@ export class Networks2IconHandler extends BaseShapeHandler {
         p3,
         p4,
         undefined,
-        style,
-        getStencilShape,
-        renderStencilShape
+        this.renderCtx.style,
+        this.renderCtx.getStencilShape,
+        this.renderCtx.renderStencilShape
       );
     }
   }
