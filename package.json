@@ -36,7 +36,7 @@
     "url": "https://github.com/markdown-viewer/drawio2svg/issues"
   },
   "author": "",
-  "license": "MIT",
+  "license": "LGPL-3.0-only",
   "engines": {
     "fibjs": ">=0.38.0"
   },
