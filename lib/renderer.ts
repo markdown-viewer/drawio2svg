@@ -2260,9 +2260,13 @@ export class SvgRenderer {
     const scaleStroke = Math.min(scaleX, scaleY);
 
     // Get style colors
-    const rawFillColor = (ctx.style.fillColor as string) || '#ffffff';
+    // lineShape=1: freehand PerfectFreehand mode - fill uses strokeColor
+    const isLineShape = ctx.style.lineShape === '1' || ctx.style.lineShape === 1 || ctx.style.lineShape === true;
+    const rawFillColor = isLineShape
+      ? ((ctx.style.strokeColor as string) || '#000000')
+      : ((ctx.style.fillColor as string) || '#ffffff');
     const resolvedFillColor = (rawFillColor === 'default' || rawFillColor === 'inherit')
-      ? '#ffffff' : rawFillColor;
+      ? (isLineShape ? '#000000' : '#ffffff') : rawFillColor;
     const normalizedFillColor = this.normalizeColor(resolvedFillColor);
 
     // Check for gradient fill - stencils should use gradient when gradientColor is specified
