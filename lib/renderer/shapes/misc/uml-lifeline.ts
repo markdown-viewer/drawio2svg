@@ -151,6 +151,67 @@ export class UmlLifelineHandler extends RectangleShapeHandler {
       // Ellipse occupying the right 5/6 of width
       builder.ellipse(x + width / 6, y, width * 5 / 6, actualSize);
       builder.fillAndStroke();
+    } else if (participant === 'umlDatabase') {
+      // Cylinder shape (database icon)
+      const capH = actualSize * 0.22;
+      const hw = width / 2;
+      const cx = x + hw;
+
+      // Body: top elliptical cap -> sides -> bottom elliptical cap
+      builder.begin();
+      builder.moveTo(x, y + capH);
+      builder.curveTo(x, y, cx, y, cx, y);
+      builder.curveTo(cx, y, x + width, y, x + width, y + capH);
+      builder.lineTo(x + width, y + actualSize - capH);
+      builder.curveTo(x + width, y + actualSize, cx, y + actualSize, cx, y + actualSize);
+      builder.curveTo(cx, y + actualSize, x, y + actualSize, x, y + actualSize - capH);
+      builder.close();
+      builder.fillAndStroke();
+
+      // Top cap closing line (inner ellipse rim)
+      builder.setFillColor(null);
+      builder.setFillAlpha(1);
+      builder.begin();
+      builder.moveTo(x, y + capH);
+      builder.curveTo(x, y + capH * 2, cx, y + capH * 2, cx, y + capH * 2);
+      builder.curveTo(cx, y + capH * 2, x + width, y + capH * 2, x + width, y + capH);
+      builder.stroke();
+    } else if (participant === 'umlCollections') {
+      // Two stacked rectangles with small offset
+      const offset = 4;
+
+      // Back rectangle (shifted right and up)
+      builder.rect(x + offset, y, width - offset, actualSize - offset);
+      builder.fillAndStroke();
+
+      // Front rectangle
+      builder.rect(x, y + offset, width - offset, actualSize - offset);
+      builder.fillAndStroke();
+    } else if (participant === 'umlQueue') {
+      // Horizontal stadium shape (queue icon)
+      const dx = 5;
+      const midY = y + actualSize / 2;
+
+      // Main body path
+      builder.begin();
+      builder.moveTo(x + dx, y);
+      builder.lineTo(x + width - dx, y);
+      builder.curveTo(x + width, y, x + width, midY, x + width, midY);
+      builder.curveTo(x + width, midY, x + width, y + actualSize, x + width - dx, y + actualSize);
+      builder.lineTo(x + dx, y + actualSize);
+      builder.curveTo(x, y + actualSize, x, midY, x, midY);
+      builder.curveTo(x, midY, x, y, x + dx, y);
+      builder.close();
+      builder.fillAndStroke();
+
+      // Inner divider line on the right
+      builder.setFillColor(null);
+      builder.setFillAlpha(1);
+      builder.begin();
+      builder.moveTo(x + width - dx, y);
+      builder.curveTo(x + width - dx * 2, y, x + width - dx * 2, midY, x + width - dx * 2, midY);
+      builder.curveTo(x + width - dx * 2, midY, x + width - dx * 2, y + actualSize, x + width - dx, y + actualSize);
+      builder.stroke();
     } else if (attrs.rounded) {
       let r: number;
       const absoluteArcSize = style.absoluteArcSize === '1' || style.absoluteArcSize === true;
