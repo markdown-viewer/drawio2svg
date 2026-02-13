@@ -5,7 +5,7 @@
  * Provides helper methods to create SVG elements with proper structure.
  */
 
-import { measureMultilineText, measureTextLayout, DEFAULT_FONT_FAMILY } from '@markdown-viewer/text-measure';
+import { measureMultilineText, measureTextLayout, DEFAULT_FONT_FAMILY, DEFAULT_FONT_SIZE } from '@markdown-viewer/text-measure';
 import { createPlaceholderInlineSvg } from '../renderer/placeholder-svg.ts';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -575,7 +575,7 @@ export class SvgBuilder {
       fillStyle: null,
       fontColor: '#000000',
       fontFamily: DEFAULT_FONT_FAMILY,
-      fontSize: 12,
+      fontSize: DEFAULT_FONT_SIZE,
       fontStyle: 0,
       fontBackgroundColor: null,
       fontBorderColor: null,
