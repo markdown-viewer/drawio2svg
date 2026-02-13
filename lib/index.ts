@@ -22,4 +22,4 @@ export {
   setTextMeasureProvider,
   getTextMeasureProvider,
   resetTextMeasureProvider
-} from './text/index.ts';
+} from '@markdown-viewer/text-measure';

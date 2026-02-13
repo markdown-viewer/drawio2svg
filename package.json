@@ -7,9 +7,14 @@
   "types": "lib/index.ts",
   "exports": {
     ".": "./lib/index.ts",
-    "./lib/text": "./lib/text/index.ts",
+    "./lib/convert": "./lib/convert.ts",
+    "./lib/decompress": "./lib/decompress.ts",
+    "./lib/svg": "./lib/svg/index.ts",
     "./lib/stencil": "./lib/stencil/index.ts",
-    "./lib/decompress": "./lib/decompress.ts"
+    "./lib/stencil/xml": "./lib/stencil/xml.ts",
+    "./lib/edge-router/utils": "./lib/edge-router/utils.ts",
+    "./lib/renderer/edge/points": "./lib/renderer/edge/points.ts",
+    "./lib/renderer/image-url": "./lib/renderer/image-url.ts"
   },
   "files": [
     "lib",
@@ -41,6 +46,7 @@
     "fibjs": ">=0.38.0"
   },
   "dependencies": {
+    "@markdown-viewer/text-measure": "^1.0.0",
     "pako": "^2.1.0"
   },
   "devDependencies": {

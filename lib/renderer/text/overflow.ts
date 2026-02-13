@@ -1,6 +1,6 @@
 import type { MxStyle } from '../../parser.ts';
 import type { TextRenderContext } from './labels.ts';
-import { DEFAULT_FONT_FAMILY } from '../../text/index.ts';
+import { DEFAULT_FONT_FAMILY } from '@markdown-viewer/text-measure';
 
 interface OverflowTextParams {
   value: string;

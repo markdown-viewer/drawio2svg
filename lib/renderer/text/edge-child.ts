@@ -1,7 +1,6 @@
 import type { MxStyle } from '../../parser.ts';
 import type { TextRenderContext } from './labels.ts';
-import { measureText } from '../../text/index.ts';
-import { DEFAULT_FONT_FAMILY } from '../../text/index.ts';
+import { measureText, DEFAULT_FONT_FAMILY } from '@markdown-viewer/text-measure';
 
 interface EdgeChildLabelParams {
   value?: string | null;

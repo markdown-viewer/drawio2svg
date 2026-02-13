@@ -1,6 +1,5 @@
 import type { MxStyle } from '../../parser.ts';
-import { measureMultilineText, measureTextLayout } from '../../text/index.ts';
-import { DEFAULT_FONT_FAMILY } from '../../text/index.ts';
+import { measureMultilineText, measureTextLayout, DEFAULT_FONT_FAMILY } from '@markdown-viewer/text-measure';
 
 export interface TextBounds {
   minX: number;

@@ -1,8 +1,7 @@
 import type { MxStyle } from '../../parser.ts';
 import type { SvgBuilder } from '../../svg/index.ts';
 import type { LabelOverrides } from '../shape-registry.ts';
-import { measureText, measureMultilineText, measureTextLayout } from '../../text/index.ts';
-import { DEFAULT_FONT_FAMILY } from '../../text/index.ts';
+import { measureText, measureMultilineText, measureTextLayout, DEFAULT_FONT_FAMILY } from '@markdown-viewer/text-measure';
 import { getLabelBounds, getAlignmentAsPoint } from './label-bounds.ts';
 import { getTextLayoutInfo } from './metrics.ts';
 

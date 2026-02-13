@@ -31,8 +31,7 @@ import {
   renderSwimlaneLabel as renderSwimlaneLabelHelper,
   type TextRenderContext
 } from './renderer/text/labels.ts';
-import { getTextMeasureProvider } from './text/index.ts';
-import { DEFAULT_FONT_FAMILY, setDefaultFontFamily } from './text/constants.ts';
+import { getTextMeasureProvider, DEFAULT_FONT_FAMILY, setDefaultFontFamily } from '@markdown-viewer/text-measure';
 import { measureTextBoundsAtPosition } from './renderer/text/bounds.ts';
 import { measureMultilineTextSize, measureMultilineTextLayout } from './renderer/text/metrics.ts';
 import { isEdgeChildLabel, getAbsolutePosition as getAbsolutePositionHelper } from './renderer/geometry.ts';

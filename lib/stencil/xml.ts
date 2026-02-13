@@ -5,7 +5,7 @@
  * that can be directly rendered without SVG parsing.
  */
 
-import { DEFAULT_FONT_FAMILY } from '../text/index.ts';
+import { DEFAULT_FONT_FAMILY } from '@markdown-viewer/text-measure';
 
 // ============================================================================
 // Type Definitions

@@ -1,6 +1,5 @@
 import type { MxStyle } from '../../parser.ts';
-import { measureMultilineText, measureTextLayout, type TextLayoutResult } from '../../text/index.ts';
-import { DEFAULT_FONT_FAMILY } from '../../text/index.ts';
+import { measureMultilineText, measureTextLayout, type TextLayoutResult, DEFAULT_FONT_FAMILY } from '@markdown-viewer/text-measure';
 
 export interface TextSize {
   width: number;
