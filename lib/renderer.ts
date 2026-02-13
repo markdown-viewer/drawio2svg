@@ -1477,6 +1477,67 @@ export class SvgRenderer {
         lineOffset = size + strokeWidth + 1;
         break;
       }
+      case 'cross': {
+        // X-shape marker: two crossing diagonal lines at the tip
+        const crossSize = len * 0.7;
+        const p1 = transform(-crossSize, crossSize);
+        const p2 = transform(crossSize, -crossSize);
+        const p3 = transform(-crossSize, -crossSize);
+        const p4 = transform(crossSize, crossSize);
+        element = createPathElement((builder) => {
+          builder.moveTo(roundValue(p1.x), roundValue(p1.y));
+          builder.lineTo(roundValue(p2.x), roundValue(p2.y));
+          builder.moveTo(roundValue(p3.x), roundValue(p3.y));
+          builder.lineTo(roundValue(p4.x), roundValue(p4.y));
+        }, 'none');
+        lineOffset = 0;
+        boundPoints = [p1, p2, p3, p4];
+        break;
+      }
+      case 'halfBottom': {
+        // Bottom half of classic arrow (only the bottom wing)
+        const p1 = transform(0, 0); // Tip
+        const p2 = transform(-len, -w); // Bottom wing
+        if (filled) {
+          // Filled: triangle (tip, bottom wing, base)
+          const p3 = transform(-len, 0); // Base center
+          const halfPoints = [roundPoint(p1), roundPoint(p2), roundPoint(p3)];
+          element = createPathElement((builder) => {
+            builder.addPoints(halfPoints, false, 0, true);
+          }, fillValue);
+          boundPoints = [p1, p2, p3];
+        } else {
+          // Open: just a line from wing to tip
+          element = createPathElement((builder) => {
+            builder.addPoints([roundPoint(p2), roundPoint(p1)], false, 0, false);
+          }, 'none');
+          boundPoints = [p1, p2];
+        }
+        lineOffset = strokeWidth * 1.118 * 2;
+        break;
+      }
+      case 'halfTop': {
+        // Top half of classic arrow (only the top wing)
+        const p1 = transform(0, 0); // Tip
+        const p2 = transform(-len, w); // Top wing
+        if (filled) {
+          // Filled: triangle (tip, top wing, base)
+          const p3 = transform(-len, 0); // Base center
+          const halfPoints = [roundPoint(p1), roundPoint(p2), roundPoint(p3)];
+          element = createPathElement((builder) => {
+            builder.addPoints(halfPoints, false, 0, true);
+          }, fillValue);
+          boundPoints = [p1, p2, p3];
+        } else {
+          // Open: just a line from wing to tip
+          element = createPathElement((builder) => {
+            builder.addPoints([roundPoint(p2), roundPoint(p1)], false, 0, false);
+          }, 'none');
+          boundPoints = [p1, p2];
+        }
+        lineOffset = strokeWidth * 1.118 * 2;
+        break;
+      }
       case 'circlePlus': {
         // Circle-plus marker (SysML): circle centered at the original tip with a plus inside
         const r = size + strokeWidth;
@@ -1513,8 +1574,42 @@ export class SvgRenderer {
 
         return { element: group, lineOffset: 0, boundPoints };
       }
-      default:
+      default: {
+        // Handle compound arrows ending with 'Dot' (e.g., classicDot, halfBottomDot)
+        // Renders the base arrow type plus an oval dot at the tip
+        if (arrowType.endsWith('Dot')) {
+          const baseType = arrowType.slice(0, -3);
+          // Recursively render the base arrow
+          const baseResult = this.createArrowPath(
+            tipX, tipY, angle, baseType, size, filled, strokeColor, strokeWidth
+          );
+          if (!baseResult) return null;
+          // Create a dot (filled circle) at the original tip position
+          const dotRadius = size * 0.5;
+          // Position the dot at the tip, offset slightly beyond the base arrow
+          const dotCenterX = tipX + dotRadius * cos;
+          const dotCenterY = tipY + dotRadius * sin;
+          const dotEl = this.builder ? this.builder.createEllipse(dotCenterX, dotCenterY, dotRadius, dotRadius) : null;
+          if (dotEl) {
+            dotEl.setAttribute('fill', strokeColor);
+            dotEl.setAttribute('stroke', strokeColor);
+            dotEl.setAttribute('stroke-width', String(strokeWidth));
+            dotEl.setAttribute('pointer-events', 'all');
+          }
+          // Combine base arrow + dot into one group
+          const group = this.builder ? this.builder.createGroup() : null;
+          if (group) {
+            if (baseResult.element) group.appendChild(baseResult.element);
+            if (dotEl) group.appendChild(dotEl);
+          }
+          return {
+            element: group,
+            lineOffset: baseResult.lineOffset,
+            boundPoints: baseResult.boundPoints
+          };
+        }
         return null;
+      }
     }
 
     return { element, lineOffset, boundPoints };
