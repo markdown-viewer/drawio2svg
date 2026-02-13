@@ -11,7 +11,7 @@ export class UmlFrameHandler extends RectangleShapeHandler {
     return {
       alwaysUseLabelBounds: true,
       getLabelBounds: (style: MxStyle, x: number, y: number, width: number, height: number) => {
-        const corner = 10;
+        const corner = parseFloat(style.corner as string) || 10;
         const tabWidth = Math.min(width, Math.max(corner, parseFloat(style.width as string) || 60));
         const tabHeight = Math.min(height, Math.max(corner * 1.5, parseFloat(style.height as string) || 30));
         return {
@@ -28,7 +28,7 @@ export class UmlFrameHandler extends RectangleShapeHandler {
     const { builder, currentGroup, style, x, y, width, height, applyShapeAttrsToBuilder } = this.renderCtx;
     if (!builder || !currentGroup) return;
 
-    const corner = 10;
+    const corner = parseFloat(style.corner as string) || 10;
     const w0 = Math.min(width, Math.max(corner, parseFloat(style.width as string) || 60));
     const h0 = Math.min(height, Math.max(corner * 1.5, parseFloat(style.height as string) || 30));
     const tabSlope = Math.min(w0, corner);
