@@ -53,10 +53,38 @@ export function measureTextBoundsAtPosition(
   const halfWidth = textWidth / 2;
   const halfHeight = textHeight / 2;
 
-  return {
-    minX: x - halfWidth,
-    maxX: x + halfWidth,
-    minY: y - halfHeight,
-    maxY: y + halfHeight
-  };
+  // Respect horizontal alignment when computing bounds.
+  // Edge labels with align=left start at x and extend right;
+  // align=right end at x and extend left.
+  // The +2/-2 matches the marginLeftOffset in edge label rendering.
+  const align = (style.align as string) || 'center';
+  let minX: number, maxX: number;
+  if (align === 'left') {
+    minX = x;
+    maxX = x + textWidth + 2;
+  } else if (align === 'right') {
+    minX = x - textWidth - 2;
+    maxX = x;
+  } else {
+    minX = x - halfWidth;
+    maxX = x + halfWidth;
+  }
+
+  // Respect vertical alignment when computing bounds.
+  // verticalAlign=bottom: text is above the point;
+  // verticalAlign=top: text is below the point.
+  const verticalAlign = (style.verticalAlign as string) || 'middle';
+  let minY: number, maxY: number;
+  if (verticalAlign === 'bottom') {
+    minY = y - textHeight;
+    maxY = y;
+  } else if (verticalAlign === 'top') {
+    minY = y;
+    maxY = y + textHeight;
+  } else {
+    minY = y - halfHeight;
+    maxY = y + halfHeight;
+  }
+
+  return { minX, maxX, minY, maxY };
 }
