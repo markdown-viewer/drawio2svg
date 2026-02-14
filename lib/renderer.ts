@@ -1576,19 +1576,20 @@ export class SvgRenderer {
       default: {
         // Handle compound arrows ending with 'Dot' (e.g., classicDot, halfBottomDot)
         // Renders the base arrow type plus an oval dot at the tip
+        // Layout: |line|---[arrowhead]---[dot at tip]---|endpoint|
         if (arrowType.endsWith('Dot')) {
           const baseType = arrowType.slice(0, -3);
-          // Recursively render the base arrow
+          const dotRadius = size * 0.5;
+          // Offset the base arrow behind the dot so arrowhead doesn't overlap
+          const baseTipX = tipX - dotRadius * cos;
+          const baseTipY = tipY - dotRadius * sin;
+          // Recursively render the base arrow at the offset position
           const baseResult = this.createArrowPath(
-            tipX, tipY, angle, baseType, size, filled, strokeColor, strokeWidth
+            baseTipX, baseTipY, angle, baseType, size, filled, strokeColor, strokeWidth
           );
           if (!baseResult) return null;
-          // Create a dot (filled circle) at the original tip position
-          const dotRadius = size * 0.5;
-          // Position the dot at the tip, offset slightly beyond the base arrow
-          const dotCenterX = tipX + dotRadius * cos;
-          const dotCenterY = tipY + dotRadius * sin;
-          const dotEl = this.builder ? this.builder.createEllipse(dotCenterX, dotCenterY, dotRadius, dotRadius) : null;
+          // Center the dot at the original tip (on the lifeline/endpoint)
+          const dotEl = this.builder ? this.builder.createEllipse(tipX, tipY, dotRadius, dotRadius) : null;
           if (dotEl) {
             dotEl.setAttribute('fill', strokeColor);
             dotEl.setAttribute('stroke', strokeColor);
@@ -1603,7 +1604,7 @@ export class SvgRenderer {
           }
           return {
             element: group,
-            lineOffset: baseResult.lineOffset,
+            lineOffset: dotRadius + baseResult.lineOffset,
             boundPoints: baseResult.boundPoints
           };
         }
