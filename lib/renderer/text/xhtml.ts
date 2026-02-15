@@ -15,6 +15,9 @@ function decodeEncodedHtmlTags(html: string): string {
   return html.replace(/&lt;(\/?)([a-zA-Z][\w:-]*)([\s\S]*?)&gt;/g, (match, slash, tag, rest) => {
     const tagName = String(tag).toLowerCase();
     if (!allowedTags.has(tagName)) return match;
+    // Only decode if rest is empty or starts with whitespace/slash (valid HTML attributes)
+    // This prevents decoding notation like <U+221E> as <u> tag
+    if (rest && !/^[\s/]/.test(rest)) return match;
     return `<${slash}${tag}${rest}>`;
   });
 }
@@ -55,6 +58,10 @@ export function convertToXhtml(html: string, domParser: DOMParser): string {
     if (trailingCount > 0) {
       normalized += '<div><br /></div>'.repeat(trailingCount);
     }
+  } else {
+    // For HTML content, convert newlines to <br> as draw.io does
+    // &#10; entities represent explicit line breaks in cell values
+    normalized = decodedHtml.replace(/\r\n|\r|\n/g, '<br>');
   }
 
   // Parse as HTML (match the platform's convertHtml behavior)
