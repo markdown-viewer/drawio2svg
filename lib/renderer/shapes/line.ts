@@ -58,17 +58,39 @@ export function renderLineSeparator(ctx: LineRenderContext, params: LineRenderPa
   } else {
     builder.setDashed(false);
   }
-  builder.begin();
-  builder.addPoints(
-    [
-      { x: lineX - half, y: lineY },
-      { x: lineX + half, y: lineY }
-    ],
-    false,
-    0,
-    false
-  );
-  builder.stroke();
+  const isDouble = style.double === '1' || style.double === 1;
+  if (isDouble) {
+    // Double line: two parallel strokes separated by a small gap
+    const gap = 2;
+    builder.begin();
+    builder.addPoints(
+      [
+        { x: lineX - half, y: lineY - gap / 2 },
+        { x: lineX + half, y: lineY - gap / 2 }
+      ],
+      false, 0, false
+    );
+    builder.stroke();
+    builder.begin();
+    builder.addPoints(
+      [
+        { x: lineX - half, y: lineY + gap / 2 },
+        { x: lineX + half, y: lineY + gap / 2 }
+      ],
+      false, 0, false
+    );
+    builder.stroke();
+  } else {
+    builder.begin();
+    builder.addPoints(
+      [
+        { x: lineX - half, y: lineY },
+        { x: lineX + half, y: lineY }
+      ],
+      false, 0, false
+    );
+    builder.stroke();
+  }
   builder.restore();
 
   const lineEl = innerG.lastChild as Element | null;
