@@ -1168,8 +1168,12 @@ export class SvgRenderer {
     const sin = Math.sin(angle);
     
     // Apply endOffset to arrow tip position
-    // endOffset = sw * 1.118 compensates for stroke width
-    const endOffset = strokeWidth * 1.118;
+    // endOffset = sw * factor compensates for stroke width
+    // Factor varies by arrow type: diamond=0.7071 (1/√2), diamondThin=0.9862, others=1.118
+    const endOffsetFactor = arrowType === 'diamond' ? 0.7071
+      : arrowType === 'diamondThin' ? 0.9862
+      : 1.118;
+    const endOffset = strokeWidth * endOffsetFactor;
     const actualTipX = tipX - endOffset * cos;
     const actualTipY = tipY - endOffset * sin;
     
@@ -1423,8 +1427,8 @@ export class SvgRenderer {
         const p3 = transform(-len, 0); // Back
         const p4 = transform(-halfLen, -w); // Right
         const diamondPoints = [roundPoint(p1), roundPoint(p2), roundPoint(p3), roundPoint(p4)];
-        // LineOffset for diamond: full length + strokeWidth offset
-        lineOffset = (size + strokeWidth) + strokeWidth * 1.118;
+        // LineOffset for diamond: full length + strokeWidth offset (using per-type factor)
+        lineOffset = (size + strokeWidth) + strokeWidth * endOffsetFactor;
         boundPoints = [p1, p2, p3, p4];
         element = createPathElement((builder) => {
           builder.addPoints(diamondPoints, false, 0, true);
