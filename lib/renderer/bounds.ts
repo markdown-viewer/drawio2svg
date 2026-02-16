@@ -96,9 +96,10 @@ export function extendBoundsForInternalLabelOverflow(
   // If overflow is hidden, text is clipped to shape bounds
   if (overflow === 'hidden' || overflow === 'fill') return;
 
-  // When wrap is enabled, measure with container width to get actual wrapped width
+  // When wrap is enabled, measure with container width to get actual wrapped dimensions
   // Otherwise measure without wrapping
   let labelWidth: number;
+  let labelHeight: number;
   
   if (whiteSpace === 'wrap' && overflow !== 'visible') {
     // Measure text with wrapping at container width
@@ -112,6 +113,7 @@ export function extendBoundsForInternalLabelOverflow(
       isHtml
     );
     labelWidth = layoutResult.width;
+    labelHeight = layoutResult.height;
   } else {
     // Measure without wrapping
     const result = measureMultilineText(
@@ -124,33 +126,56 @@ export function extendBoundsForInternalLabelOverflow(
       isHtml
     );
     labelWidth = result.width;
+    labelHeight = result.height;
   }
 
-  // Only extend if label width exceeds shape width
-  if (labelWidth <= width) return;
+  // Extend horizontal bounds if label width exceeds shape width
+  if (labelWidth > width) {
+    const align = (style.align as string | undefined) || 'center';
+    const shapeCenterX = x + width / 2;
+    
+    let labelLeft: number;
+    let labelRight: number;
+    
+    if (align === 'left') {
+      labelLeft = x;
+      labelRight = x + labelWidth;
+    } else if (align === 'right') {
+      labelLeft = x + width - labelWidth;
+      labelRight = x + width;
+    } else {
+      // center alignment
+      labelLeft = shapeCenterX - labelWidth / 2;
+      labelRight = shapeCenterX + labelWidth / 2;
+    }
 
-  // Calculate label horizontal bounds based on alignment
-  const align = (style.align as string | undefined) || 'center';
-  const shapeCenterX = x + width / 2;
-  
-  let labelLeft: number;
-  let labelRight: number;
-  
-  if (align === 'left') {
-    labelLeft = x;
-    labelRight = x + labelWidth;
-  } else if (align === 'right') {
-    labelLeft = x + width - labelWidth;
-    labelRight = x + width;
-  } else {
-    // center alignment
-    labelLeft = shapeCenterX - labelWidth / 2;
-    labelRight = shapeCenterX + labelWidth / 2;
+    updateBounds(bounds, labelLeft, y);
+    updateBounds(bounds, labelRight, y + height);
   }
 
-  // Extend bounds to include label overflow
-  updateBounds(bounds, labelLeft, y);
-  updateBounds(bounds, labelRight, y + height);
+  // Extend vertical bounds if label height exceeds shape height
+  if (labelHeight > height) {
+    const valign = (style.verticalAlign as string | undefined) || 'middle';
+
+    if (valign === 'middle') {
+      // Middle-aligned: text centered, may overflow both above and below
+      const extra = (labelHeight - height) / 2;
+      updateBounds(bounds, x, y - extra);
+      updateBounds(bounds, x + width, y + height + extra);
+    } else if (valign === 'top') {
+      // Top-aligned: text starts at y + offset, may overflow below
+      const textBottom = y + 7 + labelHeight;
+      if (textBottom > y + height) {
+        updateBounds(bounds, x + width, textBottom);
+      }
+    } else if (valign === 'bottom') {
+      // Bottom-aligned: text ends near bottom, may overflow above
+      const textTop = y + height - 3 - labelHeight;
+      if (textTop < y) {
+        updateBounds(bounds, x, textTop);
+      }
+    }
+  }
 }
 
 export function extendBoundsForExternalLabels(

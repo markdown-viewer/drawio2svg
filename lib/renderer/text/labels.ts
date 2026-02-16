@@ -340,8 +340,8 @@ export function renderNativeTextLabel(
           // Vertical centering formula: textY = y + height/2 + fontSize/2 - 1
           // Combined with labelBounds: bounds.y = state.y + height/2 (margin.y = -0.5)
           if (style.shape === 'partialRectangle') {
-            // Special adjustment for partialRectangle to match the platform
-            textY = y + height / 2 + fontSize / 3 + 0.5;
+            // partialRectangle uses standard baseline: fontSize/2 - 1
+            textY = y + height / 2 + fontSize / 2 - 1;
           } else if (isTextShape) {
             // Match the platform text baseline for centered text shapes
             textY = y + height / 2 + fontSize / 2 - 1 + spacingTop / 2;
