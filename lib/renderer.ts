@@ -3786,6 +3786,28 @@ export class SvgRenderer {
         }
       }
     }
+    // Adjacent close-point deduplication (matches draw.io mxShape.getWaypoints).
+    // When two adjacent points are both within threshold in X AND Y, the later
+    // point is dropped. This prevents tiny end segments where the arrow offset
+    // would overshoot and reverse direction.
+    {
+      const edgeScale = this.options.scale || 1;
+      const waypointThreshold = Math.max(1, 1 / edgeScale);
+      const filtered: Point[] = [normalizedPoints[0]];
+      let prev = normalizedPoints[0];
+      for (let i = 1; i < normalizedPoints.length; i++) {
+        const curr = normalizedPoints[i];
+        if (Math.abs(prev.x - curr.x) >= waypointThreshold ||
+            Math.abs(prev.y - curr.y) >= waypointThreshold) {
+          filtered.push(curr);
+        }
+        prev = curr; // always advance (matches draw.io rolling-prev behavior)
+      }
+      if (filtered.length >= 2) {
+        normalizedPoints = filtered;
+      }
+    }
+
     // Now absolutePoints is complete: [startPoint, ...waypoints, endPoint]
     // All points are guaranteed non-null at this point
     const startPoint = normalizedPoints[0];
