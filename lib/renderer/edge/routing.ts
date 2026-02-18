@@ -37,7 +37,9 @@ export function getRouterPoints(params: EdgeRoutingParams): Point[] {
   } = params;
 
   const segmentValue = parseFloat(style.segment as string);
-  const segment = Number.isFinite(segmentValue) ? segmentValue : 30;
+  // Pass undefined when style doesn't set segment, so each router uses its own default
+  // (Loop defaults to gridSize=10, EntityRelation defaults to 30)
+  const segment = Number.isFinite(segmentValue) ? segmentValue : undefined;
 
   return routeEdge(
     edgeStyle,

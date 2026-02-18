@@ -91,10 +91,10 @@ export function routeEdge(
   };
 
   // Handle loop edges (self-referencing edges)
-  // Loop function is used when loop=1 OR orthogonalLoop=1
-  // orthogonalLoop just means the loop path uses orthogonal routing
+  // Use Loop routing when loop=1 (explicit) or orthogonalLoop is not set (default behavior).
+  // When orthogonalLoop=1 without loop=1, suppress the edge (return empty).
   if (isLoop && source != null && (!hints || hints.length === 0)) {
-    if (loopEnabled) {
+    if (loopEnabled || !orthogonalLoop) {
       Loop(source, target, hints, result, p0, pe, 10, loopDirection);
     }
     return result;
