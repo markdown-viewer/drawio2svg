@@ -60,10 +60,11 @@ export class ArchimateBusinessObjectHandler extends BaseShapeHandler {
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
-    if (15 <= height) {
+    const lineY = Number(this.getStyleValue(style, 'size', 15));
+    if (lineY <= height) {
       builder.begin();
-      builder.moveTo(0, 15);
-      builder.lineTo(width, 15);
+      builder.moveTo(0, lineY);
+      builder.lineTo(width, lineY);
       builder.stroke();
     }
   }
