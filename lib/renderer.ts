@@ -1401,6 +1401,40 @@ export class SvgRenderer {
         }, fillValue);
         break;
       }
+      case 'blockBar': {
+        // Block arrow (triangle) with a separated perpendicular bar behind the base
+        // Used for PlantUML's <|| / ||> (redefines) decoration
+        const p1 = transform(0, 0);
+        const p2 = transform(-len, w);
+        const p3 = transform(-len, -w);
+        const blockBarPoints = [roundPoint(p1), roundPoint(p2), roundPoint(p3)];
+        // Bar is placed behind the triangle with a gap
+        // Extend bar by half strokeWidth on each side to match triangle base visual width
+        // (triangle corners have miter joins that extend beyond the path)
+        const barGap = strokeWidth * 2;
+        const barOffset = len + barGap;
+        const barW = w + strokeWidth / 2;
+        const barLeft = transform(-barOffset, barW);
+        const barRight = transform(-barOffset, -barW);
+        lineOffset = barOffset + strokeWidth;
+        boundPoints = [p1, barLeft, barRight];
+
+        const group = this.builder ? this.builder.createGroup() : null;
+        if (group) {
+          // Draw the triangle
+          const tri = createPathElement((builder) => {
+            builder.addPoints(blockBarPoints, false, 0, true);
+          }, fillValue);
+          if (tri) group.appendChild(tri);
+          // Draw the perpendicular bar separated from the triangle base
+          const bar = createPathElement((builder) => {
+            builder.moveTo(roundValue(barLeft.x), roundValue(barLeft.y));
+            builder.lineTo(roundValue(barRight.x), roundValue(barRight.y));
+          }, 'none');
+          if (bar) group.appendChild(bar);
+        }
+        return { element: group, lineOffset, boundPoints };
+      }
       case 'open':
       case 'openThin':
       case 'openFilled': {
@@ -1435,6 +1469,24 @@ export class SvgRenderer {
         }, fillValue);
         break;
       }
+      case 'square': {
+        // Square marker centered on the original tip (connection point)
+        // Used for PlantUML's # decoration
+        const halfSide = w * 0.8;
+        // transform uses actualTip (offset by endOffset), compensate to center on tipX/tipY
+        const eo = endOffset;
+        const sq1 = transform(-halfSide + eo, -halfSide);
+        const sq2 = transform(halfSide + eo, -halfSide);
+        const sq3 = transform(halfSide + eo, halfSide);
+        const sq4 = transform(-halfSide + eo, halfSide);
+        const squarePoints = [roundPoint(sq1), roundPoint(sq2), roundPoint(sq3), roundPoint(sq4)];
+        lineOffset = halfSide + strokeWidth;
+        boundPoints = [sq1, sq2, sq3, sq4];
+        element = createPathElement((builder) => {
+          builder.addPoints(squarePoints, false, 0, true);
+        }, fillValue);
+        break;
+      }
       case 'oval': {
         // Oval/circle marker - circle centered at the original tip point (no endOffset)
         // Oval marker doesn't use the stroke offset compensation
@@ -1457,6 +1509,62 @@ export class SvgRenderer {
         ];
         // LineOffset for oval: line should end at the edge of the circle (radius)
         return { element, lineOffset: r, boundPoints };
+      }
+      case 'ovalHalfCircle': {
+        // Circle + half-circle arc (ball-and-socket / provided-required interface)
+        // Used for PlantUML's 0) / (0 decoration
+        // Both circle and arc share the same center (tipX/tipY);
+        // arc radius is slightly larger than the circle radius.
+        const r = size / 2;
+        const arcR = r + strokeWidth * 2;
+        const perpX = -sin;
+        const perpY = cos;
+        const cx = tipX;
+        const cy = tipY;
+
+        const group = this.builder ? this.builder.createGroup() : null;
+        if (group && this.builder) {
+          // Draw the circle (ball)
+          const ellipse = this.builder.createEllipse(
+            roundValue(cx), roundValue(cy), r, r
+          );
+          ellipse.setAttribute('fill', fillValue);
+          ellipse.setAttribute('stroke', strokeColor);
+          ellipse.setAttribute('stroke-width', String(strokeWidth));
+          ellipse.setAttribute('stroke-miterlimit', '10');
+          ellipse.setAttribute('pointer-events', 'all');
+          group.appendChild(ellipse);
+
+          // Draw quarter-circle arc (socket) — same center, opens away from the line
+          // Arc spans 90° (half of previous 180°), centered on the -cos direction
+          const halfArc = arcR * Math.SQRT1_2; // arcR * cos(45°)
+          const arcStart = {
+            x: cx - cos * halfArc + perpX * halfArc,
+            y: cy - sin * halfArc + perpY * halfArc
+          };
+          const arcEnd = {
+            x: cx - cos * halfArc - perpX * halfArc,
+            y: cy - sin * halfArc - perpY * halfArc
+          };
+          // Control point pushed out so quadratic Bezier passes through the circle at t=0.5
+          // For B(0.5) to be at distance arcR: ctrlDist = 2*arcR - halfArc
+          const ctrlDist = 2 * arcR - halfArc;
+          const ctrlMid = {
+            x: cx - cos * ctrlDist,
+            y: cy - sin * ctrlDist
+          };
+          const arc = createPathElement((builder) => {
+            builder.moveTo(roundValue(arcStart.x), roundValue(arcStart.y));
+            builder.quadTo(roundValue(ctrlMid.x), roundValue(ctrlMid.y), roundValue(arcEnd.x), roundValue(arcEnd.y));
+          }, 'none');
+          if (arc) group.appendChild(arc);
+        }
+
+        boundPoints = [
+          { x: cx - arcR, y: cy - arcR },
+          { x: cx + arcR, y: cy + arcR }
+        ];
+        return { element: group, lineOffset: arcR, boundPoints };
       }
       case 'halfCircle': {
         const unitX = cos;
