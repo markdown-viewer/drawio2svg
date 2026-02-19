@@ -1940,6 +1940,34 @@ export class SvgRenderer {
             updateBoundsForRotatedRect(bounds, boundsX, boundsY, boundsW, boundsH, rotation, strokeMargin);
           }
 
+          // Extend bounds for external label positions with explicit labelWidth
+          // When labelWidth > cell width, the label extends beyond the shape
+          if (!skipBounds && style.labelWidth != null) {
+            const styleLabelWidth = parseFloat(String(style.labelWidth));
+            if (Number.isFinite(styleLabelWidth) && styleLabelWidth > boundsW) {
+              const labelPosition = (style.labelPosition as string) || 'center';
+              const verticalLabelPosition = (style.verticalLabelPosition as string) || 'middle';
+              // Compute horizontal label bounds (same logic as label-bounds.ts / labels.ts)
+              let lx = boundsX;
+              if (labelPosition === 'center' || !labelPosition) {
+                lx = boundsX - (styleLabelWidth - boundsW) / 2;
+              }
+              updateBounds(lx, boundsY);
+              updateBounds(lx + styleLabelWidth, boundsY + boundsH);
+              // Extend vertically for external label positions
+              if (verticalLabelPosition === 'bottom' && cell.value) {
+                const labelFontSize = parseFloat(style.fontSize as string) || 12;
+                const labelTextHeight = labelFontSize * 1.2;
+                const spacingTop = parseFloat(style.spacingTop as string) || 0;
+                updateBounds(lx, boundsY + boundsH + 7 + spacingTop + labelTextHeight);
+              } else if (verticalLabelPosition === 'top' && cell.value) {
+                const labelFontSize = parseFloat(style.fontSize as string) || 12;
+                const labelTextHeight = labelFontSize * 1.2;
+                updateBounds(lx, boundsY - 3 - labelTextHeight);
+              }
+            }
+          }
+
           // Edge-like vertex shapes: extend bounds to include text label
           // draw.io uses union of shape.boundingBox and text.boundingBox
           if (!skipBounds && shapeType && VERTEX_EDGE_SHAPE_SKIP.has(shapeType) && cell.value) {
