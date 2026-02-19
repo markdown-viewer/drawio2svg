@@ -7,6 +7,8 @@
 // Re-export with V2 suffix for backward compatibility during transition
 export {
   type StencilShape,
+  type DrawOp,
+  type PathCmd,
   convertStencilXmlToShapes,
   parseInlineStencil
 } from './xml.ts';
