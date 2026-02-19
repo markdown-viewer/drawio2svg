@@ -550,6 +550,17 @@ export function renderHtmlLabel(
     }
   }
 
+  // Apply explicit labelWidth style override (matches getLabelBounds behavior)
+  // When labelPosition=center, center the wider label around the cell
+  const styleLabelWidth = style.labelWidth != null ? parseFloat(String(style.labelWidth)) : NaN;
+  if (!isNaN(styleLabelWidth) && styleLabelWidth > 0) {
+    if (labelPosition === 'center' || !labelPosition) {
+      const dx = (styleLabelWidth - labelW) / 2;
+      labelX -= dx;
+    }
+    labelW = styleLabelWidth;
+  }
+
   // Check if text wrapping is enabled
   const whiteSpaceWrap = style.whiteSpace === 'wrap';
   const isOverflowFill = style.overflow === 'fill';
@@ -821,15 +832,15 @@ export function renderHtmlLabel(
     const hasExternalHorizontal = labelPosition === 'left' || labelPosition === 'right';
     if (!hasExternalHorizontal) {
       if (whiteSpaceWrap) {
-        // With wrap: use full width mode
-        marginLeft = x + 1;
-        labelWidth = width - 2;
+        // With wrap: use labelX/labelW which includes styleLabelWidth adjustments
+        marginLeft = labelX + 1;
+        labelWidth = labelW - 2;
       } else {
         // Without wrap: use width: 1px centered mode
         labelWidth = 1;
         labelHeight = 1;
         if (align === 'center') {
-          marginLeft = x + width / 2;
+          marginLeft = labelX + labelW / 2;
         }
       }
     }
@@ -845,15 +856,15 @@ export function renderHtmlLabel(
     const hasExternalHorizontal = labelPosition === 'left' || labelPosition === 'right';
     if (!hasExternalHorizontal) {
       if (whiteSpaceWrap) {
-        // With wrap: use full width mode
-        marginLeft = x + 1;
-        labelWidth = width - 2;
+        // With wrap: use labelX/labelW which includes styleLabelWidth adjustments
+        marginLeft = labelX + 1;
+        labelWidth = labelW - 2;
       } else {
         // Without wrap: use width: 1px centered mode
         labelWidth = 1;
         labelHeight = 1;
         if (align === 'center') {
-          marginLeft = x + width / 2;
+          marginLeft = labelX + labelW / 2;
         }
       }
     }
