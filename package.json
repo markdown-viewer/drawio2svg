@@ -9,15 +9,7 @@
     ".": {
       "browser": "./lib/index.ts",
       "default": "./lib/index.node.ts"
-    },
-    "./lib/convert": "./lib/convert.ts",
-    "./lib/decompress": "./lib/decompress.ts",
-    "./lib/svg": "./lib/svg/index.ts",
-    "./lib/stencil": "./lib/stencil/index.ts",
-    "./lib/stencil/xml": "./lib/stencil/xml.ts",
-    "./lib/edge-router/utils": "./lib/edge-router/utils.ts",
-    "./lib/renderer/edge/points": "./lib/renderer/edge/points.ts",
-    "./lib/renderer/image-url": "./lib/renderer/image-url.ts"
+    }
   },
   "files": [
     "lib",
