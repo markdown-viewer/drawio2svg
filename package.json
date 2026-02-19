@@ -6,7 +6,10 @@
   "main": "lib/index.ts",
   "types": "lib/index.ts",
   "exports": {
-    ".": "./lib/index.ts",
+    ".": {
+      "browser": "./lib/index.ts",
+      "default": "./lib/index.node.ts"
+    },
     "./lib/convert": "./lib/convert.ts",
     "./lib/decompress": "./lib/decompress.ts",
     "./lib/svg": "./lib/svg/index.ts",

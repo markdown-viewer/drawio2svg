@@ -101,7 +101,9 @@ const decompressedXml = decompress(compressedDrawioXml);
 
 ### Text Measurement
 
-For accurate text layout in fibjs server-side environment, use the built-in WebView provider or provide a custom text measurement provider.
+In fibjs environments, a WebView-based text measurement provider is **automatically configured** when you import `@markdown-viewer/drawio2svg`. No manual setup is needed.
+
+You can also set a custom provider if desired:
 
 ```typescript
 import { 
@@ -109,12 +111,8 @@ import {
   getTextMeasureProvider,
   resetTextMeasureProvider 
 } from '@markdown-viewer/drawio2svg';
-import { createWebViewProvider } from '@markdown-viewer/drawio2svg/lib/text';
 
-// Use built-in fibjs WebView provider (recommended)
-setTextMeasureProvider(createWebViewProvider());
-
-// Or set a custom provider
+// Set a custom provider
 setTextMeasureProvider({
   measureText(text, fontSize, fontFamily, fontWeight, fontStyle, isHtml) {
     // Return { width, height } in pixels
