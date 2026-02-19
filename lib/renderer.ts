@@ -249,6 +249,7 @@ import { finalizeAbsolutePoints } from './renderer/edge/points.ts';
 import { shouldSkipZeroLengthEdge } from './renderer/edge/length.ts';
 import { applyEdgeArrows } from './renderer/edge/arrow-render.ts';
 import { renderEdgeDom } from './renderer/edge/dom.ts';
+import { renderMiddleShape, type MiddleShapeType } from './renderer/edge/middle-shape.ts';
 import { renderEdgeLabelIfAny } from './renderer/edge/label.ts';
 import { buildEdgeRenderResult, type EdgeRenderResult } from './renderer/edge/bounds.ts';
 import { getEdgeStyleConfig } from './renderer/edge/style.ts';
@@ -4654,6 +4655,30 @@ export class SvgRenderer {
     );
     if (domBoundPointsOverride) {
       boundPointsOverride = domBoundPointsOverride;
+    }
+
+    // Render middle shape (ball/socket) if specified in style
+    const middleShapeType = style.middleShape as string | undefined;
+    if (middleShapeType && this.builder) {
+      const validTypes = new Set(['ball', 'ballSocket', 'socketBall', 'socket']);
+      if (validTypes.has(middleShapeType)) {
+        const msResult = renderMiddleShape(
+          {
+            builder: this.builder,
+            getCurrentGroup: () => this.currentGroup,
+          },
+          normalizedPoints,
+          middleShapeType as MiddleShapeType,
+          strokeColor,
+        );
+        if (msResult.boundPoints.length > 0) {
+          if (boundPointsOverride) {
+            boundPointsOverride.push(...msResult.boundPoints);
+          } else {
+            boundPointsOverride = [...normalizedPoints, ...msResult.boundPoints];
+          }
+        }
+      }
     }
 
     // mxArrow-based edge shapes: use only original routing endpoints for bounds
