@@ -1666,11 +1666,14 @@ export class SvgRenderer {
           ellipse.setAttribute('pointer-events', 'all');
           group.appendChild(ellipse);
 
+          // Rotate plus lines to match edge direction angle
           const plus = createPathElement((builder) => {
-            builder.moveTo(roundValue(center.x), roundValue(center.y - r));
-            builder.lineTo(roundValue(center.x), roundValue(center.y + r));
-            builder.moveTo(roundValue(center.x + r), roundValue(center.y));
-            builder.lineTo(roundValue(center.x - r), roundValue(center.y));
+            // Arm along the edge direction
+            builder.moveTo(roundValue(center.x + r * cos), roundValue(center.y + r * sin));
+            builder.lineTo(roundValue(center.x - r * cos), roundValue(center.y - r * sin));
+            // Arm perpendicular to the edge direction
+            builder.moveTo(roundValue(center.x - r * sin), roundValue(center.y + r * cos));
+            builder.lineTo(roundValue(center.x + r * sin), roundValue(center.y - r * cos));
           }, 'none');
           if (plus) {
             group.appendChild(plus);
@@ -1684,7 +1687,8 @@ export class SvgRenderer {
           { x: center.x - r, y: center.y + r }
         ];
 
-        return { element: group, lineOffset: 0, boundPoints };
+        // lineOffset = diameter so edge line stops at the near edge of the circle
+        return { element: group, lineOffset: 2 * r, boundPoints };
       }
       default: {
         // Handle compound arrows ending with 'Dot' (e.g., classicDot, halfBottomDot)
