@@ -7,7 +7,7 @@ export class UmlActorHandler extends ActorShapeHandler {
   }
 
   render(attrs: ShapeAttrs): void {
-    const { builder, currentGroup, x, y, width, height, applyShapeAttrsToBuilder } = this.renderCtx;
+    const { builder, currentGroup, style, x, y, width, height, applyShapeAttrsToBuilder } = this.renderCtx;
     if (!builder || !currentGroup) return;
 
     const headR = Math.min(width, height * 0.25) / 2;
@@ -78,6 +78,23 @@ export class UmlActorHandler extends ActorShapeHandler {
       false
     );
     builder.stroke();
+
+    // Business variant (actor/): draw a chord in the lower-right area of the head circle.
+    // Based on PlantUML ActorStickMan.specialBusiness: chord from angle (pi/4 + alpha) to (pi/4 - alpha),
+    // where alpha = 21*pi/64. The chord stays on the perimeter (not through center).
+    if (style.business === '1') {
+      const alpha = 21 * Math.PI / 64;
+      const p1x = headCx + headR * Math.cos(Math.PI / 4 + alpha);
+      const p1y = headCy + headR * Math.sin(Math.PI / 4 + alpha);
+      const p2x = headCx + headR * Math.cos(Math.PI / 4 - alpha);
+      const p2y = headCy + headR * Math.sin(Math.PI / 4 - alpha);
+      builder.setShadow(false);
+      builder.begin();
+      builder.moveTo(p1x, p1y);
+      builder.lineTo(p2x, p2y);
+      builder.stroke();
+    }
+
     builder.restore();
   }
 }
