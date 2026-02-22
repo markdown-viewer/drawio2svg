@@ -21,7 +21,7 @@ export class UmlLifelineHandler extends RectangleShapeHandler {
     applyShapeAttrsToBuilder(builder, attrs);
 
     if (participant === 'umlActor') {
-      const actorStyle = (style.actorStyle as string) || '';
+      const actorStyle = ((style.actorStyle as string) || '').toLowerCase();
       if (actorStyle === 'awesome') {
         renderAwesome(builder, x, y, width, actualSize);
       } else if (actorStyle === 'hollow') {

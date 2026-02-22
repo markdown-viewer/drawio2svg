@@ -10,7 +10,7 @@ export class UmlActorHandler extends ActorShapeHandler {
     const { builder, currentGroup, style, x, y, width, height, applyShapeAttrsToBuilder } = this.renderCtx;
     if (!builder || !currentGroup) return;
 
-    const actorStyle = (style.actorStyle as string) || '';
+    const actorStyle = ((style.actorStyle as string) || '').toLowerCase();
 
     builder.setCanvasRoot(currentGroup);
     builder.save();
