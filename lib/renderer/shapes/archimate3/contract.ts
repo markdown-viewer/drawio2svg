@@ -60,17 +60,14 @@ export class Archimate3ContractHandler extends BaseShapeHandler {
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
-    if (15 <= height) {
-      builder.begin();
-      builder.moveTo(0, 15);
-      builder.lineTo(width, 15);
-      builder.stroke();
-    }
-    if (30 <= height) {
-      builder.begin();
-      builder.moveTo(0, height - 15);
-      builder.lineTo(width, height - 15);
-      builder.stroke();
-    }
+    // Use proportional positions so lines render at any size
+    builder.begin();
+    builder.moveTo(0, 0.2 * height);
+    builder.lineTo(width, 0.2 * height);
+    builder.stroke();
+    builder.begin();
+    builder.moveTo(0, 0.8 * height);
+    builder.lineTo(width, 0.8 * height);
+    builder.stroke();
   }
 }

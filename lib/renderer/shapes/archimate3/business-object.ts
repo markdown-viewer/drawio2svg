@@ -60,11 +60,9 @@ export class Archimate3BusinessObjectHandler extends BaseShapeHandler {
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
-    if (15 <= height) {
-      builder.begin();
-      builder.moveTo(0, 15);
-      builder.lineTo(width, 15);
-      builder.stroke();
-    }
+    builder.begin();
+    builder.moveTo(0, 0.2 * height);
+    builder.lineTo(width, 0.2 * height);
+    builder.stroke();
   }
 }

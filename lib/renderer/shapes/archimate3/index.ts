@@ -50,6 +50,8 @@ import { Archimate3RoleHandler } from './role.ts';
 import { Archimate3SysSwHandler } from './sys-sw.ts';
 import { Archimate3ValueStreamHandler } from './value-stream.ts';
 import { Archimate3WorkPackageHandler } from './work-package.ts';
+import { Archimate3ValueHandler } from './value.ts';
+import { Archimate3MeaningHandler } from './meaning.ts';
 
 export function registerArchimate3Handlers(registry: ShapeRegistry): void {
   registry.register('mxgraph.archimate3.actor', Archimate3ActorHandler);
@@ -103,4 +105,6 @@ export function registerArchimate3Handlers(registry: ShapeRegistry): void {
   registry.register('mxgraph.archimate3.sysSw', Archimate3SysSwHandler);
   registry.register('mxgraph.archimate3.valueStream', Archimate3ValueStreamHandler);
   registry.register('mxgraph.archimate3.workPackage', Archimate3WorkPackageHandler);
+  registry.register('mxgraph.archimate3.value', Archimate3ValueHandler);
+  registry.register('mxgraph.archimate3.meaning', Archimate3MeaningHandler);
 }
