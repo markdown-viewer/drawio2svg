@@ -1,5 +1,6 @@
 import type { RenderContext, ShapeAttrs } from '../../../renderer.ts';
 import { RectangleShapeHandler } from '../../shape-registry.ts';
+import { renderAwesome, renderHollow } from './uml-actor.ts';
 
 export class UmlLifelineHandler extends RectangleShapeHandler {
   constructor(renderCtx: RenderContext) {
@@ -20,57 +21,14 @@ export class UmlLifelineHandler extends RectangleShapeHandler {
     applyShapeAttrsToBuilder(builder, attrs);
 
     if (participant === 'umlActor') {
-      const headR = Math.min(width, actualSize * 0.25) / 2;
-      const headCx = x + width / 2;
-      const headCy = y + headR;
-      const bodyTop = y + headR * 2;
-      const bodyMid = y + actualSize * 0.55;
-      const bodyBot = y + actualSize;
-      const armY = y + actualSize * 0.28;
-
-      builder.ellipse(headCx - headR, headCy - headR, headR * 2, headR * 2);
-      builder.fillAndStroke();
-
-      builder.setFillColor(null);
-      builder.setFillAlpha(1);
-      builder.begin();
-      builder.addPoints(
-        [
-          { x: headCx, y: bodyTop },
-          { x: headCx, y: bodyMid }
-        ],
-        false,
-        0,
-        false
-      );
-      builder.addPoints(
-        [
-          { x, y: armY },
-          { x: x + width, y: armY }
-        ],
-        false,
-        0,
-        false
-      );
-      builder.addPoints(
-        [
-          { x: headCx, y: bodyMid },
-          { x, y: bodyBot }
-        ],
-        false,
-        0,
-        false
-      );
-      builder.addPoints(
-        [
-          { x: headCx, y: bodyMid },
-          { x: x + width, y: bodyBot }
-        ],
-        false,
-        0,
-        false
-      );
-      builder.stroke();
+      const actorStyle = (style.actorStyle as string) || '';
+      if (actorStyle === 'awesome') {
+        renderAwesome(builder, x, y, width, actualSize);
+      } else if (actorStyle === 'hollow') {
+        renderHollow(builder, x, y, width, actualSize);
+      } else {
+        renderLifelineStickman(builder, x, y, width, actualSize);
+      }
     } else if (participant === 'umlControl') {
       const ellipseHeight = actualSize * 0.875;
       const ellipseY = y + actualSize * 0.125;
@@ -263,3 +221,40 @@ export class UmlLifelineHandler extends RectangleShapeHandler {
     builder.restore();
   }
 }
+
+// ── Actor shape helpers for lifeline ────────────────────────────────────────
+
+function renderLifelineStickman(builder: any, x: number, y: number, width: number, actualSize: number): void {
+  const headR = Math.min(width, actualSize * 0.25) / 2;
+  const headCx = x + width / 2;
+  const headCy = y + headR;
+  const bodyTop = y + headR * 2;
+  const bodyMid = y + actualSize * 0.55;
+  const bodyBot = y + actualSize;
+  const armY = y + actualSize * 0.28;
+
+  builder.ellipse(headCx - headR, headCy - headR, headR * 2, headR * 2);
+  builder.fillAndStroke();
+
+  builder.setFillColor(null);
+  builder.setFillAlpha(1);
+  builder.begin();
+  builder.addPoints(
+    [{ x: headCx, y: bodyTop }, { x: headCx, y: bodyMid }],
+    false, 0, false
+  );
+  builder.addPoints(
+    [{ x, y: armY }, { x: x + width, y: armY }],
+    false, 0, false
+  );
+  builder.addPoints(
+    [{ x: headCx, y: bodyMid }, { x, y: bodyBot }],
+    false, 0, false
+  );
+  builder.addPoints(
+    [{ x: headCx, y: bodyMid }, { x: x + width, y: bodyBot }],
+    false, 0, false
+  );
+  builder.stroke();
+}
+
