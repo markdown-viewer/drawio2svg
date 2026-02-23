@@ -1945,30 +1945,42 @@ export class SvgRenderer {
             updateBoundsForRotatedRect(bounds, boundsX, boundsY, boundsW, boundsH, rotation, strokeMargin);
           }
 
-          // Extend bounds for external label positions with explicit labelWidth
-          // When labelWidth > cell width, the label extends beyond the shape
-          if (!skipBounds && style.labelWidth != null) {
-            const styleLabelWidth = parseFloat(String(style.labelWidth));
-            if (Number.isFinite(styleLabelWidth) && styleLabelWidth > boundsW) {
+          // Extend bounds for external label positions (verticalLabelPosition=bottom/top).
+          // Works with explicit labelWidth or by measuring the label text when absent.
+          {
+            const verticalLabelPosition = (style.verticalLabelPosition as string) || 'middle';
+            const isExternalLabel = (verticalLabelPosition === 'bottom' || verticalLabelPosition === 'top') && cell.value;
+            if (!skipBounds && isExternalLabel) {
               const labelPosition = (style.labelPosition as string) || 'center';
-              const verticalLabelPosition = (style.verticalLabelPosition as string) || 'middle';
-              // Compute horizontal label bounds (same logic as label-bounds.ts / labels.ts)
-              let lx = boundsX;
-              if (labelPosition === 'center' || !labelPosition) {
-                lx = boundsX - (styleLabelWidth - boundsW) / 2;
+              const labelFontSize = parseFloat(style.fontSize as string) || 12;
+              const labelTextHeight = labelFontSize * 1.2;
+
+              // Determine effective label width: prefer explicit labelWidth, fall back to text measure.
+              let effectiveLabelWidth: number;
+              if (style.labelWidth != null) {
+                effectiveLabelWidth = parseFloat(String(style.labelWidth));
+              } else {
+                const textLayout = measureMultilineTextLayout(cell.value || '', style, labelFontSize);
+                effectiveLabelWidth = Math.max(textLayout.width, boundsW);
               }
-              updateBounds(lx, boundsY);
-              updateBounds(lx + styleLabelWidth, boundsY + boundsH);
-              // Extend vertically for external label positions
-              if (verticalLabelPosition === 'bottom' && cell.value) {
-                const labelFontSize = parseFloat(style.fontSize as string) || 12;
-                const labelTextHeight = labelFontSize * 1.2;
+
+              if (Number.isFinite(effectiveLabelWidth)) {
+                // Compute horizontal label bounds (same logic as label-bounds.ts / labels.ts)
+                let lx = boundsX;
+                if (labelPosition === 'center' || !labelPosition) {
+                  lx = boundsX - (effectiveLabelWidth - boundsW) / 2;
+                }
+                if (effectiveLabelWidth > boundsW) {
+                  updateBounds(lx, boundsY);
+                  updateBounds(lx + effectiveLabelWidth, boundsY + boundsH);
+                }
+                // Extend vertically for external label positions
                 const spacingTop = parseFloat(style.spacingTop as string) || 0;
-                updateBounds(lx, boundsY + boundsH + 7 + spacingTop + labelTextHeight);
-              } else if (verticalLabelPosition === 'top' && cell.value) {
-                const labelFontSize = parseFloat(style.fontSize as string) || 12;
-                const labelTextHeight = labelFontSize * 1.2;
-                updateBounds(lx, boundsY - 3 - labelTextHeight);
+                if (verticalLabelPosition === 'bottom') {
+                  updateBounds(lx, boundsY + boundsH + 7 + spacingTop + labelTextHeight);
+                } else if (verticalLabelPosition === 'top') {
+                  updateBounds(lx, boundsY - 3 - labelTextHeight);
+                }
               }
             }
           }
