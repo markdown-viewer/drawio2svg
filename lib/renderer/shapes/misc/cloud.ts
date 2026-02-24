@@ -1,15 +1,12 @@
 import type { RenderContext, ShapeAttrs } from '../../../renderer.ts';
-import { ActorShapeHandler, type PerimeterFn } from '../../shape-registry.ts';
-import { getEllipsePerimeterPoint } from '../../../edge-router/perimeter/ellipse.ts';
+import { ActorShapeHandler } from '../../shape-registry.ts';
 
 export class CloudHandler extends ActorShapeHandler {
   constructor(renderCtx: RenderContext) {
     super(renderCtx);
   }
 
-  getPerimeter(): PerimeterFn {
-    return getEllipsePerimeterPoint;
-  }
+  // Cloud uses default RectanglePerimeter in draw.io (no custom perimeter override)
 
   render(attrs: ShapeAttrs): void {
     const { builder, currentGroup, style, x, y, width, height, applyShapeAttrsToBuilder } = this.renderCtx;

@@ -39,17 +39,9 @@ export function buildEdgePath(
     }
     }
 
-  const isAxisAligned = (points: Point[]): boolean => {
-    const tol = 1e-6;
-    for (let i = 1; i < points.length; i++) {
-      const dx = Math.abs(points[i].x - points[i - 1].x);
-      const dy = Math.abs(points[i].y - points[i - 1].y);
-      if (dx > tol && dy > tol) return false;
-    }
-    return true;
-  };
-
-  if (edgeRounded && allPoints.length > 2 && (isOrthogonalEdge || edgeStyle === 'entityRelationEdgeStyle' || isLoop || isAxisAligned(allPoints))) {
+  // draw.io's addPoints always applies rounded corners when isRounded=true,
+  // regardless of axis alignment. The default stylesheet sets rounded=1 for edges.
+  if (edgeRounded && allPoints.length > 2) {
     return buildRoundedOrthogonalPath(allPoints);
   }
 
