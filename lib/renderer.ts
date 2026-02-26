@@ -1436,6 +1436,48 @@ export class SvgRenderer {
         }
         return { element: group, lineOffset, boundPoints };
       }
+      case 'blockTwoDots': {
+        // Block arrow (triangle) with two small filled dots behind the base (PlantUML :|> / <|:)
+        // Layout: |line|--[dot][dot][triangle]-->|endpoint|
+        const p1 = transform(0, 0);
+        const p2 = transform(-len, w);
+        const p3 = transform(-len, -w);
+        const triPoints = [roundPoint(p1), roundPoint(p2), roundPoint(p3)];
+        // Two dots placed behind the triangle base, above and below the midline
+        const dotRadius = strokeWidth * 1.5;
+        const dotGap = strokeWidth * 2;
+        const dotOffset = len + dotGap + dotRadius;
+        const dotSpacing = w * 0.6;
+        const dotTop = transform(-dotOffset, -dotSpacing);
+        const dotBottom = transform(-dotOffset, dotSpacing);
+        lineOffset = dotOffset + dotRadius + strokeWidth;
+        boundPoints = [p1, dotTop, dotBottom];
+
+        const group = this.builder ? this.builder.createGroup() : null;
+        if (group) {
+          // Draw the triangle (hollow or filled based on fill param)
+          const tri = createPathElement((builder) => {
+            builder.addPoints(triPoints, false, 0, true);
+          }, fillValue);
+          if (tri) group.appendChild(tri);
+          // Draw two filled dots behind the triangle
+          const dot1 = this.builder ? this.builder.createEllipse(dotTop.x, dotTop.y, dotRadius, dotRadius) : null;
+          if (dot1) {
+            dot1.setAttribute('fill', strokeColor);
+            dot1.setAttribute('stroke', strokeColor);
+            dot1.setAttribute('stroke-width', String(strokeWidth));
+            group.appendChild(dot1);
+          }
+          const dot2 = this.builder ? this.builder.createEllipse(dotBottom.x, dotBottom.y, dotRadius, dotRadius) : null;
+          if (dot2) {
+            dot2.setAttribute('fill', strokeColor);
+            dot2.setAttribute('stroke', strokeColor);
+            dot2.setAttribute('stroke-width', String(strokeWidth));
+            group.appendChild(dot2);
+          }
+        }
+        return { element: group, lineOffset, boundPoints };
+      }
       case 'open':
       case 'openThin':
       case 'openFilled': {
