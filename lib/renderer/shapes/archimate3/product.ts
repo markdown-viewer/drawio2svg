@@ -60,11 +60,12 @@ export class Archimate3ProductHandler extends BaseShapeHandler {
     renderStencilShape?: RenderContext['renderStencilShape']
   ): void {
     if (!builder) return;
-    // Use proportional positions matching productSmall
-    builder.begin();
-    builder.moveTo(0, 0.2 * height);
-    builder.lineTo(0.5 * width, 0.2 * height);
-    builder.lineTo(0.5 * width, 0);
-    builder.stroke();
+    if (15 <= height) {
+      builder.begin();
+      builder.moveTo(0, 15);
+      builder.lineTo(0.6 * width, 15);
+      builder.lineTo(0.6 * width, 0);
+      builder.stroke();
+    }
   }
 }
