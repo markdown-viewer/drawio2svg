@@ -6,10 +6,7 @@
   "main": "lib/index.ts",
   "types": "lib/index.ts",
   "exports": {
-    ".": {
-      "browser": "./lib/index.ts",
-      "default": "./lib/index.node.ts"
-    }
+    ".": "./lib/index.ts"
   },
   "files": [
     "lib",
