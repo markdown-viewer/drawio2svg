@@ -8,6 +8,7 @@ import { DimensionHandler } from './dimension.ts';
 import { EndStateHandler } from './end-state.ts';
 import { EmptyHandler } from './empty.ts';
 import { EmojiHandler } from './emoji.ts';
+import { FlowFinalHandler } from './flow-final.ts';
 import { FolderHandler } from './folder.ts';
 import { ImageHandler } from './image.ts';
 import { LabelHandler } from './label.ts';
@@ -32,6 +33,7 @@ export function registerMiscHandlers(registry: ShapeRegistry): void {
   registry.register('arrowConnector', EmptyHandler);
   registry.register('connector', EmptyHandler);
   registry.register('endState', EndStateHandler);
+  registry.register('flowFinal', FlowFinalHandler);
   registry.register('mxgraph.emoji', EmojiHandler);
   registry.register('folder', FolderHandler);
   registry.register('image', ImageHandler);
