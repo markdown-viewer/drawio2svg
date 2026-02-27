@@ -508,7 +508,7 @@ export class SvgRenderer {
     this.offsetX = 0;
     this.offsetY = 0;
     
-    const { bounds: firstPassBounds } = this.renderCellsWithBounds(cells);
+    const { bounds: firstPassBounds, labelExtensionPoints } = this.renderCellsWithBounds(cells);
     const edgePathPointsSnapshot = new Map(this.edgePathPoints);
 
     // Adjust top bounds for step shapes with HTML labels (extends bounds upward)
@@ -553,6 +553,11 @@ export class SvgRenderer {
       firstPassBounds.minY -= 2;
     }
 
+    // Apply deferred label extension points to first-pass bounds before offset calculation.
+    // These extension points represent external label positions that should expand the SVG canvas.
+    for (const ext of labelExtensionPoints) {
+      updateBoundsHelper(firstPassBounds, ext.x, ext.y);
+    }
     
     // Calculate offset from first pass bounds
     let hasRotatedBoldTextOverflow = false;
@@ -1778,9 +1783,12 @@ export class SvgRenderer {
    * Render all cells and collect actual bounds
    * Uses recursive tree structure
    */
-  private renderCellsWithBounds(cells: MxCell[]): { bounds: BoundingBox } {
+  private renderCellsWithBounds(cells: MxCell[]): { bounds: BoundingBox, labelExtensionPoints: Array<{x: number, y: number}> } {
     // Track actual bounds including edge paths
     const bounds = initBounds();
+    // Collect external label extension points separately so they can be applied
+    // after offset calculation to avoid shifting all shapes
+    const labelExtensionPoints: Array<{x: number, y: number}> = [];
 
     
     const updateBounds = (x: number, y: number) => {
@@ -1988,40 +1996,67 @@ export class SvgRenderer {
           }
 
           // Extend bounds for external label positions (verticalLabelPosition=bottom/top).
-          // Works with explicit labelWidth or by measuring the label text when absent.
+          // Uses per-cell rotated bbox to avoid incorrect X shift for rotated/direction shapes.
+          // Label extensions are collected separately and applied AFTER offset calculation
+          // to expand the SVG canvas without shifting existing shape positions.
+          // Skip text/label shapes — they ARE the text, no external label extension needed.
           {
             const verticalLabelPosition = (style.verticalLabelPosition as string) || 'middle';
             const isExternalLabel = (verticalLabelPosition === 'bottom' || verticalLabelPosition === 'top') && cell.value;
-            if (!skipBounds && isExternalLabel) {
-              const labelPosition = (style.labelPosition as string) || 'center';
+            if (!skipBounds && isExternalLabel && !isTextShape) {
               const labelFontSize = parseFloat(style.fontSize as string) || 12;
               const labelTextHeight = labelFontSize * 1.2;
 
-              // Determine effective label width: prefer explicit labelWidth, fall back to text measure.
-              let effectiveLabelWidth: number;
+              // Compute per-cell rotated bounding box (avoids using raw boundsX/boundsW
+              // which may be shifted by direction swap and don't match the rotated visual)
+              const cellBounds = { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+              updateBoundsForRotatedRect(cellBounds, boundsX, boundsY, boundsW, boundsH, rotation, strokeMargin);
+              const cellBoundsW = cellBounds.maxX - cellBounds.minX;
+
+              // Horizontal: extend with explicit labelWidth (applied to main bounds since it's explicit)
               if (style.labelWidth != null) {
-                effectiveLabelWidth = parseFloat(String(style.labelWidth));
-              } else {
+                const styleLabelWidth = parseFloat(String(style.labelWidth));
+                if (Number.isFinite(styleLabelWidth) && styleLabelWidth > cellBoundsW) {
+                  const labelPosition = (style.labelPosition as string) || 'center';
+                  let lx = cellBounds.minX;
+                  if (labelPosition === 'center' || !labelPosition) {
+                    lx = cellBounds.minX - (styleLabelWidth - cellBoundsW) / 2;
+                  }
+                  updateBounds(lx, cellBounds.minY);
+                  updateBounds(lx + styleLabelWidth, cellBounds.maxY);
+                }
+              } else if (style.whiteSpace !== 'wrap') {
+                // Text-measured horizontal extension (only for non-wrapping text).
+                // When whiteSpace=wrap, text wraps within cell width and doesn't extend.
                 const textLayout = measureMultilineTextLayout(cell.value || '', style, labelFontSize);
-                effectiveLabelWidth = Math.max(textLayout.width, boundsW);
+                const measuredWidth = textLayout.width;
+                if (measuredWidth > cellBoundsW) {
+                  const labelPosition = (style.labelPosition as string) || 'center';
+                  let lx = cellBounds.minX;
+                  if (labelPosition === 'center' || !labelPosition) {
+                    lx = cellBounds.minX - (measuredWidth - cellBoundsW) / 2;
+                  }
+                  labelExtensionPoints.push({ x: lx, y: cellBounds.minY });
+                  labelExtensionPoints.push({ x: lx + measuredWidth, y: cellBounds.maxY });
+                }
               }
 
-              if (Number.isFinite(effectiveLabelWidth)) {
-                // Compute horizontal label bounds (same logic as label-bounds.ts / labels.ts)
-                let lx = boundsX;
-                if (labelPosition === 'center' || !labelPosition) {
-                  lx = boundsX - (effectiveLabelWidth - boundsW) / 2;
-                }
-                if (effectiveLabelWidth > boundsW) {
-                  updateBounds(lx, boundsY);
-                  updateBounds(lx + effectiveLabelWidth, boundsY + boundsH);
-                }
-                // Extend vertically for external label positions
+              // Vertical extension: use geometry-based Y (subtract strokeMargin from
+              // cellBounds to avoid double-counting stroke in the extension).
+              // draw.io positions external labels relative to shape geometry, not visual bounds.
+              if (verticalLabelPosition === 'bottom') {
                 const spacingTop = parseFloat(style.spacingTop as string) || 0;
-                if (verticalLabelPosition === 'bottom') {
-                  updateBounds(lx, boundsY + boundsH + 7 + spacingTop + labelTextHeight);
-                } else if (verticalLabelPosition === 'top') {
-                  updateBounds(lx, boundsY - 3 - labelTextHeight);
+                const geometryBottom = cellBounds.maxY - strokeMargin;
+                const labelBottom = geometryBottom + 7 + spacingTop + labelTextHeight;
+                labelExtensionPoints.push({ x: cellBounds.minX, y: labelBottom });
+              } else if (verticalLabelPosition === 'top') {
+                const spacingBottom = parseFloat(style.spacingBottom as string) || 0;
+                const geometryTop = cellBounds.minY + strokeMargin;
+                // spacingBottom adjusts the gap: negative values pull label back into shape
+                const labelTop = geometryTop - 3 - labelTextHeight - spacingBottom;
+                // Only extend if label actually extends above the shape visual bounds
+                if (labelTop < cellBounds.minY) {
+                  labelExtensionPoints.push({ x: cellBounds.minX, y: labelTop });
                 }
               }
             }
@@ -2472,7 +2507,7 @@ export class SvgRenderer {
     // Render from roots
     rootCells.forEach(c => renderCellRecursive(c));
     
-    return { bounds: finalizeBounds(bounds) };
+    return { bounds: finalizeBounds(bounds), labelExtensionPoints };
   }
 
   /**
