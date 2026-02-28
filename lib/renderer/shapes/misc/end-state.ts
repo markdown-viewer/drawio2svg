@@ -16,7 +16,8 @@ export class EndStateHandler extends EllipseShapeHandler {
     if (!builder || !currentGroup) return;
 
     const outerSize = Math.max(0, Math.min(width, height));
-    const innerSize = Math.max(0, outerSize - 8);
+    // Inner circle proportional to outerSize (gap = 36% of outer, i.e. 4/5 of original 45% gap)
+    const innerSize = Math.max(0, Math.round(outerSize * 0.64));
     const cx = x + width / 2;
     const cy = y + height / 2;
 
