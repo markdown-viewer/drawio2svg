@@ -19,4 +19,6 @@ export interface CellState {
   strokeWidth?: number; // Stroke width for perimeter adjustments
   backboneSize?: number; // Backbone size for backbonePerimeter
   perimeterSpacing?: number; // Extra spacing for perimeter
+  fixedSize?: boolean; // Whether shape uses fixed size mode
+  size?: number; // Shape size parameter (e.g., hexagon corner offset)
 }

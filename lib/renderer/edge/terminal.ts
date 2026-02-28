@@ -130,7 +130,9 @@ export function buildEdgeTerminal(
         : undefined,
       perimeterSpacing: terminalCell.style.perimeterSpacing !== undefined
         ? parseFloat(terminalCell.style.perimeterSpacing as string)
-        : undefined
+        : undefined,
+      fixedSize: terminalCell.style.fixedSize !== undefined && terminalCell.style.fixedSize !== '0' && terminalCell.style.fixedSize !== 0,
+      size: terminalCell.style.size !== undefined ? parseFloat(terminalCell.style.size as string) : undefined
     };
     state.portConstraintMask = getPortConstraintMask(terminalCell.style, edgeStyle, rotation, kind === 'source');
 

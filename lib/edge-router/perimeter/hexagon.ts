@@ -57,6 +57,18 @@ export function getHexagonPerimeterPoint(
   const direction = (bounds.direction || 'east').toString().toLowerCase();
   const vertical = direction === 'north' || direction === 'south';
 
+  // Compute actual corner offset from style fixedSize/size
+  const isFixed = bounds.fixedSize === true;
+  const sizeRaw = bounds.size;
+  // s = horizontal corner offset for non-vertical hexagons (replaces hardcoded w/4)
+  const s = isFixed
+    ? Math.max(0, Math.min(w * 0.5, Number.isFinite(sizeRaw) ? sizeRaw! : 20))
+    : w * Math.max(0, Math.min(1, Number.isFinite(sizeRaw) ? sizeRaw! : 0.25));
+  // sv = vertical corner offset for vertical hexagons (replaces hardcoded h/4)
+  const sv = isFixed
+    ? Math.max(0, Math.min(h * 0.5, Number.isFinite(sizeRaw) ? sizeRaw! : 20))
+    : h * Math.max(0, Math.min(1, Number.isFinite(sizeRaw) ? sizeRaw! : 0.25));
+
   let a: Point = { x: 0, y: 0 };
   let b: Point = { x: 0, y: 0 };
 
@@ -74,28 +86,28 @@ export function getHexagonPerimeterPoint(
           return { x: cx, y: y + h };
         }
       } else if (px < x) {
-        if (py === y + h / 4) {
-          return { x, y: y + h / 4 };
-        } else if (py === y + 3 * h / 4) {
-          return { x, y: y + 3 * h / 4 };
+        if (py === y + sv) {
+          return { x, y: y + sv };
+        } else if (py === y + h - sv) {
+          return { x, y: y + h - sv };
         }
       } else if (px > x + w) {
-        if (py === y + h / 4) {
-          return { x: x + w, y: y + h / 4 };
-        } else if (py === y + 3 * h / 4) {
-          return { x: x + w, y: y + 3 * h / 4 };
+        if (py === y + sv) {
+          return { x: x + w, y: y + sv };
+        } else if (py === y + h - sv) {
+          return { x: x + w, y: y + h - sv };
         }
       } else if (px === x) {
         if (py < cy) {
-          return { x, y: y + h / 4 };
+          return { x, y: y + sv };
         } else if (py > cy) {
-          return { x, y: y + 3 * h / 4 };
+          return { x, y: y + h - sv };
         }
       } else if (px === x + w) {
         if (py < cy) {
-          return { x: x + w, y: y + h / 4 };
+          return { x: x + w, y: y + sv };
         } else if (py > cy) {
-          return { x: x + w, y: y + 3 * h / 4 };
+          return { x: x + w, y: y + h - sv };
         }
       }
       if (py === y) {
@@ -105,26 +117,26 @@ export function getHexagonPerimeterPoint(
       }
 
       if (px < cx) {
-        if ((py > y + h / 4) && (py < y + 3 * h / 4)) {
+        if ((py > y + sv) && (py < y + h - sv)) {
           a = { x, y };
           b = { x, y: y + h };
-        } else if (py < y + h / 4) {
-          a = { x: x - Math.floor(0.5 * w), y: y + Math.floor(0.5 * h) };
-          b = { x: x + w, y: y - Math.floor(0.25 * h) };
-        } else if (py > y + 3 * h / 4) {
-          a = { x: x - Math.floor(0.5 * w), y: y + Math.floor(0.5 * h) };
-          b = { x: x + w, y: y + Math.floor(1.25 * h) };
+        } else if (py < y + sv) {
+          a = { x: x - Math.floor(0.5 * w), y: y + Math.floor(2 * sv) };
+          b = { x: x + w, y: y - Math.floor(sv) };
+        } else if (py > y + h - sv) {
+          a = { x: x - Math.floor(0.5 * w), y: y + h - Math.floor(2 * sv) };
+          b = { x: x + w, y: y + h + Math.floor(sv) };
         }
       } else if (px > cx) {
-        if ((py > y + h / 4) && (py < y + 3 * h / 4)) {
+        if ((py > y + sv) && (py < y + h - sv)) {
           a = { x: x + w, y };
           b = { x: x + w, y: y + h };
-        } else if (py < y + h / 4) {
-          a = { x, y: y - Math.floor(0.25 * h) };
-          b = { x: x + Math.floor(1.5 * w), y: y + Math.floor(0.5 * h) };
-        } else if (py > y + 3 * h / 4) {
-          a = { x: x + Math.floor(1.5 * w), y: y + Math.floor(0.5 * h) };
-          b = { x, y: y + Math.floor(1.25 * h) };
+        } else if (py < y + sv) {
+          a = { x, y: y - Math.floor(sv) };
+          b = { x: x + Math.floor(1.5 * w), y: y + Math.floor(2 * sv) };
+        } else if (py > y + h - sv) {
+          a = { x: x + Math.floor(1.5 * w), y: y + h - Math.floor(2 * sv) };
+          b = { x, y: y + h + Math.floor(sv) };
         }
       }
     } else {
@@ -135,28 +147,28 @@ export function getHexagonPerimeterPoint(
           return { x: x + w, y: y + h / 2 };
         }
       } else if (py < y) {
-        if (px === x + w / 4) {
-          return { x: x + w / 4, y };
-        } else if (px === x + 3 * w / 4) {
-          return { x: x + 3 * w / 4, y };
+        if (px === x + s) {
+          return { x: x + s, y };
+        } else if (px === x + w - s) {
+          return { x: x + w - s, y };
         }
       } else if (py > y + h) {
-        if (px === x + w / 4) {
-          return { x: x + w / 4, y: y + h };
-        } else if (px === x + 3 * w / 4) {
-          return { x: x + 3 * w / 4, y: y + h };
+        if (px === x + s) {
+          return { x: x + s, y: y + h };
+        } else if (px === x + w - s) {
+          return { x: x + w - s, y: y + h };
         }
       } else if (py === y) {
         if (px < cx) {
-          return { x: x + w / 4, y };
+          return { x: x + s, y };
         } else if (px > cx) {
-          return { x: x + 3 * w / 4, y };
+          return { x: x + w - s, y };
         }
       } else if (py === y + h) {
         if (px < cx) {
-          return { x: x + w / 4, y: y + h };
+          return { x: x + s, y: y + h };
         } else if (py > cy) {
-          return { x: x + 3 * w / 4, y: y + h };
+          return { x: x + w - s, y: y + h };
         }
       }
       if (px === x) {
@@ -166,26 +178,26 @@ export function getHexagonPerimeterPoint(
       }
 
       if (py < cy) {
-        if ((px > x + w / 4) && (px < x + 3 * w / 4)) {
+        if ((px > x + s) && (px < x + w - s)) {
           a = { x, y };
           b = { x: x + w, y };
-        } else if (px < x + w / 4) {
-          a = { x: x - Math.floor(0.25 * w), y: y + h };
-          b = { x: x + Math.floor(0.5 * w), y: y - Math.floor(0.5 * h) };
-        } else if (px > x + 3 * w / 4) {
-          a = { x: x + Math.floor(0.5 * w), y: y - Math.floor(0.5 * h) };
-          b = { x: x + Math.floor(1.25 * w), y: y + h };
+        } else if (px < x + s) {
+          a = { x: x - Math.floor(s), y: y + h };
+          b = { x: x + Math.floor(2 * s), y: y - Math.floor(0.5 * h) };
+        } else if (px > x + w - s) {
+          a = { x: x + w - Math.floor(2 * s), y: y - Math.floor(0.5 * h) };
+          b = { x: x + w + Math.floor(s), y: y + h };
         }
       } else if (py > cy) {
-        if ((px > x + w / 4) && (px < x + 3 * w / 4)) {
+        if ((px > x + s) && (px < x + w - s)) {
           a = { x, y: y + h };
           b = { x: x + w, y: y + h };
-        } else if (px < x + w / 4) {
-          a = { x: x - Math.floor(0.25 * w), y };
-          b = { x: x + Math.floor(0.5 * w), y: y + Math.floor(1.5 * h) };
-        } else if (px > x + 3 * w / 4) {
-          a = { x: x + Math.floor(0.5 * w), y: y + Math.floor(1.5 * h) };
-          b = { x: x + Math.floor(1.25 * w), y };
+        } else if (px < x + s) {
+          a = { x: x - Math.floor(s), y };
+          b = { x: x + Math.floor(2 * s), y: y + Math.floor(1.5 * h) };
+        } else if (px > x + w - s) {
+          a = { x: x + w - Math.floor(2 * s), y: y + Math.floor(1.5 * h) };
+          b = { x: x + w + Math.floor(s), y };
         }
       }
     }
@@ -214,76 +226,76 @@ export function getHexagonPerimeterPoint(
     result = intersection(tx, ty, next.x, next.y, a.x, a.y, b.x, b.y) ?? { x: cx, y: cy };
   } else {
     if (vertical) {
-      const beta = Math.atan2(h / 4, w / 2);
+      const beta = Math.atan2(h / 2 - sv, w / 2);
 
       if (alpha === beta) {
-        return { x: x + w, y: y + Math.floor(0.25 * h) };
+        return { x: x + w, y: y + Math.floor(sv) };
       } else if (alpha === pi2) {
         return { x: x + Math.floor(0.5 * w), y };
       } else if (alpha === (pi - beta)) {
-        return { x, y: y + Math.floor(0.25 * h) };
+        return { x, y: y + Math.floor(sv) };
       } else if (alpha === -beta) {
-        return { x: x + w, y: y + Math.floor(0.75 * h) };
+        return { x: x + w, y: y + Math.floor(h - sv) };
       } else if (alpha === (-pi2)) {
         return { x: x + Math.floor(0.5 * w), y: y + h };
       } else if (alpha === (-pi + beta)) {
-        return { x, y: y + Math.floor(0.75 * h) };
+        return { x, y: y + Math.floor(h - sv) };
       }
 
       if ((alpha < beta) && (alpha > -beta)) {
         a = { x: x + w, y };
         b = { x: x + w, y: y + h };
       } else if ((alpha > beta) && (alpha < pi2)) {
-        a = { x, y: y - Math.floor(0.25 * h) };
-        b = { x: x + Math.floor(1.5 * w), y: y + Math.floor(0.5 * h) };
+        a = { x, y: y - Math.floor(sv) };
+        b = { x: x + Math.floor(1.5 * w), y: y + Math.floor(2 * sv) };
       } else if ((alpha > pi2) && (alpha < (pi - beta))) {
-        a = { x: x - Math.floor(0.5 * w), y: y + Math.floor(0.5 * h) };
-        b = { x: x + w, y: y - Math.floor(0.25 * h) };
+        a = { x: x - Math.floor(0.5 * w), y: y + Math.floor(2 * sv) };
+        b = { x: x + w, y: y - Math.floor(sv) };
       } else if (((alpha > (pi - beta)) && (alpha <= pi)) || ((alpha < (-pi + beta)) && (alpha >= -pi))) {
         a = { x, y };
         b = { x, y: y + h };
       } else if ((alpha < -beta) && (alpha > -pi2)) {
-        a = { x: x + Math.floor(1.5 * w), y: y + Math.floor(0.5 * h) };
-        b = { x, y: y + Math.floor(1.25 * h) };
+        a = { x: x + Math.floor(1.5 * w), y: y + h - Math.floor(2 * sv) };
+        b = { x, y: y + h + Math.floor(sv) };
       } else if ((alpha < -pi2) && (alpha > (-pi + beta))) {
-        a = { x: x - Math.floor(0.5 * w), y: y + Math.floor(0.5 * h) };
-        b = { x: x + w, y: y + Math.floor(1.25 * h) };
+        a = { x: x - Math.floor(0.5 * w), y: y + h - Math.floor(2 * sv) };
+        b = { x: x + w, y: y + h + Math.floor(sv) };
       }
     } else {
-      const beta = Math.atan2(h / 2, w / 4);
+      const beta = Math.atan2(h / 2, w / 2 - s);
 
       if (alpha === beta) {
-        return { x: x + Math.floor(0.75 * w), y };
+        return { x: x + Math.floor(w - s), y };
       } else if (alpha === (pi - beta)) {
-        return { x: x + Math.floor(0.25 * w), y };
+        return { x: x + Math.floor(s), y };
       } else if ((alpha === pi) || (alpha === -pi)) {
         return { x, y: y + Math.floor(0.5 * h) };
       } else if (alpha === 0) {
         return { x: x + w, y: y + Math.floor(0.5 * h) };
       } else if (alpha === -beta) {
-        return { x: x + Math.floor(0.75 * w), y: y + h };
+        return { x: x + Math.floor(w - s), y: y + h };
       } else if (alpha === (-pi + beta)) {
-        return { x: x + Math.floor(0.25 * w), y: y + h };
+        return { x: x + Math.floor(s), y: y + h };
       }
 
       if ((alpha > 0) && (alpha < beta)) {
-        a = { x: x + Math.floor(0.5 * w), y: y - Math.floor(0.5 * h) };
-        b = { x: x + Math.floor(1.25 * w), y: y + h };
+        a = { x: x + w - Math.floor(2 * s), y: y - Math.floor(0.5 * h) };
+        b = { x: x + w + Math.floor(s), y: y + h };
       } else if ((alpha > beta) && (alpha < (pi - beta))) {
         a = { x, y };
         b = { x: x + w, y };
       } else if ((alpha > (pi - beta)) && (alpha < pi)) {
-        a = { x: x - Math.floor(0.25 * w), y: y + h };
-        b = { x: x + Math.floor(0.5 * w), y: y - Math.floor(0.5 * h) };
+        a = { x: x - Math.floor(s), y: y + h };
+        b = { x: x + Math.floor(2 * s), y: y - Math.floor(0.5 * h) };
       } else if ((alpha < 0) && (alpha > -beta)) {
-        a = { x: x + Math.floor(0.5 * w), y: y + Math.floor(1.5 * h) };
-        b = { x: x + Math.floor(1.25 * w), y };
+        a = { x: x + w - Math.floor(2 * s), y: y + Math.floor(1.5 * h) };
+        b = { x: x + w + Math.floor(s), y };
       } else if ((alpha < -beta) && (alpha > (-pi + beta))) {
         a = { x, y: y + h };
         b = { x: x + w, y: y + h };
       } else if ((alpha < (-pi + beta)) && (alpha > -pi)) {
-        a = { x: x - Math.floor(0.25 * w), y };
-        b = { x: x + Math.floor(0.5 * w), y: y + Math.floor(1.5 * h) };
+        a = { x: x - Math.floor(s), y };
+        b = { x: x + Math.floor(2 * s), y: y + Math.floor(1.5 * h) };
       }
     }
 
