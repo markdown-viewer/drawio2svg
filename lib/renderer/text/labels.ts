@@ -322,35 +322,30 @@ export function renderNativeTextLabel(
   } else {
     let textY: number;
     if (verticalLabelPosition === 'top') {
-      textY = y - 6;
+      textY = labelY - 6;
     } else if (verticalLabelPosition === 'bottom') {
-      textY = y + height + fontSize + 6;
+      textY = labelY + labelH + fontSize + 6;
     } else {
       switch (verticalAlign) {
         case 'top': {
           const topOffset = 6;
-          textY = y + fontSize + topOffset + spacingTop;
+          textY = labelY + fontSize + topOffset + spacingTop;
           break;
         }
         case 'bottom':
-          textY = y + height - 4; // Small padding from bottom
+          textY = labelY + labelH - 4; // Small padding from bottom
           break;
         case 'middle':
         default:
-          // Vertical centering formula: textY = y + height/2 + fontSize/2 - 1
-          // Combined with labelBounds: bounds.y = state.y + height/2 (margin.y = -0.5)
+          // Vertical centering formula: textY = labelY + labelH/2 + fontSize/2 - 1
           if (style.shape === 'partialRectangle') {
-            // partialRectangle uses standard baseline: fontSize/2 - 1
-            textY = y + height / 2 + fontSize / 2 - 1;
+            textY = labelY + labelH / 2 + fontSize / 2 - 1;
           } else if (isTextShape) {
-            // Match the platform text baseline for centered text shapes
-            textY = y + height / 2 + fontSize / 2 - 1 + spacingTop / 2;
+            textY = labelY + labelH / 2 + fontSize / 2 - 1 + spacingTop / 2;
           } else if (hasSpacingOverrides) {
-            // Match the platform spacing behavior when spacing styles are present
-            textY = y + height / 2 + fontSize / 2 - 1 + (effectiveSpacingTop - effectiveSpacingBottom) / 2;
+            textY = labelY + labelH / 2 + fontSize / 2 - 1 + (effectiveSpacingTop - effectiveSpacingBottom) / 2;
           } else {
-            // Standard the platform middle alignment formula
-            textY = y + height / 2 + fontSize / 2 - 1;
+            textY = labelY + labelH / 2 + fontSize / 2 - 1;
             if (spacingTop !== 0) {
               textY += spacingTop / 2;
             }
