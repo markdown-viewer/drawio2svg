@@ -135,8 +135,8 @@ export class UmlLifelineHandler extends RectangleShapeHandler {
       builder.curveTo(cx, y + capH * 2, x + width, y + capH * 2, x + width, y + capH);
       builder.stroke();
     } else if (participant === 'umlCollections') {
-      // Two stacked rectangles with small offset
-      const offset = 4;
+      // Two stacked rectangles with small offset (proportional to icon size)
+      const offset = Math.round(actualSize * 0.14);
 
       // Back rectangle (shifted right and up)
       builder.rect(x + offset, y, width - offset, actualSize - offset);
@@ -147,7 +147,7 @@ export class UmlLifelineHandler extends RectangleShapeHandler {
       builder.fillAndStroke();
     } else if (participant === 'umlQueue') {
       // Horizontal stadium shape (queue icon)
-      const dx = 5;
+      const dx = Math.round(actualSize * 0.18);
       const midY = y + actualSize / 2;
 
       // Main body path
