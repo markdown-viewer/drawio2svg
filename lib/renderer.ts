@@ -1563,7 +1563,7 @@ export class SvgRenderer {
         // Used for PlantUML's 0) / (0 decoration
         // Both circle and arc share the same center (tipX/tipY);
         // arc radius is slightly larger than the circle radius.
-        const r = size / 2;
+        const r = (size + strokeWidth * 2) / 2;
         const arcR = r + strokeWidth * 2;
         const perpX = -sin;
         const perpY = cos;
@@ -1617,8 +1617,8 @@ export class SvgRenderer {
       case 'halfCircle': {
         const unitX = cos;
         const unitY = sin;
-        const nx = unitX * (size + strokeWidth + 1);
-        const ny = unitY * (size + strokeWidth + 1);
+        const nx = unitX * (size + strokeWidth * 2);
+        const ny = unitY * (size + strokeWidth * 2);
         const tip = { x: tipX, y: tipY };
         const end = { x: tipX - nx, y: tipY - ny };
         const start = { x: tip.x - ny, y: tip.y + nx };
@@ -1633,7 +1633,7 @@ export class SvgRenderer {
         }, 'none');
 
         boundPoints = [start, finish, ctrl1, ctrl2];
-        lineOffset = size + strokeWidth + 1;
+        lineOffset = size + strokeWidth * 2;
         break;
       }
       case 'cross': {
@@ -1699,7 +1699,7 @@ export class SvgRenderer {
       }
       case 'circlePlus': {
         // Circle-plus marker (SysML): circle centered at the original tip with a plus inside
-        const r = size + strokeWidth;
+        const r = size + strokeWidth * 2;
         const center = {
           x: tipX - r * cos,
           y: tipY - r * sin
@@ -1709,6 +1709,7 @@ export class SvgRenderer {
           const ellipse = this.builder.createEllipse(center.x, center.y, r, r);
           ellipse.setAttribute('fill', fillValue);
           ellipse.setAttribute('stroke', strokeColor);
+          ellipse.setAttribute('stroke-width', String(strokeWidth));
           ellipse.setAttribute('stroke-miterlimit', '10');
           ellipse.setAttribute('pointer-events', 'all');
           group.appendChild(ellipse);
@@ -1743,7 +1744,7 @@ export class SvgRenderer {
         // Layout: |line|---[arrowhead]---[dot at tip]---|endpoint|
         if (arrowType.endsWith('Dot')) {
           const baseType = arrowType.slice(0, -3);
-          const dotRadius = size * 0.5;
+          const dotRadius = (size + strokeWidth * 2) * 0.5;
           // Offset the base arrow behind the dot so arrowhead doesn't overlap
           const baseTipX = tipX - dotRadius * cos;
           const baseTipY = tipY - dotRadius * sin;
@@ -4763,6 +4764,7 @@ export class SvgRenderer {
           normalizedPoints,
           middleShapeType as MiddleShapeType,
           strokeColor,
+          strokeWidth,
         );
         if (msResult.boundPoints.length > 0) {
           if (boundPointsOverride) {

@@ -62,9 +62,9 @@ function findMidpoint(points: Point[]): { point: Point; angle: number } {
   return { point: { ...points[mid] }, angle: 0 };
 }
 
-const BALL_RADIUS = 4;
-const ARC_RADIUS = 7;
-const SHAPE_STROKE_WIDTH = 1;
+// Base radii at strokeWidth=1; matches oval arrow: (size + strokeWidth * 2) / 2 where size=6
+const BASE_BALL_RADIUS = 3;
+const BASE_ARC_RADIUS = 7;
 
 /**
  * Render a middle shape (ball/socket) at the midpoint of an edge.
@@ -74,10 +74,15 @@ export function renderMiddleShape(
   normalizedPoints: Point[],
   shapeType: MiddleShapeType,
   strokeColor: string,
+  strokeWidth: number = 1,
 ): MiddleShapeResult {
   const { builder } = ctx;
   const group = ctx.getCurrentGroup();
   if (!group) return { elements: [], boundPoints: [] };
+
+  // Scale dimensions with strokeWidth — ball uses same formula as oval arrow: base + strokeWidth
+  const BALL_RADIUS = BASE_BALL_RADIUS + strokeWidth;
+  const ARC_RADIUS = BASE_ARC_RADIUS + strokeWidth * 2;
 
   const { point: center, angle } = findMidpoint(normalizedPoints);
   const cx = Number(center.x.toFixed(2));
@@ -96,7 +101,7 @@ export function renderMiddleShape(
     const eraseCircle = builder.createEllipse(cx, cy, ARC_RADIUS, ARC_RADIUS);
     eraseCircle.setAttribute('fill', '#FFFFFF');
     eraseCircle.setAttribute('stroke', '#FFFFFF');
-    eraseCircle.setAttribute('stroke-width', '1');
+    eraseCircle.setAttribute('stroke-width', String(strokeWidth));
     group.appendChild(eraseCircle);
     elements.push(eraseCircle);
   }
@@ -122,7 +127,7 @@ export function renderMiddleShape(
     const arc = builder.createPath(d);
     arc.setAttribute('fill', 'none');
     arc.setAttribute('stroke', strokeColor);
-    arc.setAttribute('stroke-width', String(SHAPE_STROKE_WIDTH));
+    arc.setAttribute('stroke-width', String(strokeWidth));
     group.appendChild(arc);
     elements.push(arc);
     boundPoints.push(arcStart, arcEnd, {
@@ -147,7 +152,7 @@ export function renderMiddleShape(
     const arc = builder.createPath(d);
     arc.setAttribute('fill', 'none');
     arc.setAttribute('stroke', strokeColor);
-    arc.setAttribute('stroke-width', String(SHAPE_STROKE_WIDTH));
+    arc.setAttribute('stroke-width', String(strokeWidth));
     group.appendChild(arc);
     elements.push(arc);
     boundPoints.push(arcStart, arcEnd, {
@@ -160,7 +165,7 @@ export function renderMiddleShape(
   const ball = builder.createEllipse(cx, cy, BALL_RADIUS, BALL_RADIUS);
   ball.setAttribute('fill', '#FFFFFF');
   ball.setAttribute('stroke', strokeColor);
-  ball.setAttribute('stroke-width', String(SHAPE_STROKE_WIDTH));
+  ball.setAttribute('stroke-width', String(strokeWidth));
   ball.setAttribute('stroke-miterlimit', '10');
   ball.setAttribute('pointer-events', 'all');
   group.appendChild(ball);
