@@ -15,16 +15,13 @@ export class StartStateHandler extends EllipseShapeHandler {
     const { builder, currentGroup, applyShapeAttrsToBuilder, x, y, width, height } = this.renderCtx;
     if (!builder || !currentGroup) return;
 
-    const size = Math.max(0, Math.min(width, height) - 8);
-    const rx = size / 2;
-    const ry = size / 2;
-    const cx = x + width / 2;
-    const cy = y + height / 2;
+    // Matches draw.io StateShape with outerStroke=false (startState)
+    const inset = Math.min(4, Math.min(width / 5, height / 5));
 
     builder.setCanvasRoot(currentGroup);
     builder.save();
     applyShapeAttrsToBuilder(builder, attrs);
-    builder.ellipse(cx - rx, cy - ry, rx * 2, ry * 2);
+    builder.ellipse(x + inset, y + inset, width - 2 * inset, height - 2 * inset);
     builder.fillAndStroke();
     builder.restore();
   }

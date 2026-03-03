@@ -15,20 +15,21 @@ export class EndStateHandler extends EllipseShapeHandler {
     const { builder, currentGroup, applyShapeAttrsToBuilder, x, y, width, height } = this.renderCtx;
     if (!builder || !currentGroup) return;
 
-    const outerSize = Math.max(0, Math.min(width, height));
-    // Inner circle proportional to outerSize (gap = 36% of outer, i.e. 4/5 of original 45% gap)
-    const innerSize = Math.max(0, Math.round(outerSize * 0.64));
-    const cx = x + width / 2;
-    const cy = y + height / 2;
+    // Matches draw.io StateShape with outerStroke=true (endState)
+    const inset = Math.min(4, Math.min(width / 5, height / 5));
 
     builder.setCanvasRoot(currentGroup);
     builder.save();
     applyShapeAttrsToBuilder(builder, attrs);
-    builder.ellipse(cx - innerSize / 2, cy - innerSize / 2, innerSize, innerSize);
-    builder.fillAndStroke();
 
+    if (width > 0 && height > 0) {
+      builder.ellipse(x + inset, y + inset, width - 2 * inset, height - 2 * inset);
+      builder.fillAndStroke();
+    }
+
+    // Outer stroke without shadow
     builder.setFillColor(null);
-    builder.ellipse(cx - outerSize / 2, cy - outerSize / 2, outerSize, outerSize);
+    builder.ellipse(x, y, width, height);
     builder.stroke();
     builder.restore();
   }
