@@ -16,7 +16,7 @@ export class EndStateHandler extends EllipseShapeHandler {
     if (!builder || !currentGroup) return;
 
     // Matches draw.io StateShape with outerStroke=true (endState)
-    const inset = Math.min(4, Math.min(width / 5, height / 5));
+    const inset = Math.min(width / 5, height / 5);
 
     builder.setCanvasRoot(currentGroup);
     builder.save();
