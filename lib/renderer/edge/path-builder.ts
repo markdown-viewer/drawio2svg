@@ -10,7 +10,8 @@ export function buildEdgePath(
   edgeRounded: boolean,
   isOrthogonalEdge: boolean,
   edgeStyle: string,
-  isLoop: boolean = false
+  isLoop: boolean = false,
+  arcSizeOverride?: number
 ): string {
   if (curved) {
     if (allPoints.length === 2) {
@@ -42,7 +43,7 @@ export function buildEdgePath(
   // draw.io's addPoints always applies rounded corners when isRounded=true,
   // regardless of axis alignment. The default stylesheet sets rounded=1 for edges.
   if (edgeRounded && allPoints.length > 2) {
-    return buildRoundedOrthogonalPath(allPoints);
+    return buildRoundedOrthogonalPath(allPoints, arcSizeOverride);
   }
 
   let pathD = `M ${allPoints[0].x} ${allPoints[0].y}`;
@@ -56,8 +57,8 @@ export function buildEdgePath(
  * Build rounded orthogonal path with bezier corners
  * Matches mxShape.addPoints from the platform
  */
-export function buildRoundedOrthogonalPath(allPoints: Point[]): string {
-  const arcSize = 10; // LINE_ARCSIZE / 2
+export function buildRoundedOrthogonalPath(allPoints: Point[], arcSizeOverride?: number): string {
+  const arcSize = arcSizeOverride != null ? arcSizeOverride / 2 : 10; // LINE_ARCSIZE / 2
   const pts = allPoints;
   const round2 = (value: number): number => Number(value.toFixed(2));
 

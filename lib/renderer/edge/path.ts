@@ -8,9 +8,10 @@ export interface EdgePathParams {
   isOrthogonalEdge: boolean;
   edgeStyle: string;
   isLoop: boolean;
+  arcSize?: number;
 }
 
 export function getEdgePathD(params: EdgePathParams): string {
-  const { points, curved, edgeRounded, isOrthogonalEdge, edgeStyle, isLoop } = params;
-  return buildEdgePath(points, curved, edgeRounded, isOrthogonalEdge, edgeStyle, isLoop);
+  const { points, curved, edgeRounded, isOrthogonalEdge, edgeStyle, isLoop, arcSize } = params;
+  return buildEdgePath(points, curved, edgeRounded, isOrthogonalEdge, edgeStyle, isLoop, arcSize);
 }

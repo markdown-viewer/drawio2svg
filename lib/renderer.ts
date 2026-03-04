@@ -4083,6 +4083,7 @@ export class SvgRenderer {
       return scaledTokens.join(' ');
     })();
     const edgeRoundedForPath = edgeRounded || isIsometricEdge;
+    const edgeArcSize = parseFloat(style.arcSize as string);
     const edgeHasShadow = style.shadow === '1' || style.shadow === true;
 
     // Calculate angles for arrows
@@ -4722,6 +4723,7 @@ export class SvgRenderer {
       isOrthogonalEdge: isOrthogonalEdgeForPath,
       edgeStyle: edgeStyle ?? '',
       isLoop,
+      arcSize: Number.isFinite(edgeArcSize) ? edgeArcSize : undefined,
     });
     let boundPointsOverride: Point[] | null = null;
 
