@@ -339,6 +339,7 @@ export interface ShapeAttrs {
   gradientDirection?: string;
   patternId?: string;
   patternStrokeColor?: string;
+  fontFamily?: string;
 }
 
 /**

@@ -209,6 +209,7 @@ export function parseShapeAttrs(
     gradientDirection: gradientDirectionKey,
     patternId,
     patternStrokeColor,
+    fontFamily: style.fontFamily as string | undefined,
   };
 }
 
@@ -379,4 +380,8 @@ export function applyShapeAttrsToBuilder(
   builder.setLineJoin(lineJoin || 'miter');
   builder.setLineCap(lineCap || 'flat');
   builder.setShadow(false);
+
+  if (attrs.fontFamily) {
+    builder.setFontFamily(attrs.fontFamily);
+  }
 }
