@@ -42,10 +42,19 @@ export function convertToXhtml(html: string, domParser: DOMParser): string {
     return htmlTagNames.has(normalizedTag) ? '<' : '<>';
   });
 
-  const decodedHtml = decodeEncodedHtmlTags(normalizedRawHtml)
+  // Protect <pre>...</pre> blocks from entity decoding and newline conversion.
+  // Inside <pre><code>, entities like &lt;b&gt; are intentional literal text —
+  // decoding them would turn them into real HTML tags, changing the visible content.
+  const preBlocks: string[] = [];
+  const withProtectedPre = normalizedRawHtml.replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi, (match) => {
+    preBlocks.push(match);
+    return `\x00PRE${preBlocks.length - 1}\x00`;
+  });
+
+  const decodedHtml = decodeEncodedHtmlTags(withProtectedPre)
     .replace(/&amp;nbsp;|&nbsp;/g, '\u00a0')
     .replace(/&#x0?A;|&#10;|&#x0?D;|&#13;/gi, '\n');
-  const hasTags = /<[^>]+>/.test(decodedHtml);
+  const hasTags = /<[^>]+>/.test(decodedHtml) || preBlocks.length > 0;
   let normalized = decodedHtml;
   if (!hasTags) {
     const parts = decodedHtml.split(/\r\n|\r|\n/);
@@ -62,6 +71,12 @@ export function convertToXhtml(html: string, domParser: DOMParser): string {
     // For HTML content, convert newlines to <br> as draw.io does
     // &#10; entities represent explicit line breaks in cell values
     normalized = decodedHtml.replace(/\r\n|\r|\n/g, '<br>');
+  }
+
+  // Restore protected <pre> blocks, converting &#10;/&#13; entities to <br> for rendering
+  for (let i = 0; i < preBlocks.length; i++) {
+    const restored = preBlocks[i].replace(/&#x0?A;|&#10;|&#x0?D;|&#13;/gi, '<br>');
+    normalized = normalized.replace(`\x00PRE${i}\x00`, restored);
   }
 
   // Parse as HTML (match the platform's convertHtml behavior)
