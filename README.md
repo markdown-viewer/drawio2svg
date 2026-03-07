@@ -99,38 +99,6 @@ import { decompress } from '@markdown-viewer/drawio2svg';
 const decompressedXml = decompress(compressedDrawioXml);
 ```
 
-### Text Measurement
-
-In fibjs environments, a WebView-based text measurement provider is **automatically configured** when you import `@markdown-viewer/drawio2svg`. No manual setup is needed.
-
-You can also set a custom provider if desired:
-
-```typescript
-import { 
-  setTextMeasureProvider, 
-  getTextMeasureProvider,
-  resetTextMeasureProvider 
-} from '@markdown-viewer/drawio2svg';
-
-// Set a custom provider
-setTextMeasureProvider({
-  measureText(text, fontSize, fontFamily, fontWeight, fontStyle, isHtml) {
-    // Return { width, height } in pixels
-    return { width: estimatedWidth, height: estimatedHeight };
-  },
-  measureTextLayout(text, fontSize, fontFamily, fontWeight, fontStyle, containerWidth, isHtml) {
-    // Return layout info with line details
-    return { width, height, lineCount, lineHeight };
-  }
-});
-
-// Get current provider
-const provider = getTextMeasureProvider();
-
-// Reset to default
-resetTextMeasureProvider();
-```
-
 ### Stencil Support
 
 Load and use custom mxGraph stencil libraries.
