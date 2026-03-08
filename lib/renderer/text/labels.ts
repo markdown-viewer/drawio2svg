@@ -1510,8 +1510,8 @@ export function renderSwimlaneNativeLabel(
     textX = x + width - spacingRight - baseInset;
     textAnchor = 'end';
   } else {
-    // center (default)
-    textX = x + width / 2;
+    // center (default) — account for spacingLeft/spacingRight to center within available area
+    textX = x + spacingLeft + (width - spacingLeft - spacingRight) / 2;
     textAnchor = 'middle';
   }
 
@@ -1597,6 +1597,8 @@ export function renderSwimlaneHtmlLabel(
   const fontFamily = (style.fontFamily as string) || DEFAULT_FONT_FAMILY;
   const hasFontStyle = style.fontStyle !== undefined;
   const fontStyle = parseInt(style.fontStyle as string) || 0;
+  const spacingLeft = parseFloat(style.spacingLeft as string) || 0;
+  const spacingRight = parseFloat(style.spacingRight as string) || 0;
 
   // Font style flags: 1=bold, 2=italic, 4=underline
   // Swimlane titles are bold by default unless explicitly set otherwise
@@ -1648,7 +1650,7 @@ export function renderSwimlaneHtmlLabel(
     whiteSpaceStyle = 'white-space: normal; overflow-wrap: normal;';
   } else {
     // No wrap mode: use width: 1px; height: 1px centered
-    marginLeft = Math.round(x + width / 2);
+    marginLeft = Math.round(x + spacingLeft + (width - spacingLeft - spacingRight) / 2);
     if (valign === 'top') {
       paddingTop = Math.round(y + fontSize / 2 + 1);
     } else if (valign === 'bottom') {
