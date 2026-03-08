@@ -5,6 +5,25 @@ import { measureText, measureMultilineText, measureTextLayout, DEFAULT_FONT_FAMI
 import { getLabelBounds, getAlignmentAsPoint } from './label-bounds.ts';
 import { getTextLayoutInfo } from './metrics.ts';
 
+/**
+ * Properly quote a CSS font-family value.
+ * Splits comma-separated font stack and quotes names containing spaces.
+ *   'Times New Roman, serif' → '"Times New Roman", serif'
+ *   'Helvetica'              → 'Helvetica'
+ */
+export function quoteFontFamily(value: string): string {
+  return value.split(',').map(part => {
+    const t = part.trim();
+    if (!t) return t;
+    // Already quoted
+    if ((t[0] === '"' && t[t.length - 1] === '"') ||
+        (t[0] === "'" && t[t.length - 1] === "'")) return t;
+    // Quote if it contains spaces
+    if (t.includes(' ')) return `"${t}"`;
+    return t;
+  }).join(', ');
+}
+
 export interface ClipPathRect {
   x: number;
   y: number;
@@ -193,7 +212,7 @@ export function renderNativeTextLabel(
   // Create text group with styling
   const textGroup = builder.createGroup();
   textGroup.setAttribute('fill', fontColor);
-  textGroup.setAttribute('font-family', `"${fontFamily}"`);
+  textGroup.setAttribute('font-family', quoteFontFamily(fontFamily));
   textGroup.setAttribute('font-size', `${fontSize}px`);
 
   if (isBold) textGroup.setAttribute('font-weight', 'bold');
@@ -1005,7 +1024,7 @@ export function renderHtmlLabel(
     const textStyle = [
       'display: inline-block',
       `font-size: ${fontSize}px`,
-      `font-family: "${fontFamily}"`,
+      `font-family: ${quoteFontFamily(fontFamily)}`,
       `color: ${fontColor}`,
       'line-height: 1.2',
       'pointer-events: all',
@@ -1113,7 +1132,7 @@ export function renderLabelWithClipPath(
     const textOuterGroup = ctx.builder.createGroup();
     const textInnerGroup = ctx.builder.createGroup();
     textInnerGroup.setAttribute('fill', fontColor);
-    textInnerGroup.setAttribute('font-family', `"${fontFamily}"`);
+    textInnerGroup.setAttribute('font-family', quoteFontFamily(fontFamily));
     if (isBold) textInnerGroup.setAttribute('font-weight', 'bold');
     if (isItalic) textInnerGroup.setAttribute('font-style', 'italic');
     if (isUnderline) textInnerGroup.setAttribute('text-decoration', 'underline');
@@ -1179,7 +1198,7 @@ function renderEdgeLabelNative(
   const outerG = builder.createGroup();
   const innerG = builder.createGroup();
   innerG.setAttribute('fill', fontColor);
-  innerG.setAttribute('font-family', `"${fontFamily}"`);
+  innerG.setAttribute('font-family', quoteFontFamily(fontFamily));
   innerG.setAttribute('font-size', `${fontSize}px`);
 
   if (align === 'right') {
@@ -1402,7 +1421,7 @@ export function renderEdgeLabel(
     const textStyle = [
       'display: inline-block',
       `font-size: ${fontSize}px`,
-      `font-family: "${fontFamily}"`,
+      `font-family: ${quoteFontFamily(fontFamily)}`,
       `color: ${fontColor}`,
       'line-height: 1.2',
       'pointer-events: all',
@@ -1539,7 +1558,7 @@ export function renderSwimlaneNativeLabel(
   }
 
   textGroup.setAttribute('fill', fontColor);
-  textGroup.setAttribute('font-family', `"${fontFamily}"`);
+  textGroup.setAttribute('font-family', quoteFontFamily(fontFamily));
   textGroup.setAttribute('font-size', `${fontSize}px`);
   textGroup.setAttribute('text-anchor', textAnchor);
 
@@ -1707,7 +1726,7 @@ export function renderSwimlaneHtmlLabel(
     const textStyle = [
       'display: inline-block',
       `font-size: ${fontSize}px`,
-      `font-family: "${fontFamily}"`,
+      `font-family: ${quoteFontFamily(fontFamily)}`,
       `color: ${fontColor}`,
       'line-height: 1.2',
       'pointer-events: all',

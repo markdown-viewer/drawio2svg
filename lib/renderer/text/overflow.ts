@@ -1,5 +1,6 @@
 import type { MxStyle } from '../../parser.ts';
 import type { TextRenderContext } from './labels.ts';
+import { quoteFontFamily } from './labels.ts';
 import { DEFAULT_FONT_FAMILY } from '@markdown-viewer/text-measure';
 
 interface OverflowTextParams {
@@ -73,7 +74,7 @@ export function renderOverflowTextCell(
     const textOuterGroup = ctx.builder.createGroup();
     const textInnerGroup = ctx.builder.createGroup();
     textInnerGroup.setAttribute('fill', fontColor);
-    textInnerGroup.setAttribute('font-family', `"${fontFamily}"`);
+    textInnerGroup.setAttribute('font-family', quoteFontFamily(fontFamily));
     if (isUnderline) textInnerGroup.setAttribute('text-decoration', 'underline');
     textInnerGroup.setAttribute('clip-path', `url(#${clipId})`);
     textInnerGroup.setAttribute('font-size', `${fontSize}px`);

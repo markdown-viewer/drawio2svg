@@ -29,6 +29,7 @@ import {
   renderLabel as renderLabelHelper,
   renderEdgeLabel as renderEdgeLabelHelper,
   renderSwimlaneLabel as renderSwimlaneLabelHelper,
+  quoteFontFamily,
   type TextRenderContext
 } from './renderer/text/labels.ts';
 import { getTextMeasureProvider, DEFAULT_FONT_FAMILY, setDefaultFontFamily } from '@markdown-viewer/text-measure';
@@ -2916,7 +2917,7 @@ export class SvgRenderer {
             x: pending.x,
             y: textY,
             fill: state.fontColor,
-            'font-family': state.fontFamily,
+            'font-family': quoteFontFamily(state.fontFamily),
             'font-size': fontSize,
           };
           if (pending.align === 'center') textAttrs['text-anchor'] = 'middle';

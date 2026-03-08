@@ -1,5 +1,6 @@
 import type { MxStyle } from '../../parser.ts';
 import type { TextRenderContext } from './labels.ts';
+import { quoteFontFamily } from './labels.ts';
 import { measureText, DEFAULT_FONT_FAMILY } from '@markdown-viewer/text-measure';
 
 interface EdgeChildLabelParams {
@@ -64,7 +65,7 @@ export function renderEdgeChildLabel(
     const outerG = builder.createGroup();
     const innerG = builder.createGroup();
     innerG.setAttribute('fill', fontColor);
-    innerG.setAttribute('font-family', `"${fontFamily}"`);
+    innerG.setAttribute('font-family', quoteFontFamily(fontFamily));
     // Map DrawIO align to SVG text-anchor
     if (align === 'right') {
       innerG.setAttribute('text-anchor', 'end');
@@ -225,7 +226,7 @@ export function renderEdgeChildLabel(
   const textStyle = [
     'display: inline-block',
     `font-size: ${fontSize}px`,
-    `font-family: "${fontFamily}"`,
+    `font-family: ${quoteFontFamily(fontFamily)}`,
     `color: ${fontColor}`,
     'line-height: 1.2',
     'pointer-events: all',
