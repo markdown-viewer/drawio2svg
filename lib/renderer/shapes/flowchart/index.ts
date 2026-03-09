@@ -9,6 +9,8 @@ import { StepHandler } from './step.ts';
 import { TapeHandler } from './tape.ts';
 import { FlowchartDocument2Handler } from './document2.ts';
 import { OffPageConnectorHandler } from './off-page-connector.ts';
+import { SdlInputHandler } from './sdl-input.ts';
+import { SdlContinuousHandler } from './sdl-continuous.ts';
 import { EllipseHandler } from '../core/ellipse.ts';
 
 export function registerFlowchartHandlers(registry: ShapeRegistry): void {
@@ -23,4 +25,6 @@ export function registerFlowchartHandlers(registry: ShapeRegistry): void {
   registry.register('tape', TapeHandler);
   registry.register('mxgraph.flowchart.document2', FlowchartDocument2Handler);
   registry.register('horizontalPentagon', OffPageConnectorHandler);
+  registry.register('sdlInput', SdlInputHandler);
+  registry.register('sdlContinuous', SdlContinuousHandler);
 }
