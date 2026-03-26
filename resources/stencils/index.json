@@ -1,9 +1,9 @@
 {
   "version": 2,
   "generatedAt": "2026-02-04T15:37:19.793Z",
-  "totalShapes": 8910,
+  "totalShapes": 8940,
   "totalConstraints": 18882,
-  "totalGroups": 48,
+  "totalGroups": 49,
   "totalFiles": 202,
   "groups": [
     {
@@ -293,6 +293,12 @@
       "file": "weblogos.json",
       "count": 178,
       "size": 149696
+    },
+    {
+      "group": "aws4-extra",
+      "file": "aws4-extra.json",
+      "count": 31,
+      "size": 34792
     }
   ]
 }

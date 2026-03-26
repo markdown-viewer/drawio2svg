@@ -2796,6 +2796,7 @@ export class SvgRenderer {
       lineJoin?: string;
       lineCap?: string;
       miterLimit?: number;
+      fillRule?: 'evenodd' | 'nonzero';
       fontFamily: string;
       fontSize: number;
       fontStyle: number;
@@ -2849,6 +2850,7 @@ export class SvgRenderer {
         const fillOp = state.fillAlpha * effectiveAlpha;
         // Skip fill-opacity when fill is 'none' (no visual effect, matches draw.io behavior)
         if (fillOp !== 1 && state.fillColor !== 'none') attrs['fill-opacity'] = fillOp;
+        if (state.fillRule) attrs['fill-rule'] = state.fillRule;
       } else {
         attrs.fill = 'none';
       }
@@ -3019,6 +3021,8 @@ export class SvgRenderer {
         state.lineCap = op.lineCap;
       } else if ('miterLimit' in op) {
         state.miterLimit = op.miterLimit;
+      } else if ('fillRule' in op) {
+        state.fillRule = op.fillRule;
       } else if ('fontFamily' in op) {
         state.fontFamily = op.fontFamily;
       } else if ('fontSize' in op) {

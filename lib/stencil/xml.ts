@@ -52,6 +52,7 @@ export type DrawOp =
   | { lineJoin: string }
   | { lineCap: string }
   | { miterLimit: number }
+  | { fillRule: 'evenodd' | 'nonzero' }
   // Font operations
   | { fontFamily: string }
   | { fontSize: number }
