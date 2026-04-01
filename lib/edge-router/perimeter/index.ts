@@ -10,6 +10,7 @@ export { getRhombusPerimeterPoint } from './rhombus.ts';
 export { getEllipsePerimeterPoint } from './ellipse.ts';
 export { getTrianglePerimeterPoint } from './triangle.ts';
 export { getHexagonPerimeterPoint } from './hexagon.ts';
+export { getFolderPerimeterPoint } from './folder.ts';
 
 // Type for perimeter function
 export type PerimeterFn = (bounds: CellState, next: Point, orthogonal: boolean, direction?: string) => Point;

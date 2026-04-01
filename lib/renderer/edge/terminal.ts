@@ -132,7 +132,10 @@ export function buildEdgeTerminal(
         ? parseFloat(terminalCell.style.perimeterSpacing as string)
         : undefined,
       fixedSize: terminalCell.style.fixedSize !== undefined && terminalCell.style.fixedSize !== '0' && terminalCell.style.fixedSize !== 0,
-      size: terminalCell.style.size !== undefined ? parseFloat(terminalCell.style.size as string) : undefined
+      size: terminalCell.style.size !== undefined ? parseFloat(terminalCell.style.size as string) : undefined,
+      tabWidth: terminalCell.style.tabWidth !== undefined ? parseFloat(terminalCell.style.tabWidth as string) : undefined,
+      tabHeight: terminalCell.style.tabHeight !== undefined ? parseFloat(terminalCell.style.tabHeight as string) : undefined,
+      tabPosition: terminalCell.style.tabPosition as string | undefined,
     };
     state.portConstraintMask = getPortConstraintMask(terminalCell.style, edgeStyle, rotation, kind === 'source');
 

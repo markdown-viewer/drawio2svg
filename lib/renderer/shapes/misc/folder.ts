@@ -1,10 +1,15 @@
 import type { RenderContext, ShapeAttrs } from '../../../renderer.ts';
 import { RectangleShapeHandler } from '../../shape-registry.ts';
-import type { LabelOverrides } from '../../shape-registry.ts';
+import type { LabelOverrides, PerimeterFn } from '../../shape-registry.ts';
+import { getFolderPerimeterPoint } from '../../../edge-router/perimeter/folder.ts';
 
 export class FolderHandler extends RectangleShapeHandler {
   constructor(renderCtx: RenderContext) {
     super(renderCtx);
+  }
+
+  getPerimeter(): PerimeterFn {
+    return getFolderPerimeterPoint;
   }
 
   getLabelOverrides(): LabelOverrides | null {

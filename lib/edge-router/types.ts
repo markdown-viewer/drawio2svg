@@ -21,4 +21,7 @@ export interface CellState {
   perimeterSpacing?: number; // Extra spacing for perimeter
   fixedSize?: boolean; // Whether shape uses fixed size mode
   size?: number; // Shape size parameter (e.g., hexagon corner offset)
+  tabWidth?: number; // Folder tab width
+  tabHeight?: number; // Folder tab height
+  tabPosition?: string; // Folder tab position ('left' or 'right')
 }
