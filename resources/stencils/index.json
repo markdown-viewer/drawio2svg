@@ -293,12 +293,6 @@
       "file": "weblogos.json",
       "count": 178,
       "size": 149696
-    },
-    {
-      "group": "aws4-extra",
-      "file": "aws4-extra.json",
-      "count": 31,
-      "size": 34792
     }
   ]
 }
