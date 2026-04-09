@@ -1,6 +1,6 @@
 {
   "name": "@markdown-viewer/drawio2svg",
-  "version": "1.4.2",
+  "version": "1.5.0",
   "description": "Lightweight DrawIO to SVG converter for browser and fibjs",
   "type": "module",
   "main": "lib/index.ts",
@@ -38,7 +38,7 @@
     "fibjs": ">=0.38.0"
   },
   "dependencies": {
-    "@markdown-viewer/text-measure": "^1.0.0",
+    "@markdown-viewer/text-measure": "^1.1.0",
     "pako": "^2.1.0"
   },
   "devDependencies": {
