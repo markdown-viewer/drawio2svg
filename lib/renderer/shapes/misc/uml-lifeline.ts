@@ -198,8 +198,12 @@ export class UmlLifelineHandler extends RectangleShapeHandler {
     }
 
     if (actualSize < height) {
+      const lifelineStrokeColor = typeof style.strokeColor2 === 'string' ? style.strokeColor2 : null;
+      const lifelineStrokeWidth = parseFloat(style.strokeWidth2 as string);
       builder.setFillColor(null);
       builder.setDashed(lifelineDashed);
+      if (lifelineStrokeColor) builder.setStrokeColor(lifelineStrokeColor);
+      if (Number.isFinite(lifelineStrokeWidth)) builder.setStrokeWidth(lifelineStrokeWidth);
       builder.begin();
       builder.addPoints(
         [
