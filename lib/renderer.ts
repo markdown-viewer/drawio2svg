@@ -4764,10 +4764,17 @@ export class SvgRenderer {
     if (middleShapeType && this.builder) {
       const validTypes = new Set(['ball', 'ballSocket', 'socketBall', 'socket']);
       if (validTypes.has(middleShapeType)) {
+        const rawMiddleFillColor = style.middleFillColor as string | undefined;
+        const middleFillColor = rawMiddleFillColor
+          ? this.normalizeColor(rawMiddleFillColor)
+          : (this.options.backgroundColor !== 'transparent'
+              ? this.normalizeColor(this.options.backgroundColor)
+              : '#FFFFFF');
         const msResult = renderMiddleShape(
           {
             builder: this.builder,
             getCurrentGroup: () => this.currentGroup,
+            fillColor: middleFillColor,
           },
           normalizedPoints,
           middleShapeType as MiddleShapeType,

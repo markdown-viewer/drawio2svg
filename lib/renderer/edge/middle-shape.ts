@@ -14,6 +14,7 @@ export type MiddleShapeType = 'ball' | 'ballSocket' | 'socketBall' | 'socket';
 export interface MiddleShapeContext {
   builder: SvgBuilder;
   getCurrentGroup: () => Element | null;
+  fillColor: string;
 }
 
 export interface MiddleShapeResult {
@@ -79,6 +80,7 @@ export function renderMiddleShape(
   const { builder } = ctx;
   const group = ctx.getCurrentGroup();
   if (!group) return { elements: [], boundPoints: [] };
+  const fillColor = ctx.fillColor;
 
   // Scale dimensions with strokeWidth — ball uses same formula as oval arrow: base + strokeWidth
   const BALL_RADIUS = BASE_BALL_RADIUS + strokeWidth;
@@ -96,11 +98,11 @@ export function renderMiddleShape(
   const elements: Element[] = [];
   const boundPoints: Point[] = [];
 
-  // For full socket '(0)', draw a white background circle to erase the line beneath
+  // For full socket '(0)', draw a background circle to erase the line beneath.
   if (shapeType === 'socket') {
     const eraseCircle = builder.createEllipse(cx, cy, ARC_RADIUS, ARC_RADIUS);
-    eraseCircle.setAttribute('fill', '#FFFFFF');
-    eraseCircle.setAttribute('stroke', '#FFFFFF');
+    eraseCircle.setAttribute('fill', fillColor);
+    eraseCircle.setAttribute('stroke', fillColor);
     eraseCircle.setAttribute('stroke-width', String(strokeWidth));
     group.appendChild(eraseCircle);
     elements.push(eraseCircle);
@@ -163,7 +165,7 @@ export function renderMiddleShape(
 
   // Draw the ball (circle) — always present
   const ball = builder.createEllipse(cx, cy, BALL_RADIUS, BALL_RADIUS);
-  ball.setAttribute('fill', '#FFFFFF');
+  ball.setAttribute('fill', fillColor);
   ball.setAttribute('stroke', strokeColor);
   ball.setAttribute('stroke-width', String(strokeWidth));
   ball.setAttribute('stroke-miterlimit', '10');
