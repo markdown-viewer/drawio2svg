@@ -215,4 +215,7 @@ interface MxCell {
 
 ## License
 
-MIT
+This package is dual-licensed:
+
+- Open-source license: **GPL-3.0-only**
+- Commercial/private license: available by separate negotiation
